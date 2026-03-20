@@ -565,7 +565,7 @@ function showTooltip(site,ev,pinned){
   h+="<div style='font-size:10px;color:var(--text3);margin-top:5px;line-height:1.4'>"+confNote(conf)+"</div>";
   var iT=encodeURIComponent("Data correction: "+site.name+" ("+site.country+")");
   var iB=encodeURIComponent("**Site:** "+site.name+", "+site.country+"\n**Current scores:** Solar="+site.solar+" | Humidity="+site.humidity+" | Storage="+site.storage+" | Grid="+site.grid+" | Land="+site.land+"\n**Confidence:** "+conf+"\n\n**Factor to correct:** \n\n**Suggested value:** \n\n**Source / citation:** \n\n**Notes:** ");
-  h+="<a class='tt-report' href='https://github.com/CO2Ri/CDR-Intelligence/issues/new?title="+iT+"&body="+iB+"&labels=data-correction' target='_blank'><span class='tt-report-dot'></span>report a data error \u2197</a>";
+  h+="<a class='tt-report' href='https://github.com/CO2Ri/CDR-Intelligence/issues/new?title="+iT+"&body="+iB+"' target='_blank'><span class='tt-report-dot'></span>report a data error \u2197</a>";
   tooltip.innerHTML=h;
   tooltip.style.display="block";
   tooltip.style.borderColor=pinned?"rgba(74,222,128,0.4)":"var(--border2)";
