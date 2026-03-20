@@ -9,536 +9,431 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-:root {
-  --cream: #f5f0e8;
-  --cream2: #ede7d9;
-  --cream3: #e4dccb;
-  --bark: #2c2416;
-  --bark2: #4a3f2f;
-  --bark3: #6b5c45;
-  --moss: #4a6741;
-  --moss2: #5c8251;
-  --clay: #b5622a;
-  --clay2: #d4773a;
-  --sand: #c9a96e;
-  --sand2: #e8c98a;
-  --sky: #3d7a8a;
-  --mist: rgba(44,36,22,0.06);
-  --mist2: rgba(44,36,22,0.12);
-  --serif: 'Playfair Display', Georgia, serif;
-  --sans: 'Source Sans 3', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
+:root{
+  --cream:#f5f0e8;--cream2:#ede7d9;--cream3:#ddd5c4;--cream4:#d0c6b0;
+  --bark:#2c2416;--bark2:#4a3f2f;--bark3:#7a6d58;
+  --moss:#4a6741;--moss2:#5c8251;--moss3:#7aaa6a;
+  --clay:#b5622a;--clay2:#d4773a;--clay3:#e89060;
+  --sand:#c9a96e;--sand2:#e8c98a;
+  --sky:#3d7a8a;--sky2:#4e9aae;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Source Sans 3',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: var(--cream); color: var(--bark); font-family: var(--sans); }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--cream);color:var(--bark);font-family:var(--sans)}
+#app{display:flex;height:100vh;width:100vw}
 
-/* ─── LAYOUT ─────────────────────────────────────────────────── */
-#app { display: flex; height: 100vh; width: 100vw; }
-#sidebar { width: 380px; min-width: 380px; height: 100%; background: var(--cream); border-right: 1px solid var(--cream3); display: flex; flex-direction: column; overflow: hidden; z-index: 1000; }
-#map-wrap { flex: 1; position: relative; }
-#map { width: 100%; height: 100%; }
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+#sidebar{width:380px;min-width:380px;height:100%;background:var(--cream);border-right:1px solid var(--cream3);display:flex;flex-direction:column;overflow:hidden;z-index:1000}
+#s-head{padding:22px 22px 16px;border-bottom:1px solid var(--cream3);background:linear-gradient(150deg,var(--cream) 0%,var(--cream2) 100%);position:relative;overflow:hidden;flex-shrink:0}
+#s-head::after{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(181,98,42,0.07) 0%,transparent 70%);pointer-events:none}
+.wordmark{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.leaf-mark{width:26px;height:26px;flex-shrink:0;position:relative}
+.leaf-mark svg{width:100%;height:100%}
+.brand-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--bark3)}
+.s-title{font-family:var(--serif);font-size:24px;font-weight:500;color:var(--bark);line-height:1.2;margin-bottom:7px}
+.s-title em{font-style:italic;color:var(--clay)}
+.s-sub{font-size:12px;color:var(--bark3);line-height:1.6;font-weight:300}
+.open-pill{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 10px;background:rgba(74,103,65,0.1);border:1px solid rgba(74,103,65,0.2);border-radius:20px;font-family:var(--mono);font-size:9px;color:var(--moss);letter-spacing:0.06em;text-transform:uppercase}
+.open-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--moss2);animation:breathe 2.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
 
-/* ─── SIDEBAR HEADER ─────────────────────────────────────────── */
-#s-head {
-  padding: 24px 24px 20px;
-  border-bottom: 1px solid var(--cream3);
-  background: linear-gradient(160deg, var(--cream) 0%, var(--cream2) 100%);
-  position: relative;
-  overflow: hidden;
-}
-#s-head::before {
-  content: '';
-  position: absolute;
-  top: -20px; right: -20px;
-  width: 120px; height: 120px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(181,98,42,0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-.wordmark {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.wordmark-leaf {
-  width: 28px; height: 28px;
-  background: var(--moss);
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(-45deg);
-  flex-shrink: 0;
-  position: relative;
-  box-shadow: 0 2px 8px rgba(74,103,65,0.3);
-}
-.wordmark-leaf::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) rotate(45deg);
-  width: 1px; height: 60%;
-  background: rgba(255,255,255,0.5);
-}
-.wordmark-text {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--bark3);
-}
-.s-title {
-  font-family: var(--serif);
-  font-size: 26px;
-  font-weight: 500;
-  color: var(--bark);
-  line-height: 1.15;
-  margin-bottom: 8px;
-}
-.s-title em { font-style: italic; color: var(--clay); }
-.s-sub {
-  font-size: 12px;
-  color: var(--bark3);
-  line-height: 1.6;
-  font-weight: 300;
-}
-.v2-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 10px;
-  padding: 4px 10px;
-  background: rgba(74,103,65,0.1);
-  border: 1px solid rgba(74,103,65,0.2);
-  border-radius: 20px;
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 500;
-  color: var(--moss);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.v2-pill::before {
-  content: '';
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--moss2);
-  animation: breathe 2.5s ease-in-out infinite;
-}
-@keyframes breathe { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+/* FARHAN BIO */
+.farhan-bar{display:flex;align-items:center;gap:10px;padding:10px 22px;background:var(--cream2);border-bottom:1px solid var(--cream3);flex-shrink:0}
+.farhan-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--moss) 0%,var(--clay) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;font-weight:600;color:white;flex-shrink:0}
+.farhan-name{font-size:12px;font-weight:600;color:var(--bark);line-height:1.2}
+.farhan-role{font-size:10px;color:var(--bark3);font-weight:300}
+.linkedin-btn{margin-left:auto;display:flex;align-items:center;gap:5px;padding:5px 10px;background:white;border:1px solid var(--cream3);border-radius:8px;font-family:var(--mono);font-size:9px;color:var(--bark3);cursor:pointer;text-decoration:none;transition:all .15s;flex-shrink:0}
+.linkedin-btn:hover{border-color:var(--sky);color:var(--sky);box-shadow:0 2px 8px rgba(61,122,138,0.15)}
+.linkedin-icon{width:13px;height:13px;fill:currentColor;flex-shrink:0}
 
-/* ─── SIDEBAR BODY ───────────────────────────────────────────── */
-#s-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px 22px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--cream3) transparent;
-}
-#s-body::-webkit-scrollbar { width: 4px; }
-#s-body::-webkit-scrollbar-thumb { background: var(--cream3); border-radius: 2px; }
+/* SIDEBAR BODY */
+#s-body{flex:1;overflow-y:auto;padding:16px 20px;scrollbar-width:thin;scrollbar-color:var(--cream3) transparent}
+#s-body::-webkit-scrollbar{width:4px}
+#s-body::-webkit-scrollbar-thumb{background:var(--cream3);border-radius:2px}
 
-/* ─── STAT CARDS ─────────────────────────────────────────────── */
-.global-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 22px;
-}
-.stat-card {
-  background: white;
-  border: 1px solid var(--cream3);
-  border-radius: 12px;
-  padding: 12px 14px;
-  box-shadow: 0 1px 4px rgba(44,36,22,0.05);
-  transition: box-shadow 0.2s;
-}
-.stat-card:hover { box-shadow: 0 3px 12px rgba(44,36,22,0.1); }
-.stat-val {
-  font-family: var(--serif);
-  font-size: 24px;
-  font-weight: 500;
-  color: var(--clay);
-  line-height: 1;
-}
-.stat-label { font-size: 11px; color: var(--bark3); margin-top: 4px; font-weight: 300; }
+/* STATS */
+.global-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:18px}
+.stat-card{background:white;border:1px solid var(--cream3);border-radius:12px;padding:11px 13px;box-shadow:0 1px 4px rgba(44,36,22,0.05);transition:box-shadow .2s}
+.stat-card:hover{box-shadow:0 3px 12px rgba(44,36,22,0.1)}
+.stat-val{font-family:var(--serif);font-size:22px;font-weight:500;color:var(--clay);line-height:1}
+.stat-label{font-size:10px;color:var(--bark3);margin-top:3px;font-weight:300}
 
-/* ─── SECTION HEADS ─────────────────────────────────────────── */
-.sec-head {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--bark3);
-  margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--cream3);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.sec-head::before {
-  content: '';
-  width: 3px; height: 12px;
-  border-radius: 2px;
-  background: var(--clay);
-  flex-shrink: 0;
-}
+/* SECTION HEADS */
+.sec-head{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--bark3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--cream3);display:flex;align-items:center;gap:6px}
+.sec-head-bar{width:3px;height:11px;border-radius:2px;background:var(--clay);flex-shrink:0}
 
-/* ─── SLIDERS ────────────────────────────────────────────────── */
-.weights { margin-bottom: 20px; display: flex; flex-direction: column; gap: 11px; }
-.weight-row { display: flex; flex-direction: column; gap: 5px; }
-.weight-meta { display: flex; justify-content: space-between; align-items: center; }
-.weight-name { font-size: 12px; color: var(--bark2); font-weight: 400; }
-.weight-val { font-family: var(--mono); font-size: 11px; color: var(--clay); min-width: 30px; text-align: right; font-weight: 500; }
-input[type=range] { width: 100%; height: 4px; border-radius: 2px; outline: none; appearance: none; cursor: pointer; background: var(--cream3); }
-input[type=range]::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: white; border: 2px solid var(--clay); cursor: pointer; box-shadow: 0 1px 4px rgba(181,98,42,0.3); transition: transform 0.15s; }
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+/* SLIDERS */
+.weights{margin-bottom:18px;display:flex;flex-direction:column;gap:10px}
+.weight-row{display:flex;flex-direction:column;gap:4px}
+.weight-meta{display:flex;justify-content:space-between;align-items:center}
+.weight-name{font-size:12px;color:var(--bark2)}
+.weight-val{font-family:var(--mono);font-size:11px;color:var(--clay);min-width:32px;text-align:right;font-weight:500}
+input[type=range]{width:100%;height:4px;border-radius:2px;outline:none;appearance:none;cursor:pointer;background:var(--cream3)}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:white;border:2px solid var(--clay);cursor:pointer;box-shadow:0 1px 4px rgba(181,98,42,0.25);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
 
-/* ─── OVERLAY TOGGLES ────────────────────────────────────────── */
-.overlays-wrap { margin-bottom: 20px; display: flex; flex-direction: column; gap: 7px; }
-.overlay-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 9px 12px;
-  background: white;
-  border: 1px solid var(--cream3);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.15s;
-  box-shadow: 0 1px 3px rgba(44,36,22,0.04);
-}
-.overlay-row:hover { border-color: var(--sand); box-shadow: 0 2px 8px rgba(44,36,22,0.08); }
-.overlay-label { font-size: 12px; color: var(--bark2); }
-.overlay-src { font-family: var(--mono); font-size: 9px; color: var(--bark3); margin-top: 1px; }
-.toggle { width: 32px; height: 18px; border-radius: 9px; background: var(--cream3); position: relative; transition: background 0.2s; flex-shrink: 0; }
-.toggle.on { background: var(--moss); }
-.toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: white; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-.toggle.on::after { transform: translateX(14px); }
+/* OVERLAYS */
+.overlays-wrap{margin-bottom:18px;display:flex;flex-direction:column;gap:6px}
+.overlay-row{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:white;border:1px solid var(--cream3);border-radius:10px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(44,36,22,0.04)}
+.overlay-row:hover{border-color:var(--sand);box-shadow:0 2px 8px rgba(44,36,22,0.08)}
+.overlay-label{font-size:12px;color:var(--bark2)}
+.overlay-src{font-family:var(--mono);font-size:9px;color:var(--bark3);margin-top:1px}
+.toggle{width:32px;height:18px;border-radius:9px;background:var(--cream3);position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--moss)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:white;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,0.12)}
+.toggle.on::after{transform:translateX(14px)}
 
-/* ─── REGION FILTERS ─────────────────────────────────────────── */
-.filter-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 20px; }
-.filter-btn {
-  font-family: var(--mono);
-  font-size: 10px;
-  padding: 5px 11px;
-  border-radius: 20px;
-  border: 1px solid var(--cream3);
-  background: white;
-  color: var(--bark3);
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: all 0.15s;
-  box-shadow: 0 1px 2px rgba(44,36,22,0.04);
-}
-.filter-btn:hover { border-color: var(--clay2); color: var(--clay); }
-.filter-btn.active { background: var(--clay); color: white; border-color: var(--clay); box-shadow: 0 2px 8px rgba(181,98,42,0.25); }
+/* REGION FILTERS */
+.filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px}
+.filter-btn{font-family:var(--mono);font-size:10px;padding:5px 11px;border-radius:20px;border:1px solid var(--cream3);background:white;color:var(--bark3);cursor:pointer;letter-spacing:.04em;transition:all .15s;box-shadow:0 1px 2px rgba(44,36,22,0.04)}
+.filter-btn:hover{border-color:var(--clay3);color:var(--clay)}
+.filter-btn.active{background:var(--clay);color:white;border-color:var(--clay);box-shadow:0 2px 8px rgba(181,98,42,0.25)}
 
-/* ─── LEGEND ─────────────────────────────────────────────────── */
-.legend { margin-bottom: 20px; display: flex; flex-direction: column; gap: 5px; }
-.legend-row { display: flex; align-items: center; gap: 9px; }
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legend-text { font-size: 12px; color: var(--bark3); }
+/* LEGEND */
+.legend{margin-bottom:18px;display:flex;flex-direction:column;gap:5px}
+.legend-row{display:flex;align-items:center;gap:8px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-text{font-size:11px;color:var(--bark3)}
 
-/* ─── SITE LIST ──────────────────────────────────────────────── */
-#site-list { display: flex; flex-direction: column; gap: 7px; }
-.site-item {
-  background: white;
-  border: 1px solid var(--cream3);
-  border-radius: 12px;
-  padding: 11px 13px;
-  cursor: pointer;
-  transition: all 0.18s;
-  box-shadow: 0 1px 3px rgba(44,36,22,0.04);
-}
-.site-item:hover { border-color: var(--clay2); box-shadow: 0 4px 16px rgba(44,36,22,0.1); transform: translateY(-1px); }
-.site-item.active { border-color: var(--clay); box-shadow: 0 4px 16px rgba(181,98,42,0.15); }
-.site-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
-.site-name { font-family: var(--serif); font-size: 14px; font-weight: 500; color: var(--bark); line-height: 1.3; }
-.site-score { font-family: var(--serif); font-size: 16px; font-weight: 600; }
-.score-high { color: var(--moss2); }
-.score-mid { color: var(--sand); }
-.score-low { color: var(--clay2); }
-.site-country { font-size: 11px; color: var(--bark3); margin-top: 2px; font-weight: 300; }
-.site-bars { display: flex; gap: 3px; margin-top: 8px; }
-.mini-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--cream2); overflow: hidden; }
-.mini-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; opacity: 0.75; }
-.site-flags { display: flex; gap: 4px; margin-top: 7px; flex-wrap: wrap; }
-.site-unc { display: inline-block; font-family: var(--mono); font-size: 9px; padding: 1px 5px; border-radius: 4px; margin-left: 4px; vertical-align: middle; }
+/* SITE LIST */
+#site-list{display:flex;flex-direction:column;gap:7px}
+.site-item{background:white;border:1px solid var(--cream3);border-radius:14px;padding:12px 14px;cursor:pointer;transition:all .18s;box-shadow:0 1px 4px rgba(44,36,22,0.05);position:relative}
+.site-item:hover{border-color:var(--clay3);box-shadow:0 5px 18px rgba(44,36,22,0.1);transform:translateY(-1px)}
+.site-item.active{border-color:var(--clay);box-shadow:0 4px 16px rgba(181,98,42,0.15)}
+.site-item.in-compare{border-color:var(--moss);box-shadow:0 3px 12px rgba(74,103,65,0.2)}
+.site-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.site-name{font-family:var(--serif);font-size:14px;font-weight:500;color:var(--bark);line-height:1.3}
+.site-unc{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:4px;margin-left:4px;vertical-align:middle}
+.site-score-wrap{text-align:right;flex-shrink:0}
+.site-score{font-family:var(--serif);font-size:17px;font-weight:600;line-height:1}
+.score-high{color:var(--moss2)}.score-mid{color:var(--sand)}.score-low{color:var(--clay2)}
+.site-range{font-family:var(--mono);font-size:9px;color:var(--bark3);margin-top:1px}
+.site-country{font-size:11px;color:var(--bark3);margin-top:2px;font-weight:300}
+.site-bars{display:flex;gap:3px;margin-top:7px}
+.mini-bar{flex:1;height:3px;border-radius:2px;background:var(--cream2);overflow:hidden}
+.mini-fill{height:100%;border-radius:2px;transition:width .4s ease;opacity:.72}
+.site-flags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
 
-/* ─── CSV BUTTON ─────────────────────────────────────────────── */
-#csv-btn {
-  width: 100%;
-  padding: 9px 0;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--bark3);
-  background: transparent;
-  border: 1px dashed var(--cream3);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 16px;
-}
-#csv-btn:hover { color: var(--clay); border-color: var(--clay); border-style: solid; background: rgba(181,98,42,0.04); }
+/* COST BADGE */
+.cost-badge{display:flex;align-items:center;gap:7px;margin-top:8px;padding:7px 10px;background:rgba(181,98,42,0.05);border:1px solid rgba(181,98,42,0.12);border-radius:8px}
+.cost-icon{font-size:11px;color:var(--clay2)}
+.cost-range{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--bark2)}
+.cost-label{font-size:10px;color:var(--bark3);margin-left:auto}
 
-/* ─── BADGES ─────────────────────────────────────────────────── */
-.conf-h { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(92,130,81,0.12);color:var(--moss);border:1px solid rgba(92,130,81,0.2);letter-spacing:.05em }
-.conf-m { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,169,110,0.15);color:#a07830;border:1px solid rgba(201,169,110,0.3);letter-spacing:.05em }
-.conf-l { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.1);color:var(--clay);border:1px solid rgba(181,98,42,0.2);letter-spacing:.05em }
-.water-0 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(61,122,138,0.1);color:var(--sky);border:1px solid rgba(61,122,138,0.2) }
-.water-1 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(92,130,81,0.12);color:var(--moss);border:1px solid rgba(92,130,81,0.2) }
-.water-2 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,169,110,0.15);color:#a07830;border:1px solid rgba(201,169,110,0.3) }
-.water-3 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.12);color:var(--clay);border:1px solid rgba(181,98,42,0.25) }
-.water-4 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.2);color:var(--clay);border:1px solid rgba(181,98,42,0.4);font-weight:500 }
-.ccs-2 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(92,130,81,0.12);color:var(--moss);border:1px solid rgba(92,130,81,0.2) }
-.ccs-1 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,169,110,0.15);color:#a07830;border:1px solid rgba(201,169,110,0.3) }
-.ccs-0 { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.1);color:var(--clay);border:1px solid rgba(181,98,42,0.2) }
-.curtail-tag { font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(107,92,69,0.1);color:var(--bark2);border:1px solid rgba(107,92,69,0.2) }
+/* COMPARE BUTTON ON CARD */
+.compare-add-btn{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:white;border:1px solid var(--cream3);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--bark3);cursor:pointer;transition:all .15s;line-height:1;opacity:0}
+.site-item:hover .compare-add-btn{opacity:1}
+.compare-add-btn:hover{background:var(--moss);border-color:var(--moss);color:white}
+.site-item.in-compare .compare-add-btn{opacity:1;background:var(--moss);border-color:var(--moss);color:white;font-size:11px}
 
-/* ─── MAP OVERLAYS ───────────────────────────────────────────── */
-.leaflet-container { background: #e8e4dc; }
-#map-header {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 500;
-  background: rgba(245,240,232,0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--cream3);
-  border-radius: 14px;
-  padding: 12px 16px;
-  pointer-events: none;
-  box-shadow: 0 4px 20px rgba(44,36,22,0.12);
-}
-.mh-label { font-family:var(--mono);font-size:9px;color:var(--bark3);letter-spacing:.12em;text-transform:uppercase }
-.mh-val { font-family:var(--serif);font-size:26px;font-weight:500;color:var(--clay);line-height:1;margin-top:2px }
-.mh-sub { font-size:11px;color:var(--bark3);margin-top:2px;font-weight:300 }
+/* CSV */
+#csv-btn{width:100%;padding:9px 0;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--bark3);background:transparent;border:1px dashed var(--cream3);border-radius:8px;cursor:pointer;transition:all .2s;margin-bottom:14px}
+#csv-btn:hover{color:var(--clay);border-color:var(--clay);border-style:solid;background:rgba(181,98,42,0.04)}
 
-#search {
-  position: absolute;
-  top: 16px;
-  right: 60px;
-  z-index: 500;
-  background: rgba(245,240,232,0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--cream3);
-  border-radius: 10px;
-  padding: 9px 15px;
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--bark);
-  outline: none;
-  width: 210px;
-  box-shadow: 0 2px 10px rgba(44,36,22,0.08);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-#search::placeholder { color: var(--bark3); }
-#search:focus { border-color: var(--clay2); box-shadow: 0 2px 10px rgba(181,98,42,0.15); }
+/* ── BADGES ───────────────────────────────────────────────────── */
+.conf-h{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(92,130,81,0.12);color:var(--moss);border:1px solid rgba(92,130,81,0.2);letter-spacing:.04em}
+.conf-m{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,169,110,0.15);color:#8a6820;border:1px solid rgba(201,169,110,0.3);letter-spacing:.04em}
+.conf-l{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.1);color:var(--clay);border:1px solid rgba(181,98,42,0.2);letter-spacing:.04em}
+.water-0{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(61,122,138,0.1);color:var(--sky);border:1px solid rgba(61,122,138,0.2)}
+.water-1{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(92,130,81,0.12);color:var(--moss);border:1px solid rgba(92,130,81,0.2)}
+.water-2{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,169,110,0.15);color:#8a6820;border:1px solid rgba(201,169,110,0.3)}
+.water-3{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.12);color:var(--clay);border:1px solid rgba(181,98,42,0.25)}
+.water-4{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.22);color:var(--clay);border:1px solid rgba(181,98,42,0.4);font-weight:500}
+.ccs-2{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(92,130,81,0.12);color:var(--moss);border:1px solid rgba(92,130,81,0.2)}
+.ccs-1{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(201,169,110,0.15);color:#8a6820;border:1px solid rgba(201,169,110,0.3)}
+.ccs-0{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(181,98,42,0.1);color:var(--clay);border:1px solid rgba(181,98,42,0.2)}
+.curtail-tag{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(107,92,69,0.1);color:var(--bark2);border:1px solid rgba(107,92,69,0.2)}
 
-#tooltip {
-  position: absolute;
-  z-index: 800;
-  background: rgba(245,240,232,0.98);
-  border: 1px solid var(--cream3);
-  border-radius: 14px;
-  padding: 16px 18px;
-  display: none;
-  min-width: 260px;
-  max-width: 290px;
-  pointer-events: all !important;
-  box-shadow: 0 8px 32px rgba(44,36,22,0.16);
-}
-.tt-name { font-family:var(--serif);font-size:16px;font-weight:500;color:var(--bark);margin-bottom:2px }
-.tt-country { font-family:var(--mono);font-size:10px;color:var(--bark3);margin-bottom:10px;letter-spacing:.04em }
-.tt-flags { display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px }
-.tt-section { font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--bark3);margin:10px 0 6px }
-.tt-row { display:flex;justify-content:space-between;align-items:center;margin-bottom:5px }
-.tt-key { font-size:12px;color:var(--bark2);display:flex;align-items:center;gap:6px }
-.tt-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;opacity:.85 }
-.tt-val { font-family:var(--mono);font-size:12px;color:var(--bark);font-weight:500 }
-.tt-stor { display:flex;gap:10px;margin-bottom:5px;padding-left:14px }
-.tt-stor-item { font-size:11px;color:var(--bark3) }
-.tt-stor-val { font-family:var(--mono);font-size:11px;color:var(--bark2);font-weight:500 }
-.tt-divider { height:1px;background:var(--cream3);margin:10px 0 8px }
-.tt-total { display:flex;justify-content:space-between;align-items:center }
-.tt-total-label { font-size:12px;color:var(--bark2) }
-.tt-total-val { font-family:var(--serif);font-size:20px;font-weight:600 }
-.tt-range { font-family:var(--mono);font-size:10px;color:var(--bark3);margin-top:2px;text-align:right }
-.tt-note { font-size:10px;color:var(--bark3);margin-top:8px;line-height:1.5 }
-.tt-report {
-  display:block;margin-top:12px;padding-top:10px;
+/* ── MAP ─────────────────────────────────────────────────────── */
+#map-wrap{flex:1;position:relative;overflow:hidden}
+#map{width:100%;height:100%}
+.leaflet-container{background:#e8e2d8}
+
+#map-header{position:absolute;top:14px;left:14px;z-index:500;background:rgba(245,240,232,0.96);backdrop-filter:blur(10px);border:1px solid var(--cream3);border-radius:14px;padding:11px 15px;pointer-events:none;box-shadow:0 4px 20px rgba(44,36,22,0.12)}
+.mh-label{font-family:var(--mono);font-size:9px;color:var(--bark3);letter-spacing:.12em;text-transform:uppercase}
+.mh-val{font-family:var(--serif);font-size:26px;font-weight:500;color:var(--clay);line-height:1;margin-top:2px}
+.mh-sub{font-size:11px;color:var(--bark3);margin-top:2px;font-weight:300}
+
+#search{position:absolute;top:14px;right:58px;z-index:500;background:rgba(245,240,232,0.96);backdrop-filter:blur(10px);border:1px solid var(--cream3);border-radius:10px;padding:9px 15px;font-family:var(--sans);font-size:13px;color:var(--bark);outline:none;width:210px;box-shadow:0 2px 10px rgba(44,36,22,0.08);transition:border-color .2s,box-shadow .2s}
+#search::placeholder{color:var(--bark3)}
+#search:focus{border-color:var(--clay2);box-shadow:0 2px 10px rgba(181,98,42,0.15)}
+
+#map-controls{position:absolute;bottom:20px;right:14px;z-index:500;display:flex;flex-direction:column;gap:6px}
+.map-btn{width:36px;height:36px;background:rgba(245,240,232,0.96);backdrop-filter:blur(10px);border:1px solid var(--cream3);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--bark3);font-size:15px;transition:all .15s;box-shadow:0 2px 8px rgba(44,36,22,0.1)}
+.map-btn:hover{border-color:var(--clay2);color:var(--clay);box-shadow:0 3px 12px rgba(181,98,42,0.2)}
+
+#methodology{position:absolute;bottom:20px;left:14px;z-index:500;background:rgba(245,240,232,0.96);backdrop-filter:blur(10px);border:1px solid var(--cream3);border-radius:12px;padding:10px 14px;max-width:300px;box-shadow:0 4px 16px rgba(44,36,22,0.1)}
+.meth-head{font-family:var(--mono);font-size:9px;color:var(--bark3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.meth-text{font-size:11px;color:var(--bark3);line-height:1.55;font-weight:300}
+.meth-sources{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.src-tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;background:white;color:var(--bark3);border:1px solid var(--cream3);letter-spacing:.04em}
+
+/* ── TOOLTIP ─────────────────────────────────────────────────── */
+#tooltip{position:absolute;z-index:800;background:rgba(245,240,232,0.98);border:1px solid var(--cream3);border-radius:16px;padding:16px 18px;display:none;min-width:265px;max-width:295px;pointer-events:all!important;box-shadow:0 10px 40px rgba(44,36,22,0.18)}
+.tt-name{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--bark);margin-bottom:2px}
+.tt-country{font-family:var(--mono);font-size:10px;color:var(--bark3);margin-bottom:9px;letter-spacing:.04em}
+.tt-flags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px}
+.tt-section{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--bark3);margin:9px 0 6px}
+.tt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.tt-key{font-size:12px;color:var(--bark2);display:flex;align-items:center;gap:6px}
+.tt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;opacity:.85}
+.tt-val{font-family:var(--mono);font-size:12px;color:var(--bark);font-weight:500}
+.tt-stor{display:flex;gap:10px;margin-bottom:5px;padding-left:14px}
+.tt-stor-item{font-size:11px;color:var(--bark3)}
+.tt-stor-val{font-family:var(--mono);font-size:11px;color:var(--bark2);font-weight:500}
+.tt-divider{height:1px;background:var(--cream3);margin:10px 0 8px}
+.tt-total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.tt-total-label{font-size:12px;color:var(--bark2)}
+.tt-total-val{font-family:var(--serif);font-size:21px;font-weight:600}
+.tt-range-note{font-family:var(--mono);font-size:10px;color:var(--bark3);margin-bottom:6px}
+
+/* COST IN TOOLTIP */
+.tt-cost-box{background:rgba(181,98,42,0.06);border:1px solid rgba(181,98,42,0.14);border-radius:9px;padding:9px 12px;margin-bottom:8px}
+.tt-cost-head{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--bark3);margin-bottom:5px}
+.tt-cost-range{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--clay);line-height:1}
+.tt-cost-mid{font-family:var(--mono);font-size:10px;color:var(--bark3);margin-top:3px}
+.tt-cost-note{font-size:10px;color:var(--bark3);margin-top:3px;font-weight:300}
+
+.tt-note{font-size:10px;color:var(--bark3);margin-top:6px;line-height:1.5}
+
+/* REPORT + CTA BUTTONS */
+.tt-actions{display:flex;gap:7px;margin-top:11px;padding-top:10px;border-top:1px solid var(--cream3)}
+.tt-report{flex:1;padding:7px 0;font-family:var(--mono);font-size:10px;color:var(--bark3);background:white;border:1px solid var(--cream3);border-radius:8px;cursor:pointer;transition:all .15s;text-align:center;letter-spacing:.04em}
+.tt-report:hover{color:var(--clay);border-color:var(--clay)}
+.tt-request{flex:1;padding:7px 0;font-family:var(--mono);font-size:10px;color:white;background:var(--moss);border:1px solid var(--moss);border-radius:8px;cursor:pointer;transition:all .15s;text-align:center;letter-spacing:.04em;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:4px}
+.tt-request:hover{background:var(--moss2);border-color:var(--moss2);box-shadow:0 3px 10px rgba(74,103,65,0.3)}
+
+/* ── COMPARE DRAWER ──────────────────────────────────────────── */
+#compare-drawer{
+  position:absolute;bottom:0;left:0;right:0;z-index:700;
+  background:rgba(245,240,232,0.98);
+  backdrop-filter:blur(14px);
   border-top:1px solid var(--cream3);
-  font-size:11px;color:var(--bark3);font-family:var(--mono);
-  letter-spacing:.04em;cursor:pointer;transition:color .15s;
-  pointer-events:all;background:none;border-left:none;border-right:none;border-bottom:none;
-  width:100%;text-align:left;padding-left:0;padding-right:0
+  box-shadow:0 -8px 32px rgba(44,36,22,0.14);
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(0.34,1.2,0.64,1);
+  max-height:340px;
 }
-.tt-report:hover { color:var(--clay) }
-.tt-report-dot { display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--bark3);margin-right:6px;vertical-align:middle;position:relative;top:-1px;transition:background .15s }
-.tt-report:hover .tt-report-dot { background:var(--clay) }
+#compare-drawer.open{transform:translateY(0)}
+#compare-header{display:flex;align-items:center;padding:12px 18px 10px;border-bottom:1px solid var(--cream3);gap:10px}
+.compare-title{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--bark)}
+.compare-subtitle{font-size:12px;color:var(--bark3);font-weight:300;margin-left:4px}
+#compare-close{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--cream2);border:1px solid var(--cream3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--bark3);transition:all .15s}
+#compare-close:hover{background:var(--clay);color:white;border-color:var(--clay)}
+#compare-cta{display:flex;align-items:center;gap:10px;padding:10px 18px 8px;border-bottom:1px solid var(--cream3)}
+.compare-cta-text{font-size:12px;color:var(--bark3);font-weight:300}
+.compare-linkedin{display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--sky);color:white;border:none;border-radius:8px;font-family:var(--mono);font-size:10px;cursor:pointer;text-decoration:none;transition:all .15s;letter-spacing:.04em}
+.compare-linkedin:hover{background:var(--sky2);box-shadow:0 3px 10px rgba(61,122,138,0.3)}
+#compare-body{overflow-x:auto;padding:0 18px 16px}
+#compare-table{display:flex;gap:14px;min-width:max-content;padding-top:14px}
+.compare-col{min-width:200px;max-width:240px;background:white;border:1px solid var(--cream3);border-radius:12px;overflow:hidden;position:relative;box-shadow:0 2px 8px rgba(44,36,22,0.07)}
+.compare-col-head{padding:12px 14px 10px;border-bottom:1px solid var(--cream3)}
+.compare-col-name{font-family:var(--serif);font-size:14px;font-weight:500;color:var(--bark);line-height:1.2}
+.compare-col-country{font-size:11px;color:var(--bark3);margin-top:2px;font-weight:300}
+.compare-col-score{font-family:var(--serif);font-size:22px;font-weight:600;margin-top:6px;line-height:1}
+.compare-col-cost{font-family:var(--mono);font-size:11px;color:var(--bark3);margin-top:3px}
+.compare-remove{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--cream2);border:1px solid var(--cream3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--bark3);transition:all .15s;line-height:1}
+.compare-remove:hover{background:var(--clay);color:white;border-color:var(--clay)}
+.compare-factors{padding:10px 14px}
+.compare-factor-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.compare-factor-name{font-size:11px;color:var(--bark3);width:100px;flex-shrink:0;font-weight:300}
+.compare-factor-bar-wrap{flex:1;height:8px;background:var(--cream2);border-radius:4px;overflow:hidden}
+.compare-factor-bar{height:100%;border-radius:4px;transition:width .5s ease}
+.compare-factor-val{font-family:var(--mono);font-size:10px;color:var(--bark2);width:24px;text-align:right;flex-shrink:0}
+.compare-flags{display:flex;gap:4px;flex-wrap:wrap;padding:0 14px 12px}
 
-#map-controls {
-  position:absolute;bottom:20px;right:16px;z-index:500;
-  display:flex;flex-direction:column;gap:6px;
-}
-.map-btn {
-  width:36px;height:36px;
-  background:rgba(245,240,232,0.95);
-  backdrop-filter:blur(10px);
-  border:1px solid var(--cream3);
-  border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--bark3);font-size:16px;
-  transition:all .15s;
-  box-shadow:0 2px 8px rgba(44,36,22,0.1);
-}
-.map-btn:hover { border-color:var(--clay2);color:var(--clay);box-shadow:0 3px 12px rgba(181,98,42,0.2); }
+/* COMPARE BUTTON BAR */
+#compare-bar{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:600;display:none;background:rgba(245,240,232,0.96);backdrop-filter:blur(10px);border:1px solid var(--cream3);border-radius:24px;padding:7px 16px;box-shadow:0 4px 20px rgba(44,36,22,0.15);align-items:center;gap:10px;white-space:nowrap}
+#compare-bar.visible{display:flex}
+#compare-bar-text{font-size:13px;color:var(--bark2)}
+#compare-bar-count{font-family:var(--mono);font-size:11px;color:var(--moss);font-weight:500}
+#compare-open-btn{padding:6px 14px;background:var(--moss);color:white;border:none;border-radius:16px;font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.05em}
+#compare-open-btn:hover{background:var(--moss2)}
 
-#methodology {
-  position:absolute;bottom:20px;left:16px;z-index:500;
-  background:rgba(245,240,232,0.95);
-  backdrop-filter:blur(10px);
-  border:1px solid var(--cream3);border-radius:12px;
-  padding:11px 14px;max-width:320px;
-  box-shadow:0 4px 16px rgba(44,36,22,0.1);
-}
-.meth-head { font-family:var(--mono);font-size:9px;color:var(--bark3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px }
-.meth-text { font-size:11px;color:var(--bark3);line-height:1.55;font-weight:300 }
-.meth-sources { display:flex;gap:5px;flex-wrap:wrap;margin-top:7px }
-.src-tag {
-  font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;
-  background:white;color:var(--bark3);border:1px solid var(--cream3);letter-spacing:.04em;
-}
-
-.no-sites { text-align:center;padding:28px 0;color:var(--bark3);font-size:13px;font-style:italic }
+.no-sites{text-align:center;padding:28px 0;color:var(--bark3);font-size:13px;font-style:italic}
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="sidebar">
-    <div id="s-head">
-      <div class="wordmark">
-        <div class="wordmark-leaf"></div>
-        <span class="wordmark-text">CDR Intelligence</span>
+
+<!-- ── SIDEBAR ────────────────────────────────────────────────── -->
+<div id="sidebar">
+  <div id="s-head">
+    <div class="wordmark">
+      <div class="leaf-mark">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="13" cy="13" rx="10" ry="13" fill="#4a6741" transform="rotate(-30 13 13)"/>
+          <line x1="13" y1="4" x2="13" y2="22" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="9" y1="10" x2="13" y2="13" stroke="rgba(255,255,255,0.3)" stroke-width="0.9" stroke-linecap="round"/>
+          <line x1="17" y1="14" x2="13" y2="17" stroke="rgba(255,255,255,0.3)" stroke-width="0.9" stroke-linecap="round"/>
+        </svg>
       </div>
-      <div class="s-title">DAC <em>Site Suitability</em><br>Index</div>
-      <div class="s-sub">308 global locations scored across renewable energy, humidity, geological storage, grid cleanliness, land access, water stress, and CCS readiness.</div>
-      <div class="v2-pill">Open methodology &middot; public data only &middot; corrections welcome</div>
+      <span class="brand-name">CDR Intelligence</span>
+    </div>
+    <div class="s-title">DAC <em>Site Suitability</em><br>Index</div>
+    <div class="s-sub">308 locations &middot; cost estimates &middot; water stress &middot; CCS readiness &middot; open methodology</div>
+    <div class="open-pill"><div class="open-pill-dot"></div>Public data &middot; corrections welcome</div>
+  </div>
+
+  <!-- FARHAN -->
+  <div class="farhan-bar">
+    <div class="farhan-avatar">F</div>
+    <div>
+      <div class="farhan-name">Farhan M</div>
+      <div class="farhan-role">CDR researcher &amp; tool builder</div>
+    </div>
+    <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" class="linkedin-btn">
+      <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+      Connect
+    </a>
+  </div>
+
+  <div id="s-body">
+    <div class="global-stats">
+      <div class="stat-card"><div class="stat-val" id="st-top">&mdash;</div><div class="stat-label">Top score</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-viable">&mdash;</div><div class="stat-label">Viable sites (&ge;60)</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-countries">&mdash;</div><div class="stat-label">Countries</div></div>
+      <div class="stat-card"><div class="stat-val" id="st-avg">&mdash;</div><div class="stat-label">Global avg</div></div>
     </div>
 
-    <div id="s-body">
-      <div class="global-stats">
-        <div class="stat-card"><div class="stat-val" id="st-top">&mdash;</div><div class="stat-label">Top score</div></div>
-        <div class="stat-card"><div class="stat-val" id="st-viable">&mdash;</div><div class="stat-label">Viable sites (&ge;60)</div></div>
-        <div class="stat-card"><div class="stat-val" id="st-countries">&mdash;</div><div class="stat-label">Countries</div></div>
-        <div class="stat-card"><div class="stat-val" id="st-avg">&mdash;</div><div class="stat-label">Global avg</div></div>
+    <div class="sec-head"><div class="sec-head-bar"></div>Factor weights</div>
+    <div class="weights" id="weights-container"></div>
+
+    <div class="sec-head"><div class="sec-head-bar"></div>Overlay layers</div>
+    <div class="overlays-wrap">
+      <div class="overlay-row" onclick="toggleOverlay('water')">
+        <div><div class="overlay-label">Water stress penalty</div><div class="overlay-src">WRI Aqueduct &mdash; on by default</div></div>
+        <div class="toggle on" id="tog-water"></div>
       </div>
-
-      <div class="sec-head">Factor weights</div>
-      <div class="weights" id="weights-container"></div>
-
-      <div class="sec-head">Overlay layers</div>
-      <div class="overlays-wrap">
-        <div class="overlay-row" onclick="toggleOverlay('water')">
-          <div>
-            <div class="overlay-label">Water stress penalty</div>
-            <div class="overlay-src">WRI Aqueduct &mdash; on by default</div>
-          </div>
-          <div class="toggle on" id="tog-water"></div>
-        </div>
-        <div class="overlay-row" onclick="toggleOverlay('curtail')">
-          <div>
-            <div class="overlay-label">Curtailed renewables bonus</div>
-            <div class="overlay-src">ERCOT &middot; CAISO &middot; AEMO &middot; Entso-E</div>
-          </div>
-          <div class="toggle" id="tog-curtail"></div>
-        </div>
+      <div class="overlay-row" onclick="toggleOverlay('curtail')">
+        <div><div class="overlay-label">Curtailed renewables bonus</div><div class="overlay-src">ERCOT &middot; CAISO &middot; AEMO &middot; Entso-E</div></div>
+        <div class="toggle" id="tog-curtail"></div>
       </div>
+    </div>
 
-      <div class="sec-head">Filter by region</div>
-      <div class="filter-row" id="region-filters"></div>
+    <div class="sec-head"><div class="sec-head-bar"></div>Filter by region</div>
+    <div class="filter-row" id="region-filters"></div>
 
-      <div class="sec-head">Legend</div>
-      <div class="legend">
-        <div class="legend-row"><div class="legend-dot" style="background:#5c8251"></div><div class="legend-text">High suitability (&ge;75)</div></div>
-        <div class="legend-row"><div class="legend-dot" style="background:#c9a96e"></div><div class="legend-text">Moderate (50&ndash;74)</div></div>
-        <div class="legend-row"><div class="legend-dot" style="background:#d4773a"></div><div class="legend-text">Marginal (30&ndash;49)</div></div>
-        <div class="legend-row"><div class="legend-dot" style="background:#b5622a;opacity:.5"></div><div class="legend-text">Low suitability (&lt;30)</div></div>
-      </div>
+    <div class="sec-head"><div class="sec-head-bar"></div>Legend</div>
+    <div class="legend">
+      <div class="legend-row"><div class="legend-dot" style="background:#5c8251"></div><div class="legend-text">High suitability (&ge;75)</div></div>
+      <div class="legend-row"><div class="legend-dot" style="background:#c9a96e"></div><div class="legend-text">Moderate (50&ndash;74)</div></div>
+      <div class="legend-row"><div class="legend-dot" style="background:#d4773a"></div><div class="legend-text">Marginal (30&ndash;49)</div></div>
+      <div class="legend-row"><div class="legend-dot" style="background:#b5622a;opacity:.5"></div><div class="legend-text">Low suitability (&lt;30)</div></div>
+    </div>
 
-      <div class="sec-head">Top sites <span id="site-count" style="color:var(--clay);font-family:var(--mono);font-size:9px"></span></div>
-      <button id="csv-btn">&#8595; &nbsp; export as CSV</button>
-      <div id="site-list"></div>
+    <div class="sec-head"><div class="sec-head-bar"></div>Top sites <span id="site-count" style="color:var(--clay);font-family:var(--mono);font-size:9px;margin-left:4px"></span></div>
+    <button id="csv-btn">&#8595; &nbsp;export CSV with cost estimates</button>
+    <div id="site-list"></div>
+  </div>
+</div>
+
+<!-- ── MAP AREA ───────────────────────────────────────────────── -->
+<div id="map-wrap">
+  <div id="map"></div>
+
+  <div id="map-header">
+    <div class="mh-label">viewing</div>
+    <div class="mh-val" id="mh-val">308</div>
+    <div class="mh-sub" id="mh-sub">global candidate sites</div>
+  </div>
+
+  <input id="search" placeholder="Search location or country&hellip;" autocomplete="off">
+
+  <!-- COMPARE BAR -->
+  <div id="compare-bar">
+    <span id="compare-bar-text">Comparing</span>
+    <span id="compare-bar-count"></span>
+    <button id="compare-open-btn" onclick="openDrawer()">View comparison &rarr;</button>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <div id="map-controls">
+    <div class="map-btn" id="btn-zoom-in">+</div>
+    <div class="map-btn" id="btn-zoom-out">&minus;</div>
+  </div>
+
+  <div id="methodology">
+    <div class="meth-head">Methodology &amp; sources</div>
+    <div class="meth-text">Suitability: weighted composite of 5 factors. Cost: Fasihi et al. 2022 + NREL 2023 solid sorbent model. Humidity = P90 summer RH (ERA5). Water stress: WRI Aqueduct. CCS: Global CCS Institute. All estimates &plusmn;35&ndash;40%.</div>
+    <div class="meth-sources">
+      <span class="src-tag">Fasihi 2022</span><span class="src-tag">NREL 2023</span><span class="src-tag">ERA5</span><span class="src-tag">WRI Aqueduct</span><span class="src-tag">Global CCS Inst.</span>
     </div>
   </div>
 
-  <div id="map-wrap">
-    <div id="map"></div>
-    <div id="map-header">
-      <div class="mh-label">viewing</div>
-      <div class="mh-val" id="mh-val">308</div>
-      <div class="mh-sub" id="mh-sub">global candidate sites</div>
-    </div>
-    <input id="search" placeholder="Search location or country&hellip;" autocomplete="off">
-    <div id="tooltip"></div>
-    <div id="map-controls">
-      <div class="map-btn" id="btn-zoom-in">+</div>
-      <div class="map-btn" id="btn-zoom-out">&minus;</div>
-    </div>
-    <div id="methodology">
-      <div class="meth-head">Methodology</div>
-      <div class="meth-text">Composite index. Humidity = P90 summer RH (ERA5). Storage = avg(capacity, injectivity). Water stress penalty from WRI Aqueduct. CCS flag from Global CCS Institute. Not a substitute for site-level feasibility.</div>
-      <div class="meth-sources">
-        <span class="src-tag">ERA5</span>
-        <span class="src-tag">WRI Aqueduct</span>
-        <span class="src-tag">Global CCS Inst.</span>
-        <span class="src-tag">NREL</span>
-        <span class="src-tag">ERCOT/CAISO</span>
+  <!-- COMPARE DRAWER -->
+  <div id="compare-drawer">
+    <div id="compare-header">
+      <div>
+        <span class="compare-title">Site Comparison</span>
+        <span class="compare-subtitle">Up to 3 sites &mdash; click &ldquo;+&rdquo; on any card</span>
       </div>
+      <div id="compare-close" onclick="closeDrawer()">&#10005;</div>
+    </div>
+    <div id="compare-cta">
+      <span class="compare-cta-text">Interested in a full site report for any of these?</span>
+      <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" class="compare-linkedin">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Connect with Farhan
+      </a>
+    </div>
+    <div id="compare-body">
+      <div id="compare-table"></div>
     </div>
   </div>
+</div>
 </div>
 
 <script>
 var SITES_RAW=[["Tucson","USA","N. America",32.2,-110.9,95,40,78,66,58,82,3,20,2],["Phoenix","USA","N. America",33.4,-112.1,96,42,80,68,55,78,3,20,2],["Las Vegas","USA","N. America",36.1,-115.2,94,68,75,63,52,72,3,20,2],["Albuquerque","USA","N. America",35.1,-106.6,90,45,82,70,54,80,3,20,2],["El Paso","USA","N. America",31.8,-106.4,93,48,85,73,53,78,3,20,2],["Midland","USA","N. America",31.9,-102.1,88,55,96,68,48,80,3,82,2],["Odessa","USA","N. America",31.8,-102.3,87,54,95,66,49,79,3,82,2],["Amarillo","USA","N. America",35.2,-101.8,82,50,88,76,50,82,3,82,2],["Gillette","USA","N. America",44.3,-105.5,72,62,92,88,62,85,3,42,2],["Casper","USA","N. America",42.8,-106.3,74,64,90,86,60,83,3,42,2],["Billings","USA","N. America",45.8,-108.5,68,60,85,73,64,82,3,20,2],["Rock Springs","USA","N. America",41.6,-109.2,75,65,88,84,58,84,3,42,2],["Mojave","USA","N. America",35.1,-118.2,97,72,70,58,72,74,3,68,2],["Lancaster","USA","N. America",34.7,-118.1,95,70,68,56,70,72,3,68,2],["Fresno","USA","N. America",36.7,-119.8,88,62,65,53,60,70,3,68,2],["Rapid City","USA","N. America",44.1,-103.2,72,58,87,75,62,83,3,42,2],["Bismarck","USA","N. America",46.8,-100.8,65,55,84,72,58,80,3,42,2],["Lubbock","USA","N. America",33.6,-101.8,87,52,89,77,51,81,3,82,2],["Houston","USA","N. America",29.8,-95.4,78,18,94,90,44,60,3,20,2],["Corpus Christi","USA","N. America",27.8,-97.4,82,20,92,88,45,62,3,82,2],["Atlanta","USA","N. America",33.7,-84.4,74,22,60,48,48,58,3,20,2],["Permian Basin","USA","N. America",31.5,-102.8,89,56,98,70,50,82,3,82,2],["Denver-Julesburg","USA","N. America",40.5,-103.5,74,60,88,78,62,80,3,20,2],["Williston Basin","USA","N. America",48.2,-103.6,62,58,90,82,55,78,3,42,2],["Paradox Basin","USA","N. America",38.3,-109.5,80,65,85,76,55,80,3,20,2],["Big Bend","USA","N. America",29.4,-103.2,90,52,84,72,50,78,3,82,2],["Reno","USA","N. America",39.5,-119.8,82,68,72,60,60,72,3,68,2],["Blythe","USA","N. America",33.6,-114.6,96,65,70,58,50,72,3,68,2],["Needles","USA","N. America",34.8,-114.6,95,64,72,60,50,70,3,68,2],["Yuma","USA","N. America",32.7,-114.6,97,60,70,58,48,72,3,68,2],["Palm Springs","USA","N. America",33.8,-116.5,96,70,68,56,56,70,3,68,2],["Kingman","USA","N. America",35.2,-114.1,92,65,72,60,52,72,3,68,2],["Farmington","USA","N. America",36.7,-108.2,85,50,85,80,52,78,3,20,2],["Carlsbad","USA","N. America",32.4,-104.2,88,55,92,72,48,78,3,82,2],["Sweetwater","USA","N. America",32.5,-100.4,85,54,88,76,50,78,3,82,2],["Pampa","USA","N. America",35.5,-100.9,80,52,86,74,52,80,3,82,2],["Plainview","USA","N. America",34.2,-101.7,85,53,88,76,50,80,3,82,2],["Hobbs","USA","N. America",32.7,-103.1,88,54,92,74,48,78,3,82,2],["Portales","USA","N. America",34.2,-103.3,86,54,88,76,50,78,3,82,2],["San Angelo","USA","N. America",31.5,-100.4,86,55,86,74,50,76,3,82,2],["Hermosillo","Mexico","N. America",29.1,-110.9,92,55,72,60,48,70,3,5,0],["Chihuahua","Mexico","N. America",28.6,-106.1,88,48,75,63,46,68,3,5,0],["Monterrey","Mexico","N. America",25.7,-100.3,80,35,72,60,46,62,3,5,0],["Mexicali","Mexico","N. America",32.7,-115.5,94,65,70,58,46,68,3,5,0],["Medicine Hat","Canada","N. America",50.0,-110.7,72,55,85,80,58,78,1,5,2],["Lethbridge","Canada","N. America",49.7,-112.8,70,55,82,78,60,76,1,5,2],["Regina","Canada","N. America",50.5,-104.6,68,55,80,76,56,76,1,5,2],["Saskatoon","Canada","N. America",52.1,-106.7,66,55,82,78,56,76,1,5,2],["Grande Prairie","Canada","N. America",55.2,-118.8,56,55,80,68,54,72,1,5,2],["Fort McMurray","Canada","N. America",56.7,-111.4,52,52,88,80,52,68,1,5,2],["Estevan","Canada","N. America",49.1,-103.0,68,55,85,82,54,76,1,5,2],["Reykjavik","Iceland","Europe",64.1,-21.9,28,15,98,95,85,70,0,5,2],["Akureyri","Iceland","Europe",65.7,-18.1,25,14,96,93,85,68,0,5,2],["Keflavik","Iceland","Europe",63.9,-22.6,29,16,95,92,85,72,0,5,2],["Stavanger","Norway","Europe",58.9,5.7,42,22,88,92,96,65,0,18,2],["Bergen","Norway","Europe",60.4,5.3,38,18,85,90,97,62,0,18,2],["Oslo","Norway","Europe",59.9,10.7,44,28,82,88,95,65,0,18,2],["Hammerfest","Norway","Europe",70.7,23.7,30,20,80,68,97,55,0,18,2],["Alesund","Norway","Europe",62.5,6.2,36,18,75,63,96,55,0,18,2],["Aberdeen","UK","Europe",57.1,-2.1,40,25,82,88,78,62,1,38,2],["Newcastle","UK","Europe",54.9,-1.6,42,28,80,68,76,60,1,38,2],["Humberside","UK","Europe",53.7,-0.3,42,28,82,90,70,58,1,38,2],["Liverpool Bay","UK","Europe",53.5,-3.5,40,24,80,88,72,55,1,38,2],["St Fergus","UK","Europe",57.5,-1.9,38,22,80,68,74,55,1,38,2],["Copenhagen","Denmark","Europe",55.7,12.6,46,30,75,63,88,63,1,42,2],["Esbjerg","Denmark","Europe",55.5,8.4,48,28,80,68,90,65,1,42,2],["Rotterdam","Netherlands","Europe",51.9,4.5,50,30,82,85,72,58,1,30,2],["Groningen","Netherlands","Europe",53.2,6.6,48,28,80,84,74,60,1,30,2],["Hamburg","Germany","Europe",53.6,10.0,50,30,75,63,70,58,1,45,2],["Magdeburg","Germany","Europe",52.1,11.6,54,32,72,60,68,60,1,45,2],["Stuttgart","Germany","Europe",48.8,9.2,58,35,65,53,68,60,1,45,2],["Leipzig","Germany","Europe",51.3,12.4,54,32,68,56,65,60,1,45,2],["Gothenburg","Sweden","Europe",57.7,12.0,44,28,75,63,90,62,0,22,2],["Stockholm","Sweden","Europe",59.3,18.1,44,30,72,60,88,62,0,22,2],["Helsinki","Finland","Europe",60.2,25.0,40,32,70,58,85,60,0,18,0],["Oulu","Finland","Europe",65.0,25.5,35,28,68,56,88,58,0,18,0],["Seville","Spain","Europe",37.4,-5.9,88,48,68,56,55,72,2,52,0],["Zaragoza","Spain","Europe",41.6,-0.9,82,42,65,53,54,70,2,52,0],["Almeria","Spain","Europe",36.8,-2.5,91,45,62,50,52,68,2,52,0],["Badajoz","Spain","Europe",38.9,-6.9,87,46,64,52,53,70,2,52,0],["Las Palmas","Spain","Europe",28.1,-15.4,84,55,55,43,52,65,2,52,0],["Fuerteventura","Spain","Europe",28.4,-14.1,86,52,52,40,52,68,2,52,0],["Evora","Portugal","Europe",38.6,-7.9,88,48,60,48,60,70,2,5,0],["Beja","Portugal","Europe",37.9,-7.9,89,46,60,48,58,70,2,5,0],["Azores","Portugal","Europe",37.7,-25.7,48,50,48,36,68,55,2,5,0],["Palermo","Italy","Europe",38.1,13.4,82,45,55,43,52,62,2,5,0],["Athens","Greece","Europe",38.0,23.7,83,48,58,46,50,62,2,5,0],["Thessaloniki","Greece","Europe",40.6,22.9,80,46,60,48,50,62,2,5,0],["Bucharest","Romania","Europe",44.4,26.1,68,40,68,56,52,62,2,5,0],["Sofia","Bulgaria","Europe",42.7,23.3,66,40,60,48,52,60,2,5,0],["Belgrade","Serbia","Europe",44.8,20.5,64,40,62,50,50,60,2,5,0],["Krakow","Poland","Europe",50.1,19.9,56,38,68,56,52,58,1,5,0],["Bratislava","Slovakia","Europe",48.1,17.1,60,40,65,53,58,60,1,5,0],["Linz","Austria","Europe",48.3,14.3,56,38,62,50,72,58,1,5,0],["Volgograd","Russia","Europe",48.7,44.5,68,38,78,66,42,62,1,5,0],["Saratov","Russia","Europe",51.5,46.0,64,35,76,64,42,60,1,5,0],["Samara","Russia","Europe",53.2,50.2,60,32,78,66,42,60,1,5,0],["Stavropol","Russia","Europe",45.0,41.9,70,40,70,58,44,62,1,5,0],["Dnipro","Ukraine","Europe",48.5,35.0,65,38,75,63,45,58,2,5,0],["Kharkiv","Ukraine","Europe",50.0,36.3,62,36,72,60,44,56,2,5,0],["Riyadh","Saudi Arabia","Middle East",24.7,46.7,94,78,78,70,45,72,4,5,1],["Jeddah","Saudi Arabia","Middle East",21.5,39.2,88,52,72,60,44,60,4,5,1],["Dammam","Saudi Arabia","Middle East",26.4,50.1,90,58,82,78,46,68,4,5,1],["Tabuk","Saudi Arabia","Middle East",28.4,36.6,93,82,70,58,42,72,4,5,1],["NEOM","Saudi Arabia","Middle East",27.5,36.0,93,78,68,56,44,75,4,5,1],["Jubail","Saudi Arabia","Middle East",27.0,49.6,89,55,82,80,44,65,4,5,1],["Riyadh SE","Saudi Arabia","Middle East",24.2,47.0,93,80,80,68,44,70,4,5,1],["Abu Dhabi","UAE","Middle East",24.5,54.4,91,55,80,68,44,68,4,5,1],["Dubai","UAE","Middle East",25.2,55.3,90,52,78,66,44,65,4,5,1],["Masdar City","UAE","Middle East",24.4,54.6,91,55,80,68,50,72,4,5,1],["Kuwait City","Kuwait","Middle East",29.4,47.9,91,55,82,70,43,65,4,5,1],["Oman Duqm","Oman","Middle East",19.6,57.7,90,60,70,58,42,70,4,5,1],["Doha","Qatar","Middle East",25.3,51.5,90,52,80,68,42,65,4,5,1],["Konya","Turkey","Middle East",37.9,32.5,82,52,60,48,50,65,2,5,1],["Ankara","Turkey","Middle East",39.9,32.9,72,50,58,46,52,62,2,5,1],["Gaziantep","Turkey","Middle East",37.1,37.4,78,48,55,43,48,60,2,5,1],["Negev","Israel","Middle East",30.5,34.9,90,82,62,50,52,65,3,5,0],["Aqaba","Jordan","Middle East",29.5,35.0,90,78,60,48,48,65,4,5,0],["Wadi Rum","Jordan","Middle East",29.6,35.4,91,82,58,46,46,65,4,5,0],["Isfahan","Iran","Middle East",32.7,51.7,84,78,68,56,38,62,4,5,0],["Kerman","Iran","Middle East",30.3,57.1,86,82,65,53,36,62,4,5,0],["Yazd","Iran","Middle East",31.9,54.4,85,84,62,50,36,60,4,5,0],["Aden","Yemen","Middle East",12.8,45.0,88,45,58,46,32,50,4,5,0],["Tabriz","Iran","Middle East",38.1,46.3,72,45,62,50,36,58,4,5,0],["Mashhad","Iran","Middle East",36.3,59.6,78,62,65,53,36,58,4,5,0],["Shiraz","Iran","Middle East",29.6,52.5,82,58,62,50,36,60,4,5,0],["Muscat","Oman","Middle East",23.6,58.6,88,52,68,56,42,62,4,5,1],["Salalah","Oman","Middle East",17.0,54.1,84,38,65,53,40,60,4,5,1],["Sanaa","Yemen","Middle East",15.4,44.2,82,62,48,36,28,45,4,5,0],["Amman","Jordan","Middle East",31.9,35.9,82,68,58,46,48,62,4,5,0],["Tel Aviv","Israel","Middle East",32.1,34.8,84,48,58,46,55,60,3,5,0],["Beirut","Lebanon","Middle East",33.9,35.5,76,40,45,35,44,50,2,5,0],["Ouarzazate","Morocco","Africa",30.9,-6.9,93,80,60,48,45,72,2,5,1],["Laayoune","Morocco","Africa",27.2,-13.2,92,78,55,43,42,68,2,5,1],["Agadir","Morocco","Africa",30.4,-9.6,88,62,55,43,44,65,2,5,1],["Ouargla","Algeria","Africa",31.9,5.3,93,88,65,58,38,70,4,5,1],["Hassi Messaoud","Algeria","Africa",31.7,6.1,92,88,78,72,38,68,4,5,1],["Tamanrasset","Algeria","Africa",22.8,5.5,95,90,58,46,34,65,4,5,1],["Tripoli","Libya","Africa",32.9,13.2,88,58,72,60,38,60,4,5,0],["Benghazi","Libya","Africa",32.1,20.1,86,55,70,58,38,58,4,5,0],["Tripoli Libya South","Libya","Africa",26.0,13.5,90,90,68,56,32,60,4,5,0],["Sebha","Libya","Africa",27.0,14.4,92,92,65,53,30,58,4,5,0],["Aswan","Egypt","Africa",24.1,32.9,96,90,75,65,40,68,4,5,1],["Cairo","Egypt","Africa",30.1,31.2,90,72,70,62,40,62,4,5,1],["Hurghada","Egypt","Africa",27.3,33.8,93,75,70,58,40,65,4,5,1],["Dakhla","Egypt","Africa",25.5,29.0,94,85,68,56,38,65,4,5,1],["Luxor","Egypt","Africa",25.7,32.7,95,90,72,60,38,65,4,5,1],["Nouakchott","Mauritania","Africa",18.1,-15.9,90,68,50,38,32,55,4,5,0],["Agadez","Niger","Africa",16.9,7.9,92,82,48,36,30,52,4,5,0],["Niamey","Niger","Africa",13.5,2.1,90,62,40,35,28,45,4,5,0],["Khartoum","Sudan","Africa",15.6,32.5,90,58,55,43,32,55,4,5,0],["Bamako","Mali","Africa",12.6,-8.0,86,45,38,35,28,44,4,5,0],["Ouagadougou","Burkina Faso","Africa",12.4,-1.5,88,42,40,35,28,45,3,5,0],["Timbuktu","Mali","Africa",16.8,-3.0,88,70,38,35,26,42,4,5,0],["Ndjamena","Chad","Africa",12.1,15.1,88,55,42,35,26,42,4,5,0],["Diffa","Niger","Africa",13.3,12.6,90,58,42,35,26,42,4,5,0],["Windhoek","Namibia","Africa",-22.6,17.1,88,65,58,46,38,65,4,5,0],["Upington","South Africa","Africa",-28.4,21.2,90,68,65,53,44,68,3,5,1],["Prieska","South Africa","Africa",-29.7,22.7,88,66,62,50,44,66,3,5,1],["De Aar","South Africa","Africa",-30.7,24.0,88,68,60,48,44,65,3,5,1],["Beaufort West","South Africa","Africa",-32.4,22.6,85,62,58,46,44,62,3,5,1],["Cape Town","South Africa","Africa",-33.9,18.4,78,48,60,48,46,62,3,5,1],["Kimberley","South Africa","Africa",-28.7,24.8,88,65,62,50,44,65,3,5,1],["Bloemfontein","South Africa","Africa",-29.1,26.2,84,55,60,48,44,62,3,5,1],["Nairobi","Kenya","Africa",-1.3,36.8,72,42,48,36,42,52,2,5,0],["Mombasa","Kenya","Africa",-4.1,39.6,72,40,45,35,38,48,2,5,0],["Dire Dawa","Ethiopia","Africa",9.6,41.9,82,52,45,35,30,48,3,5,0],["Addis Ababa","Ethiopia","Africa",9.0,38.7,72,40,42,35,36,48,3,5,0],["Djibouti","Djibouti","Africa",11.6,43.1,88,40,55,43,36,55,4,5,0],["Praia","Cape Verde","Africa",14.9,-23.5,84,55,42,35,36,55,3,5,0],["Kampala","Uganda","Africa",0.3,32.6,68,35,40,35,34,44,2,5,0],["Dar es Salaam","Tanzania","Africa",-6.8,39.3,72,32,42,35,36,44,2,5,0],["Lusaka","Zambia","Africa",-15.4,28.3,78,40,48,36,36,48,2,5,0],["Harare","Zimbabwe","Africa",-17.8,31.1,80,42,50,38,38,50,2,5,0],["Gaborone","Botswana","Africa",-24.7,25.9,86,55,55,43,40,58,3,5,0],["Maputo","Mozambique","Africa",-25.9,32.6,76,38,42,35,34,46,2,5,0],["Antananarivo","Madagascar","Africa",-18.9,47.5,72,38,38,35,30,42,1,5,0],["Dakar","Senegal","Africa",14.7,-17.4,82,45,38,35,32,48,2,5,0],["Abuja","Nigeria","Africa",9.1,7.5,78,38,50,38,30,44,2,5,0],["Accra","Ghana","Africa",5.6,-0.2,76,35,42,35,32,44,2,5,0],["Maroua","Cameroon","Africa",10.6,14.3,82,38,38,35,28,40,2,5,0],["Alice Springs","Australia","Oceania",-23.7,133.9,97,62,72,60,45,85,4,22,2],["Port Augusta","Australia","Oceania",-32.5,137.8,90,55,80,72,48,80,3,75,2],["Broken Hill","Australia","Oceania",-32.0,141.5,91,58,75,63,46,82,3,22,2],["Mildura","Australia","Oceania",-34.2,142.2,88,52,72,60,46,78,3,75,2],["Kalgoorlie","Australia","Oceania",-30.7,121.5,92,58,68,56,44,80,4,42,2],["Carnarvon","Australia","Oceania",-24.9,113.7,95,55,70,58,42,78,4,42,2],["Exmouth","Australia","Oceania",-21.9,114.1,94,52,65,53,40,75,4,42,2],["Newman","Australia","Oceania",-23.4,119.7,92,55,68,56,38,78,4,42,2],["Coober Pedy","Australia","Oceania",-29.0,134.8,95,62,70,58,40,82,4,22,2],["Mount Isa","Australia","Oceania",-20.7,139.5,90,45,62,50,36,75,3,22,2],["Whyalla","Australia","Oceania",-33.0,137.6,89,52,78,70,46,78,3,75,2],["Darwin","Australia","Oceania",-12.5,130.8,82,22,65,53,38,65,3,22,2],["Adelaide","Australia","Oceania",-34.9,138.6,82,50,70,58,52,70,3,75,2],["Melbourne","Australia","Oceania",-37.8,145.0,68,45,68,56,54,68,3,22,2],["Broome","Australia","Oceania",-17.9,122.2,88,40,62,50,36,68,3,22,2],["Karratha","Australia","Oceania",-20.7,116.8,91,52,65,53,38,72,3,42,2],["Port Hedland","Australia","Oceania",-20.3,118.6,90,50,66,54,38,70,3,22,2],["Geraldton","Australia","Oceania",-28.8,114.6,88,52,68,56,42,72,3,22,2],["Wellington","New Zealand","Oceania",-41.3,174.8,55,42,55,43,72,62,0,5,2],["Dunedin","New Zealand","Oceania",-45.9,170.5,50,40,50,38,70,60,0,5,2],["Antofagasta","Chile","S. America",-23.6,-70.4,97,88,65,53,52,72,4,35,1],["Calama","Chile","S. America",-22.5,-68.9,96,92,60,48,48,70,4,35,1],["Iquique","Chile","S. America",-20.2,-70.1,94,85,62,50,50,70,4,35,1],["Arica","Chile","S. America",-18.5,-70.3,93,80,60,48,50,68,4,35,1],["Copiapo","Chile","S. America",-27.4,-70.3,92,85,62,50,50,70,2,35,1],["Punta Arenas","Chile","S. America",-53.1,-70.9,38,52,58,46,55,72,2,35,1],["Puerto Natales","Chile","S. America",-51.7,-72.5,36,48,55,43,52,70,2,35,1],["Mendoza","Argentina","S. America",-32.9,-68.8,85,68,68,56,44,74,2,5,1],["San Juan","Argentina","S. America",-31.5,-68.5,87,70,65,53,42,72,2,5,1],["Neuquen","Argentina","S. America",-38.9,-68.1,78,60,75,63,44,74,2,5,1],["Comodoro Rivadavia","Argentina","S. America",-45.9,-67.5,68,55,80,68,44,72,2,5,1],["Bahia Blanca","Argentina","S. America",-38.7,-62.3,78,58,72,60,42,70,2,5,1],["Viedma","Argentina","S. America",-40.8,-63.0,72,55,70,58,42,68,2,5,1],["Cordoba","Argentina","S. America",-31.4,-64.2,78,52,65,53,44,68,2,5,1],["Resistencia","Argentina","S. America",-27.5,-59.0,78,38,68,56,42,64,2,5,1],["Fortaleza","Brazil","S. America",-3.7,-38.5,82,32,55,43,40,55,1,5,1],["Petrolina","Brazil","S. America",-9.4,-40.5,88,42,60,48,38,60,1,5,1],["Barreiras","Brazil","S. America",-12.1,-44.9,85,45,58,46,40,60,1,5,1],["Recife","Brazil","S. America",-8.1,-34.9,82,28,52,40,38,52,1,5,1],["Salvador","Brazil","S. America",-12.9,-38.5,80,30,50,38,38,50,1,5,1],["Manaus","Brazil","S. America",-3.1,-60.0,65,18,40,35,34,40,1,5,1],["Lima","Peru","S. America",-12.0,-77.0,65,62,60,48,50,52,2,5,0],["Arequipa","Peru","S. America",-16.4,-71.5,82,68,58,46,50,60,2,5,0],["Santa Cruz","Bolivia","S. America",-17.8,-63.2,72,38,55,43,36,50,2,5,0],["La Paz","Bolivia","S. America",-16.5,-68.1,68,48,45,35,36,48,2,5,0],["Bogota","Colombia","S. America",4.7,-74.1,65,40,45,35,52,50,1,5,0],["Cali","Colombia","S. America",3.4,-76.5,68,38,42,35,48,48,1,5,0],["Medellin","Colombia","S. America",6.2,-75.6,66,38,40,35,48,46,1,5,0],["Asuncion","Paraguay","S. America",-25.3,-57.6,74,40,55,43,38,52,2,5,0],["Montevideo","Uruguay","S. America",-34.9,-56.2,68,48,55,43,52,58,1,5,0],["Jodhpur","India","Asia",26.3,73.0,90,42,65,53,35,62,3,5,1],["Jaisalmer","India","Asia",26.9,70.9,91,45,60,48,34,60,3,5,1],["Kutch","India","Asia",23.7,69.9,88,40,62,50,35,58,3,5,1],["Bikaner","India","Asia",28.0,73.3,89,42,62,50,35,60,3,5,1],["Rajkot","India","Asia",22.3,70.8,86,38,60,48,36,58,3,5,1],["Barmer","India","Asia",25.7,71.4,90,44,58,46,34,58,3,5,1],["Pokhran","India","Asia",26.9,71.9,91,45,56,44,34,58,3,5,1],["Bhuj","India","Asia",23.3,69.7,88,38,58,46,35,58,3,5,1],["Anantapur","India","Asia",14.7,77.6,84,35,52,40,36,54,3,5,1],["Tirunelveli","India","Asia",8.7,77.7,80,32,50,38,36,52,3,5,1],["Chennai","India","Asia",13.1,80.3,82,28,58,46,35,52,3,5,1],["Islamabad","Pakistan","Asia",33.7,73.1,76,38,58,46,35,52,4,5,0],["Lahore","Pakistan","Asia",31.5,74.3,80,32,60,48,34,50,4,5,0],["Peshawar","Pakistan","Asia",34.0,71.6,74,38,55,43,34,50,4,5,0],["Almaty","Kazakhstan","Asia",43.2,76.9,68,42,78,66,45,65,4,5,0],["Astana","Kazakhstan","Asia",51.2,71.5,62,38,82,70,44,65,4,5,0],["Aktau","Kazakhstan","Asia",43.6,51.2,72,52,85,73,44,68,4,5,0],["Atyrau","Kazakhstan","Asia",47.1,52.1,72,50,88,76,42,65,4,5,0],["Aktobe","Kazakhstan","Asia",50.3,57.2,66,40,82,70,42,62,4,5,0],["Shymkent","Kazakhstan","Asia",42.3,69.6,72,42,70,58,40,58,4,5,0],["Ashgabat","Turkmenistan","Asia",37.9,58.4,82,65,80,68,40,62,4,5,0],["Tashkent","Uzbekistan","Asia",41.3,69.3,76,42,72,60,40,60,4,5,0],["Bishkek","Kyrgyzstan","Asia",42.9,74.6,65,38,62,50,45,58,2,5,0],["Ulaanbaatar","Mongolia","Asia",47.9,106.9,62,38,65,53,38,60,4,5,0],["Dalanzadgad","Mongolia","Asia",43.6,104.4,65,50,62,50,36,62,4,5,0],["Dunhuang","China","Asia",40.1,94.7,82,62,68,56,35,65,3,5,1],["Turpan","China","Asia",42.9,89.2,84,58,65,53,35,62,3,5,1],["Hami","China","Asia",42.8,93.5,82,60,65,53,35,62,3,5,1],["Zhangye","China","Asia",38.9,100.5,80,50,62,50,38,60,3,5,1],["Jiuquan","China","Asia",39.7,98.5,78,52,65,53,38,62,3,5,1],["Yinchuan","China","Asia",38.5,106.3,76,42,70,58,40,62,3,5,1],["Urumqi","China","Asia",43.8,87.6,76,40,65,53,35,60,3,5,1],["Sendai","Japan","Asia",38.3,140.9,60,38,68,56,52,52,1,5,1],["Seoul","South Korea","Asia",37.6,127.0,62,35,65,53,50,50,2,5,1],["Novosibirsk","Russia","Asia",55.0,82.9,55,38,75,63,42,60,1,5,0],["Omsk","Russia","Asia",55.0,73.4,55,36,78,66,40,60,1,5,0],["Ufa","Russia","Asia",54.7,56.0,52,32,72,60,42,58,1,5,0],["Orenburg","Russia","Asia",51.8,55.1,60,40,80,68,42,62,1,5,0],["Astrakhan","Russia","Asia",46.4,48.0,68,40,82,70,42,65,1,5,0],["Quetta","Pakistan","Asia",30.2,67.0,82,58,60,48,35,55,4,5,0],["Multan","Pakistan","Asia",30.2,71.4,84,42,62,50,35,52,4,5,0],["Karachi","Pakistan","Asia",24.9,67.0,82,42,55,43,35,48,4,5,0],["Hyderabad","Pakistan","Asia",25.4,68.4,84,40,52,40,34,48,4,5,0],["Bangkok","Thailand","Asia",13.8,100.5,72,22,45,35,38,42,2,5,0],["Nakhon Ratchasima","Thailand","Asia",15.0,102.1,72,25,40,35,38,44,2,5,0],["Manila","Philippines","Asia",14.6,121.0,70,22,40,35,36,40,1,5,0],["Cebu","Philippines","Asia",10.3,124.0,68,22,38,35,34,40,1,5,0],["Jakarta","Indonesia","Asia",-6.2,106.8,62,18,42,35,30,38,1,5,1],["Surabaya","Indonesia","Asia",-7.2,112.7,65,20,40,35,30,40,1,5,1],["Ho Chi Minh City","Vietnam","Asia",10.8,106.7,72,20,38,35,32,40,1,5,0],["Hanoi","Vietnam","Asia",21.0,105.8,68,25,40,35,34,42,1,5,0],["Chittagong","Bangladesh","Asia",22.3,91.8,68,18,42,35,30,38,2,5,0],["Yangon","Myanmar","Asia",16.9,96.2,72,18,40,35,30,38,2,5,0],["Phnom Penh","Cambodia","Asia",11.6,104.9,70,20,38,35,30,38,2,5,0],["Ubon Ratchathani","Thailand","Asia",15.2,104.9,74,22,42,35,36,44,2,5,0],["Davao","Philippines","Asia",7.2,125.5,68,20,36,35,32,40,1,5,0],["Makassar","Indonesia","Asia",-5.1,119.4,72,22,40,35,28,38,1,5,1],["Medan","Indonesia","Asia",3.6,98.7,65,18,38,35,28,36,1,5,1],["Palembang","Indonesia","Asia",-3.0,104.8,66,18,42,35,30,38,1,5,1],["Irkutsk","Russia","Asia",52.3,104.3,52,35,70,58,40,55,1,5,0],["Yakutsk","Russia","Asia",62.0,129.7,40,32,65,53,36,45,1,5,0],["Chita","Russia","Asia",52.0,113.5,54,35,68,56,38,55,1,5,0],["Ekaterinburg","Russia","Asia",56.8,60.6,52,30,72,60,42,58,1,5,0],["Chelyabinsk","Russia","Asia",55.2,61.4,54,30,70,58,42,58,1,5,0],["Perm","Russia","Asia",58.0,56.3,50,28,68,56,42,56,1,5,0],["Kazan","Russia","Europe",55.8,49.1,56,30,72,60,42,58,1,5,0],["Nizhny Novgorod","Russia","Europe",56.3,44.0,54,28,68,56,44,58,1,5,0],["Ulan-Ude","Russia","Asia",51.8,107.6,55,35,62,50,38,55,1,5,0],["Norilsk","Russia","Asia",69.3,88.2,28,25,60,48,35,42,1,5,0],["Vladivostok","Russia","Asia",43.1,131.9,58,38,62,50,42,50,1,5,0],["Krasnodar","Russia","Europe",45.0,39.0,68,42,70,58,44,60,1,5,0],["Thessaly","Greece","Europe",39.6,22.4,80,45,55,43,50,60,2,5,0],["Plovdiv","Bulgaria","Europe",42.1,24.7,68,40,60,48,50,58,2,5,0],["Craiova","Romania","Europe",44.3,23.8,66,38,65,53,48,58,2,5,0],["Baku","Azerbaijan","Europe",40.4,49.9,72,48,78,66,42,60,2,5,0],["Tbilisi","Georgia","Europe",41.7,44.8,68,40,60,48,46,56,2,5,0],["Yerevan","Armenia","Europe",40.2,44.5,72,42,58,46,46,56,2,5,0]];
 
 var FACTORS=[
-  {key:'solar',    label:'Renewable energy potential', color:'#b5622a'},
-  {key:'humidity', label:'Low humidity (P90 summer)',   color:'#3d7a8a'},
-  {key:'storage',  label:'Geological storage',          color:'#4a6741'},
-  {key:'grid',     label:'Clean / affordable grid',     color:'#6b5c45'},
-  {key:'land',     label:'Land & infrastructure',       color:'#c9a96e'},
+  {key:'solar',    label:'Renewable energy', color:'#b5622a'},
+  {key:'humidity', label:'Low humidity',      color:'#3d7a8a'},
+  {key:'storage',  label:'Geo. storage',      color:'#4a6741'},
+  {key:'grid',     label:'Clean grid',        color:'#6b5c45'},
+  {key:'land',     label:'Land & infra.',     color:'#c9a96e'},
 ];
 var REGIONS=['All','N. America','Europe','Middle East','Africa','Asia','Oceania','S. America'];
-var WATER_LABELS=['Low','Low\u2013Med','Med\u2013High','High','Extreme'];
+var WATER_LABELS=['Low','Low–Med','Med–High','High','Extreme'];
 var WATER_PENALTY=[0,0,5,12,20];
 var CCS_LABELS=['No framework','Developing','Established'];
-var CONF_OVERRIDES={
-  'USA':'H','Canada':'H','Iceland':'H','Norway':'H','Denmark':'H','Netherlands':'H','Germany':'H',
-  'UK':'H','Sweden':'H','Finland':'H','Australia':'H','New Zealand':'H','Chile':'H','Spain':'H',
-  'Portugal':'H','Austria':'H',
-  'Saudi Arabia':'M','UAE':'M','Kuwait':'M','Qatar':'M','Oman':'M','Morocco':'M','Egypt':'M',
-  'South Africa':'M','Israel':'M','Jordan':'M','Mexico':'M','Argentina':'M','Brazil':'M',
-  'Peru':'M','Turkey':'M','Kazakhstan':'M','Romania':'M','Bulgaria':'M','Serbia':'M',
-  'Poland':'M','Slovakia':'M','India':'M','China':'M','Japan':'M','South Korea':'M','Colombia':'M',
-};
+var CONF_OVERRIDES={'USA':'H','Canada':'H','Iceland':'H','Norway':'H','Denmark':'H','Netherlands':'H','Germany':'H','UK':'H','Sweden':'H','Finland':'H','Australia':'H','New Zealand':'H','Chile':'H','Spain':'H','Portugal':'H','Austria':'H','Saudi Arabia':'M','UAE':'M','Kuwait':'M','Qatar':'M','Oman':'M','Morocco':'M','Egypt':'M','South Africa':'M','Israel':'M','Jordan':'M','Mexico':'M','Argentina':'M','Brazil':'M','Peru':'M','Turkey':'M','Kazakhstan':'M','Romania':'M','Bulgaria':'M','Serbia':'M','Poland':'M','Slovakia':'M','India':'M','China':'M','Japan':'M','South Korea':'M','Colombia':'M'};
 var CONF_REGION={'N. America':'H','Europe':'H','Oceania':'H','Middle East':'M','S. America':'M','Asia':'M','Africa':'L'};
 
 function getConf(s){return CONF_OVERRIDES[s.country]||CONF_REGION[s.region]||'M';}
 function confLabel(c){return c==='H'?'High confidence':c==='M'?'Medium confidence':'Low confidence';}
-function confNote(c){
-  if(c==='H')return 'Multiple validated datasets available. \u00b15 pts uncertainty.';
-  if(c==='M')return 'Regional proxies used. \u00b115 pts uncertainty.';
-  return 'Sparse public data. \u00b130 pts uncertainty. Corrections welcome.';
+function confNote(c){if(c==='H')return 'Validated datasets. ±5 pts.';if(c==='M')return 'Regional proxies. ±15 pts.';return 'Sparse data. ±30 pts. Corrections welcome.';}
+function confRange(sc,c){var m=c==='H'?5:c==='M'?15:30;return[Math.max(0,sc-m),Math.min(100,sc+m)];}
+
+// ── LCOC COST MODEL (Fasihi et al. 2022 + NREL 2023) ──────────
+function computeLCOC(s){
+  var energy_score=(s.solar*0.65+s.grid*0.35)/100;
+  var humidity_score=s.humidity/100;
+  var stor_score=(s.stor_cap+s.stor_inj)/200;
+  var land_score=s.land/100;
+  var water_cost=[0,0,18,35,55][s.water]||0;
+  var energy_cost=210-energy_score*130;
+  var capture_cost=125-humidity_score*65;
+  var capex_cost=115-land_score*40;
+  var storage_cost=55-stor_score*35;
+  var mid=energy_cost+capture_cost+capex_cost+storage_cost+water_cost;
+  return{
+    low:Math.round(mid*0.68/5)*5,
+    mid:Math.round(mid/5)*5,
+    high:Math.round(mid*1.38/5)*5
+  };
 }
-function confRange(score,c){var m=c==='H'?5:c==='M'?15:30;return[Math.max(0,score-m),Math.min(100,score+m)];}
 
 var weights={solar:1,humidity:1,storage:1,grid:1,land:1};
 var overlays={water:true,curtail:false};
 var activeRegion='All',searchTerm='',tooltipPinned=false;
+var compareSites=[];
 
 var sites=SITES_RAW.map(function(r){
   return{name:r[0],country:r[1],region:r[2],lat:r[3],lng:r[4],
@@ -560,26 +455,19 @@ function baseScore(s){
   var stor=Math.round((s.stor_cap+s.stor_inj)/2);
   return Math.round((s.solar*weights.solar+s.humidity*weights.humidity+stor*weights.storage+s.grid*weights.grid+s.land*weights.land)/t);
 }
-
 function scoreColor(v){return v>=75?'#5c8251':v>=60?'#7a9e52':v>=50?'#c9a96e':v>=35?'#d4773a':'#b5622a';}
 function scoreClass(v){return v>=65?'score-high':v>=45?'score-mid':'score-low';}
 
-// ── MAP ──────────────────────────────────────────────────────────
+// ── MAP ──────────────────────────────────────────────────────
 var map=L.map('map',{center:[25,15],zoom:2,zoomControl:false,minZoom:2,maxZoom:10,worldCopyJump:true});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{
-  attribution:'&copy; OpenStreetMap contributors &copy; CARTO',subdomains:'abcd',maxZoom:19
-}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
 document.getElementById('btn-zoom-in').onclick=function(){map.zoomIn();};
 document.getElementById('btn-zoom-out').onclick=function(){map.zoomOut();};
-
 var markersLayer=L.layerGroup().addTo(map);
 
 function createMarker(site){
   var score=computeScore(site),color=scoreColor(score),r=score>=75?9:score>=60?7:score>=45?6:5;
-  var m=L.circleMarker([site.lat,site.lng],{
-    radius:r,fillColor:color,fillOpacity:score>=60?0.82:0.45,
-    color:'white',weight:1.2,opacity:score>=60?0.6:0.3
-  });
+  var m=L.circleMarker([site.lat,site.lng],{radius:r,fillColor:color,fillOpacity:score>=60?0.82:0.45,color:'white',weight:1.2,opacity:score>=60?0.5:0.25});
   m.on('mouseover',function(e){if(!tooltipPinned)showTooltip(site,e.originalEvent,false);});
   m.on('mouseout',function(e){
     if(tooltipPinned)return;
@@ -592,13 +480,10 @@ function createMarker(site){
 }
 function renderMarkers(){markersLayer.clearLayers();getFiltered().forEach(function(s){createMarker(s).addTo(markersLayer);});}
 function getFiltered(){
-  return sites.filter(function(s){
-    return(activeRegion==='All'||s.region===activeRegion)&&
-      (!searchTerm||s.name.toLowerCase().includes(searchTerm)||s.country.toLowerCase().includes(searchTerm));
-  }).sort(function(a,b){return computeScore(b)-computeScore(a);});
+  return sites.filter(function(s){return(activeRegion==='All'||s.region===activeRegion)&&(!searchTerm||s.name.toLowerCase().includes(searchTerm)||s.country.toLowerCase().includes(searchTerm));}).sort(function(a,b){return computeScore(b)-computeScore(a);});
 }
 
-// ── TOOLTIP ──────────────────────────────────────────────────────
+// ── TOOLTIP ──────────────────────────────────────────────────
 var tooltip=document.getElementById('tooltip');
 function showTooltip(site,ev,pinned){
   tooltipPinned=!!pinned;
@@ -607,104 +492,153 @@ function showTooltip(site,ev,pinned){
   var stor=Math.round((site.stor_cap+site.stor_inj)/2);
   var penalty=overlays.water?WATER_PENALTY[site.water]||0:0;
   var bonus=overlays.curtail?Math.round(site.curtail/100*10):0;
+  var lcoc=computeLCOC(site);
+  var issueUrl='https://github.com/CO2Ri/CDR-Intelligence-/issues/new?title='+encodeURIComponent('Data correction: '+site.name+' ('+site.country+')');
+  var linkedIn='https://www.linkedin.com/in/cheme-farhan/';
 
-  var h=pinned?'<div style="font-family:var(--mono);font-size:9px;color:var(--bark3);margin-bottom:8px;letter-spacing:.06em">PINNED \u2014 click map to close</div>':'';
+  var h=pinned?'<div style="font-family:var(--mono);font-size:9px;color:var(--bark3);margin-bottom:8px;letter-spacing:.06em">PINNED — click map to close</div>':'';
   h+='<div class="tt-name">'+site.name+'</div>';
-  h+='<div class="tt-country">'+site.country+' \u00b7 '+site.region+'</div>';
-  h+='<div class="tt-flags">';
-  h+='<span class="'+cc+'">'+conf+'</span>';
-  h+='<span class="water-'+site.water+'">H\u2082O: '+WATER_LABELS[site.water]+'</span>';
-  h+='<span class="ccs-'+site.ccs+'">CCS: '+CCS_LABELS[site.ccs]+'</span>';
-  if(site.curtail>=40)h+='<span class="curtail-tag">Curtail: '+site.curtail+'</span>';
+  h+='<div class="tt-country">'+site.country+' · '+site.region+'</div>';
+  h+='<div class="tt-flags"><span class="'+cc+'">'+conf+'</span><span class="water-'+site.water+'">H₂O: '+WATER_LABELS[site.water]+'</span><span class="ccs-'+site.ccs+'">CCS: '+CCS_LABELS[site.ccs]+'</span>'+(site.curtail>=40?'<span class="curtail-tag">Curtail: '+site.curtail+'</span>':'')+'</div>';
+
+  // Cost box
+  h+='<div class="tt-cost-box">';
+  h+='<div class="tt-cost-head">Est. LCOC (solid sorbent, 2025)</div>';
+  h+='<div class="tt-cost-range">$'+lcoc.low+'–$'+lcoc.high+'<span style="font-size:12px;color:var(--bark3)"> /tonne</span></div>';
+  h+='<div class="tt-cost-mid">Midpoint: $'+lcoc.mid+'/t · Fasihi et al. 2022 + NREL 2023</div>';
+  h+='<div class="tt-cost-note">±35–40% uncertainty. Screening estimate only.</div>';
   h+='</div>';
+
   h+='<div class="tt-section">Factor scores</div>';
   FACTORS.forEach(function(f){
     var v=f.key==='storage'?stor:site[f.key];
     h+='<div class="tt-row"><div class="tt-key"><div class="tt-dot" style="background:'+f.color+'"></div>'+f.label+'</div><div class="tt-val">'+v+'</div></div>';
-    if(f.key==='storage'){
-      h+='<div class="tt-stor"><span class="tt-stor-item">Capacity: <span class="tt-stor-val">'+site.stor_cap+'</span></span><span class="tt-stor-item" style="margin-left:12px">Injectivity: <span class="tt-stor-val">'+site.stor_inj+'</span></span></div>';
-    }
+    if(f.key==='storage'){h+='<div class="tt-stor"><span class="tt-stor-item">Capacity: <span class="tt-stor-val">'+site.stor_cap+'</span></span><span class="tt-stor-item" style="margin-left:12px">Injectivity: <span class="tt-stor-val">'+site.stor_inj+'</span></span></div>';}
   });
   h+='<div class="tt-divider"></div>';
-  h+='<div class="tt-total"><div class="tt-total-label">Composite score</div><div class="tt-total-val" style="color:'+color+'">'+score+' <span style="font-size:13px;color:var(--bark3)">/ 100</span></div></div>';
-  h+='<div class="tt-range">'+range[0]+'\u2013'+range[1]+' uncertainty range</div>';
-  if(penalty>0||bonus>0){
-    h+='<div style="font-size:10px;color:var(--bark3);margin-top:5px">Base score '+bs;
-    if(penalty>0)h+=' &minus; '+penalty+' (water)';
-    if(bonus>0)h+=' + '+bonus+' (curtailment)';
-    h+='</div>';
-  }
-  h+='<div class="tt-note">'+confNote(conf)+'</div>';
-  var issueUrl='https://github.com/CO2Ri/CDR-Intelligence-/issues/new?title='+encodeURIComponent('Data correction: '+site.name+' ('+site.country+')');
-  h+='<button class="tt-report" onclick="window.open(\''+issueUrl+'\',\'_blank\')"><span class="tt-report-dot"></span>report a data error \u2197</button>';
-  tooltip.innerHTML=h;
-  tooltip.style.display='block';
+  h+='<div class="tt-total-row"><div class="tt-total-label">Suitability score</div><div class="tt-total-val" style="color:'+color+'">'+score+'<span style="font-size:13px;color:var(--bark3)"> /100</span></div></div>';
+  h+='<div class="tt-range-note">Range: '+range[0]+'–'+range[1]+' ('+confLabel(conf)+')</div>';
+  if(penalty>0||bonus>0){h+='<div style="font-size:10px;color:var(--bark3);margin-top:2px">Base '+bs+(penalty>0?' − '+penalty+' water':'')+(bonus>0?' + '+bonus+' curtailment':'')+'</div>';}
+  h+='<div class="tt-actions">';
+  h+='<button class="tt-report" onclick="window.open(''+issueUrl+'','_blank')">Report data error</button>';
+  h+='<a class="tt-request" href="'+linkedIn+'" target="_blank"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>Get site report</a>';
+  h+='</div>';
+  tooltip.innerHTML=h;tooltip.style.display='block';
   tooltip.style.borderColor=pinned?'rgba(181,98,42,0.35)':'var(--cream3)';
   positionTooltip(ev);
 }
 function hideTooltip(){if(!tooltipPinned)tooltip.style.display='none';}
 function forceHideTooltip(){tooltipPinned=false;tooltip.style.display='none';}
-tooltip.addEventListener('mouseleave',function(e){
-  if(tooltipPinned)return;
-  var rel=e.relatedTarget;
-  if(rel&&rel.closest&&rel.closest('.leaflet-interactive'))return;
-  hideTooltip();
-});
+tooltip.addEventListener('mouseleave',function(e){if(tooltipPinned)return;var rel=e.relatedTarget;if(rel&&rel.closest&&rel.closest('.leaflet-interactive'))return;hideTooltip();});
 function positionTooltip(ev){
   var wrap=document.getElementById('map-wrap'),rect=wrap.getBoundingClientRect();
   var x=ev.clientX-rect.left+16,y=ev.clientY-rect.top-12;
-  if(x+295>rect.width)x=ev.clientX-rect.left-307;
-  if(y+440>rect.height)y=ev.clientY-rect.top-440;
+  if(x+300>rect.width)x=ev.clientX-rect.left-312;
+  if(y+460>rect.height)y=ev.clientY-rect.top-460;
   tooltip.style.left=x+'px';tooltip.style.top=y+'px';
 }
 document.getElementById('map-wrap').addEventListener('mousemove',function(e){if(tooltip.style.display==='block'&&!tooltipPinned)positionTooltip(e);});
 map.on('click',function(){forceHideTooltip();});
 
 function selectSite(site,marker){
-  map.flyTo([site.lat,site.lng],6,{duration:1.2});
+  map.flyTo([site.lat,site.lng],6,{duration:1.2});renderSiteList();
+  setTimeout(function(){document.querySelectorAll('.site-item').forEach(function(el){el.classList.toggle('active',el.dataset.name===site.name);if(el.dataset.name===site.name)el.scrollIntoView({behavior:'smooth',block:'nearest'});});},100);
+}
+
+// ── COMPARE ──────────────────────────────────────────────────
+function toggleCompare(site,e){
+  e.stopPropagation();
+  var idx=compareSites.findIndex(function(s){return s.name===site.name;});
+  if(idx>=0){compareSites.splice(idx,1);}
+  else if(compareSites.length<3){compareSites.push(site);}
+  updateCompareBar();
   renderSiteList();
-  setTimeout(function(){
-    document.querySelectorAll('.site-item').forEach(function(el){
-      el.classList.toggle('active',el.dataset.name===site.name);
-      if(el.dataset.name===site.name)el.scrollIntoView({behavior:'smooth',block:'nearest'});
-    });
-  },100);
+  if(compareSites.length>0)renderDrawer();
 }
 
-function toggleOverlay(id){
-  overlays[id]=!overlays[id];
-  document.getElementById('tog-'+id).classList.toggle('on',overlays[id]);
-  refresh();
+function updateCompareBar(){
+  var bar=document.getElementById('compare-bar');
+  var count=document.getElementById('compare-bar-count');
+  if(compareSites.length>0){
+    bar.classList.add('visible');
+    count.textContent=compareSites.length+' site'+(compareSites.length>1?'s':'');
+  } else {
+    bar.classList.remove('visible');
+    closeDrawer();
+  }
 }
 
-// ── SIDEBAR CONTROLS ─────────────────────────────────────────────
+function openDrawer(){renderDrawer();document.getElementById('compare-drawer').classList.add('open');}
+function closeDrawer(){document.getElementById('compare-drawer').classList.remove('open');}
+
+function renderDrawer(){
+  var table=document.getElementById('compare-table');
+  table.innerHTML='';
+  compareSites.forEach(function(site){
+    var score=computeScore(site),color=scoreColor(score),conf=getConf(site);
+    var stor=Math.round((site.stor_cap+site.stor_inj)/2);
+    var lcoc=computeLCOC(site);
+    var cc=scoreClass(score);
+    var col=document.createElement('div');col.className='compare-col';
+    var factors_html=FACTORS.map(function(f){
+      var v=f.key==='storage'?stor:site[f.key];
+      return '<div class="compare-factor-row">'+
+        '<div class="compare-factor-name">'+f.label+'</div>'+
+        '<div class="compare-factor-bar-wrap"><div class="compare-factor-bar" style="width:'+v+'%;background:'+f.color+'"></div></div>'+
+        '<div class="compare-factor-val">'+v+'</div>'+
+        '</div>';
+    }).join('');
+    var flags='<span class="water-'+site.water+'">H₂O: '+WATER_LABELS[site.water]+'</span> '+
+              '<span class="ccs-'+site.ccs+'">'+CCS_LABELS[site.ccs]+'</span>'+
+              (site.curtail>=40?'<span class="curtail-tag" style="margin-left:3px">Curtail '+site.curtail+'</span>':'');
+    col.innerHTML=
+      '<div class="compare-remove" onclick="removeCompare(''+site.name+'')">&#10005;</div>'+
+      '<div class="compare-col-head">'+
+        '<div class="compare-col-name">'+site.name+'</div>'+
+        '<div class="compare-col-country">'+site.country+'</div>'+
+        '<div class="compare-col-score '+cc+'">'+score+'<span style="font-family:var(--mono);font-size:10px;color:var(--bark3);font-weight:400"> /100</span></div>'+
+        '<div class="compare-col-cost">$'+lcoc.low+'–$'+lcoc.high+'/t est.</div>'+
+      '</div>'+
+      '<div class="compare-factors">'+factors_html+'</div>'+
+      '<div class="compare-flags">'+flags+'</div>';
+    table.appendChild(col);
+  });
+  // Add empty slot hint if <3
+  if(compareSites.length<3){
+    var hint=document.createElement('div');
+    hint.style.cssText='min-width:200px;border:2px dashed var(--cream3);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:30px 20px;';
+    hint.innerHTML='<div style="text-align:center"><div style="font-size:24px;color:var(--cream3);margin-bottom:6px">+</div><div style="font-family:var(--mono);font-size:10px;color:var(--bark3)">Add another site</div></div>';
+    table.appendChild(hint);
+  }
+}
+
+function removeCompare(name){
+  compareSites=compareSites.filter(function(s){return s.name!==name;});
+  updateCompareBar();
+  renderSiteList();
+  if(compareSites.length>0)renderDrawer();else closeDrawer();
+}
+
+// ── OVERLAYS ─────────────────────────────────────────────────
+function toggleOverlay(id){overlays[id]=!overlays[id];document.getElementById('tog-'+id).classList.toggle('on',overlays[id]);refresh();}
+
+// ── SIDEBAR ──────────────────────────────────────────────────
 function buildWeights(){
-  var container=document.getElementById('weights-container');container.innerHTML='';
+  var c=document.getElementById('weights-container');c.innerHTML='';
   FACTORS.forEach(function(f){
     var row=document.createElement('div');row.className='weight-row';
-    row.innerHTML='<div class="weight-meta"><span class="weight-name">'+f.label+'</span><span class="weight-val" id="wv-'+f.key+'">100%</span></div>'+
-      '<input type="range" min="0" max="200" step="10" value="100" data-key="'+f.key+'" style="accent-color:'+f.color+'">';
-    container.appendChild(row);
-    row.querySelector('input').addEventListener('input',function(){
-      weights[this.dataset.key]=parseFloat(this.value)/100;
-      document.getElementById('wv-'+this.dataset.key).textContent=this.value+'%';
-      refresh();
-    });
+    row.innerHTML='<div class="weight-meta"><span class="weight-name">'+f.label+'</span><span class="weight-val" id="wv-'+f.key+'">100%</span></div><input type="range" min="0" max="200" step="10" value="100" data-key="'+f.key+'" style="accent-color:'+f.color+'">';
+    c.appendChild(row);
+    row.querySelector('input').addEventListener('input',function(){weights[this.dataset.key]=parseFloat(this.value)/100;document.getElementById('wv-'+this.dataset.key).textContent=this.value+'%';refresh();});
   });
 }
 
 function buildRegionFilters(){
-  var container=document.getElementById('region-filters');container.innerHTML='';
+  var c=document.getElementById('region-filters');c.innerHTML='';
   REGIONS.forEach(function(r){
-    var btn=document.createElement('button');
-    btn.className='filter-btn'+(r===activeRegion?' active':'');
-    btn.textContent=r;
-    btn.onclick=function(){
-      activeRegion=r;
-      document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
-      btn.classList.add('active');refresh();
-    };
-    container.appendChild(btn);
+    var btn=document.createElement('button');btn.className='filter-btn'+(r===activeRegion?' active':'');btn.textContent=r;
+    btn.onclick=function(){activeRegion=r;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');refresh();};
+    c.appendChild(btn);
   });
 }
 
@@ -720,53 +654,57 @@ function renderStats(){
 
 function renderSiteList(){
   var filtered=getFiltered().slice(0,30);
-  var container=document.getElementById('site-list');
+  var c=document.getElementById('site-list');
   document.getElementById('site-count').textContent='top '+Math.min(30,getFiltered().length);
-  if(!filtered.length){container.innerHTML='<div class="no-sites">No sites match this filter.</div>';return;}
-  container.innerHTML='';
+  if(!filtered.length){c.innerHTML='<div class="no-sites">No sites match this filter.</div>';return;}
+  c.innerHTML='';
   filtered.forEach(function(site){
     var score=computeScore(site),conf=getConf(site),range=confRange(score,conf),cc='conf-'+conf.toLowerCase();
     var stor=Math.round((site.stor_cap+site.stor_inj)/2);
-    var item=document.createElement('div');item.className='site-item';item.dataset.name=site.name;
-    var bars=FACTORS.map(function(f){
-      var v=f.key==='storage'?stor:site[f.key];
-      return'<div class="mini-bar"><div class="mini-fill" style="width:'+v+'%;background:'+f.color+'"></div></div>';
-    }).join('');
+    var lcoc=computeLCOC(site);
+    var inCompare=compareSites.some(function(s){return s.name===site.name;});
+    var item=document.createElement('div');
+    item.className='site-item'+(inCompare?' in-compare':'');
+    item.dataset.name=site.name;
+    var bars=FACTORS.map(function(f){var v=f.key==='storage'?stor:site[f.key];return'<div class="mini-bar"><div class="mini-fill" style="width:'+v+'%;background:'+f.color+'"></div></div>';}).join('');
     item.innerHTML=
+      '<div class="compare-add-btn" title="'+(inCompare?'Remove from compare':'Add to compare')+'">'+(inCompare?'&#10003;':'+')+'</div>'+
       '<div class="site-top">'+
         '<div>'+
           '<div class="site-name">'+site.name+' <span class="site-unc '+cc+'">'+conf+'</span></div>'+
-          '<div class="site-country">'+site.country+' \u00b7 '+site.region+'</div>'+
+          '<div class="site-country">'+site.country+' · '+site.region+'</div>'+
         '</div>'+
         '<div style="text-align:right">'+
           '<div class="site-score '+scoreClass(score)+'">'+score+'</div>'+
-          '<div style="font-size:9px;color:var(--bark3);font-family:var(--mono)">'+range[0]+'\u2013'+range[1]+'</div>'+
+          '<div style="font-family:var(--mono);font-size:9px;color:var(--bark3)">'+range[0]+'–'+range[1]+'</div>'+
         '</div>'+
       '</div>'+
       '<div class="site-bars">'+bars+'</div>'+
+      '<div class="cost-badge">'+
+        '<span class="cost-icon">$</span>'+
+        '<span class="cost-range">$'+lcoc.low+'–$'+lcoc.high+'/t</span>'+
+        '<span class="cost-label">est. LCOC &middot; Fasihi 2022</span>'+
+      '</div>'+
       '<div class="site-flags">'+
-        '<span class="water-'+site.water+'">H\u2082O: '+WATER_LABELS[site.water]+'</span>'+
+        '<span class="water-'+site.water+'">H₂O: '+WATER_LABELS[site.water]+'</span>'+
         '<span class="ccs-'+site.ccs+'">'+CCS_LABELS[site.ccs]+'</span>'+
         (site.curtail>=40?'<span class="curtail-tag">Curtail '+site.curtail+'</span>':'')+
       '</div>';
-    item.onclick=function(){
-      map.flyTo([site.lat,site.lng],6,{duration:1.2});
-      document.querySelectorAll('.site-item').forEach(function(el){el.classList.remove('active');});
-      item.classList.add('active');
-    };
-    container.appendChild(item);
+    item.querySelector('.compare-add-btn').addEventListener('click',function(e){toggleCompare(site,e);});
+    item.addEventListener('click',function(){map.flyTo([site.lat,site.lng],6,{duration:1.2});document.querySelectorAll('.site-item').forEach(function(el){el.classList.remove('active');});item.classList.add('active');});
+    c.appendChild(item);
   });
 }
 
 function exportCSV(){
   var filtered=getFiltered();
-  var hdr='Rank,Name,Country,Region,Lat,Lng,Solar,Humidity_P90_inv,Stor_Capacity,Stor_Injectivity,Grid,Land,Score,Score_min,Score_max,Water_Stress,Water_Label,CCS_Framework,CCS_Label,Curtailment_Score,Confidence';
+  var hdr='Rank,Name,Country,Region,Lat,Lng,Suitability_Score,Score_min,Score_max,LCOC_Low,LCOC_Mid,LCOC_High,Solar,Humidity_P90,Stor_Capacity,Stor_Injectivity,Grid,Land,Water_Stress,Water_Label,CCS_Framework,CCS_Label,Curtailment,Confidence';
   var rows=filtered.map(function(s,i){
-    var score=computeScore(s),conf=getConf(s),range=confRange(score,conf);
+    var score=computeScore(s),conf=getConf(s),range=confRange(score,conf),lcoc=computeLCOC(s);
     return[i+1,'"'+s.name+'"','"'+s.country+'"','"'+s.region+'"',s.lat,s.lng,
+      score,range[0],range[1],lcoc.low,lcoc.mid,lcoc.high,
       s.solar,s.humidity,s.stor_cap,s.stor_inj,s.grid,s.land,
-      score,range[0],range[1],s.water,'"'+WATER_LABELS[s.water]+'"',
-      s.ccs,'"'+CCS_LABELS[s.ccs]+'"',s.curtail,conf].join(',');
+      s.water,'"'+WATER_LABELS[s.water]+'"',s.ccs,'"'+CCS_LABELS[s.ccs]+'"',s.curtail,conf].join(',');
   });
   var csv=hdr+'\n'+rows.join('\n');
   var url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
@@ -777,7 +715,7 @@ function exportCSV(){
 document.getElementById('csv-btn').onclick=exportCSV;
 document.getElementById('search').addEventListener('input',function(){searchTerm=this.value.toLowerCase().trim();refresh();});
 
-function refresh(){renderMarkers();renderStats();renderSiteList();}
+function refresh(){renderMarkers();renderStats();renderSiteList();if(compareSites.length>0)renderDrawer();}
 buildWeights();buildRegionFilters();refresh();
 </script>
 </body>
