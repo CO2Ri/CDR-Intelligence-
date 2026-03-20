@@ -10,22 +10,11 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
-  --bg: #0a0f0d;
-  --bg2: #111812;
-  --bg3: #182118;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --text: #e8ede9;
-  --text2: #8fa890;
-  --text3: #4d5e4e;
-  --accent: #4ade80;
-  --accent2: #22c55e;
-  --teal: #2dd4bf;
-  --amber: #f59e0b;
-  --red: #f87171;
-  --mono: 'DM Mono', monospace;
-  --serif: 'Instrument Serif', serif;
-  --sans: 'DM Sans', sans-serif;
+  --bg: #0a0f0d; --bg2: #111812; --bg3: #182118;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+  --text: #e8ede9; --text2: #8fa890; --text3: #4d5e4e;
+  --accent: #4ade80; --accent2: #22c55e; --teal: #2dd4bf; --amber: #f59e0b; --red: #f87171;
+  --mono: 'DM Mono', monospace; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--sans); }
@@ -66,9 +55,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
 .site-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
 .site-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; }
 .site-score { font-family: var(--mono); font-size: 14px; font-weight: 500; }
-.score-high { color: var(--accent); }
-.score-mid { color: var(--amber); }
-.score-low { color: var(--red); }
+.score-high { color: var(--accent); } .score-mid { color: var(--amber); } .score-low { color: var(--red); }
 .site-country { font-size: 11px; color: var(--text3); margin-top: 2px; }
 .site-bars { display: flex; gap: 4px; margin-top: 7px; }
 .mini-bar { flex: 1; height: 3px; border-radius: 1px; background: var(--bg); overflow: hidden; }
@@ -81,7 +68,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
 .mh-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; }
 .mh-val { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--accent); line-height: 1; margin-top: 2px; }
 .mh-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
-#tooltip { position: absolute; z-index: 800; background: rgba(10,15,13,0.95); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; pointer-events: none; display: none; min-width: 220px; }
+#tooltip { position: absolute; z-index: 800; background: rgba(10,15,13,0.95); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; display: none; min-width: 240px; max-width: 260px; pointer-events: all !important; }
 .tt-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
 .tt-country { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-bottom: 10px; }
 .tt-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
@@ -100,10 +87,19 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
 .meth-sources { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
 .src-tag { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 3px; background: var(--bg3); color: var(--text3); border: 1px solid var(--border); letter-spacing: .04em; }
 .leaflet-container { background: #0d1410; }
-.tt-report { display: block; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: var(--text3); text-decoration: none; font-family: var(--mono); letter-spacing: .04em; cursor: pointer; transition: color .15s; }
+.tt-report { display: block; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: var(--text3); text-decoration: none; font-family: var(--mono); letter-spacing: .04em; cursor: pointer; transition: color .15s; pointer-events: all; }
 .tt-report:hover { color: var(--accent); }
 .tt-report-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text3); margin-right: 5px; vertical-align: middle; position: relative; top: -1px; transition: background .15s; }
 .tt-report:hover .tt-report-dot { background: var(--accent); }
+.conf-h { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 3px; background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); letter-spacing:.05em; }
+.conf-m { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 3px; background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); letter-spacing:.05em; }
+.conf-l { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 3px; background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); letter-spacing:.05em; }
+.tt-conf-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.tt-conf-label { font-size: 11px; color: var(--text3); }
+.tt-unc-bar { height: 2px; margin-top: 3px; border-radius: 1px; }
+#csv-btn { width: 100%; padding: 8px 0; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); background: transparent; border: 1px solid var(--border2); border-radius: 6px; cursor: pointer; transition: all .15s; margin-bottom: 16px; }
+#csv-btn:hover { color: var(--accent); border-color: var(--accent); }
+.site-unc { display: inline-block; font-family: var(--mono); font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
 #search { position: absolute; top: 16px; right: 60px; z-index: 500; background: rgba(10,15,13,0.88); backdrop-filter: blur(8px); border: 1px solid var(--border2); border-radius: 8px; padding: 8px 14px; font-family: var(--mono); font-size: 12px; color: var(--text); outline: none; width: 200px; }
 #search::placeholder { color: var(--text3); }
 #search:focus { border-color: var(--accent); }
@@ -114,15 +110,12 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
 <div id="app">
   <div id="sidebar">
     <div id="s-head">
-      <div class="logo-row">
-        <div class="logo-dot"></div>
-        <span class="logo-label">CDR Site Intelligence · v0.1</span>
-      </div>
+      <div class="logo-row"><div class="logo-dot"></div><span class="logo-label">CDR Site Intelligence · v0.1</span></div>
       <div class="s-title">DAC <em>Suitability</em><br>Index</div>
       <div class="s-sub">Scoring 312 global locations across 5 factors. Public data only. Open methodology.</div>
     </div>
     <div id="s-body">
-      <div class="global-stats" id="global-stats">
+      <div class="global-stats">
         <div class="stat-card"><div class="stat-val" id="st-top">—</div><div class="stat-label">Top score</div></div>
         <div class="stat-card"><div class="stat-val" id="st-viable">—</div><div class="stat-label">Viable sites (≥60)</div></div>
         <div class="stat-card"><div class="stat-val" id="st-countries">—</div><div class="stat-label">Countries</div></div>
@@ -140,6 +133,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
         <div class="legend-row"><div class="legend-dot" style="background:#ef4444;opacity:.5"></div><div class="legend-text">Low suitability (&lt;30)</div></div>
       </div>
       <div class="sec-head">Top sites <span id="site-count" style="color:var(--accent)"></span></div>
+      <button id="csv-btn">&#8595; export as CSV</button>
       <div id="site-list"></div>
     </div>
   </div>
@@ -153,18 +147,14 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
     <input id="search" placeholder="Search location…" autocomplete="off">
     <div id="tooltip"></div>
     <div id="map-controls">
-      <div class="map-btn" id="btn-zoom-in" title="Zoom in">+</div>
-      <div class="map-btn" id="btn-zoom-out" title="Zoom out">−</div>
+      <div class="map-btn" id="btn-zoom-in">+</div>
+      <div class="map-btn" id="btn-zoom-out">−</div>
     </div>
     <div id="methodology">
       <div class="meth-head">Scoring methodology</div>
       <div class="meth-text">Composite index across 5 factors. Weighted sum normalised 0–100. Proxy values derived from published climatology and geology atlases. Not a substitute for site-level feasibility study.</div>
       <div class="meth-sources">
-        <span class="src-tag">ERA5 / Copernicus</span>
-        <span class="src-tag">NREL NSRDB</span>
-        <span class="src-tag">Global CCS Inst.</span>
-        <span class="src-tag">IEA Grid Data</span>
-        <span class="src-tag">GEBCO</span>
+        <span class="src-tag">ERA5 / Copernicus</span><span class="src-tag">NREL NSRDB</span><span class="src-tag">Global CCS Inst.</span><span class="src-tag">IEA Grid Data</span><span class="src-tag">GEBCO</span>
       </div>
     </div>
   </div>
@@ -192,9 +182,9 @@ var SITES_RAW = [
   ["Houston","USA","N. America",29.8,-95.4,78,52,94,44,60],
   ["Corpus Christi","USA","N. America",27.8,-97.4,82,58,92,45,62],
   ["Atlanta","USA","N. America",33.7,-84.4,74,55,60,48,58],
-  ["Reykjavik","Iceland","Europe",64.1,-21.9,28,82,98,99,70],
-  ["Akureyri","Iceland","Europe",65.7,-18.1,25,80,96,99,68],
-  ["Keflavik","Iceland","Europe",63.9,-22.6,29,83,95,99,72],
+  ["Reykjavik","Iceland","Europe",64.1,-21.9,28,22,98,85,70],
+  ["Akureyri","Iceland","Europe",65.7,-18.1,25,20,96,85,68],
+  ["Keflavik","Iceland","Europe",63.9,-22.6,29,24,95,85,72],
   ["Stavanger","Norway","Europe",58.9,5.7,42,72,88,96,65],
   ["Bergen","Norway","Europe",60.4,5.3,38,68,85,97,62],
   ["Oslo","Norway","Europe",59.9,10.7,44,70,82,95,65],
@@ -410,219 +400,209 @@ var SITES_RAW = [
 ];
 
 var FACTORS = [
-  {key:'solar',    label:'Renewable energy potential', color:'#f59e0b', idx:5},
-  {key:'humidity', label:'Low humidity (drying cost)', color:'#60a5fa', idx:6},
-  {key:'storage',  label:'Geological storage access',  color:'#34d399', idx:7},
-  {key:'grid',     label:'Clean / cheap electricity',  color:'#c084fc', idx:8},
-  {key:'land',     label:'Land & infrastructure',      color:'#fb923c', idx:9},
+  {key:'solar',    label:'Renewable energy potential', color:'#f59e0b'},
+  {key:'humidity', label:'Low humidity (drying cost)', color:'#60a5fa'},
+  {key:'storage',  label:'Geological storage access',  color:'#34d399'},
+  {key:'grid',     label:'Clean / cheap electricity',  color:'#c084fc'},
+  {key:'land',     label:'Land & infrastructure',      color:'#fb923c'},
 ];
 
 var REGIONS = ['All','N. America','Europe','Middle East','Africa','Asia','Oceania','S. America'];
-var weights = {solar:1, humidity:1, storage:1, grid:1, land:1};
+
+var CONF_OVERRIDES = {
+  'USA':'H','Canada':'H','Iceland':'H','Norway':'H','Denmark':'H','Netherlands':'H','Germany':'H','UK':'H','Sweden':'H','Finland':'H','Australia':'H','New Zealand':'H','Chile':'H','France':'H','Spain':'H','Portugal':'H','Austria':'H',
+  'Saudi Arabia':'M','UAE':'M','Kuwait':'M','Qatar':'M','Oman':'M','Morocco':'M','Egypt':'M','South Africa':'M','Israel':'M','Jordan':'M','Mexico':'M','Argentina':'M','Brazil':'M','Peru':'M','Turkey':'M','Kazakhstan':'M','Romania':'M','Bulgaria':'M','Serbia':'M','Poland':'M','Slovakia':'M','India':'M','China':'M','Japan':'M','South Korea':'M',
+  'Algeria':'L','Libya':'L','Sudan':'L','Mauritania':'L','Niger':'L','Mali':'L','Burkina Faso':'L','Ethiopia':'L','Kenya':'L','Namibia':'L','Djibouti':'L','Cape Verde':'L','Turkmenistan':'L','Uzbekistan':'L','Kyrgyzstan':'L','Mongolia':'L','Pakistan':'L','Bangladesh':'L','Indonesia':'L','Vietnam':'L','Philippines':'L','Thailand':'L','Yemen':'L','Iran':'L','Russia':'L','Ukraine':'L'
+};
+
+var CONF_REGION = {'N. America':'H','Europe':'H','Oceania':'H','Middle East':'M','S. America':'M','Asia':'M','Africa':'L'};
+
+function getConf(site) { return CONF_OVERRIDES[site.country] || CONF_REGION[site.region] || 'M'; }
+function confLabel(c) { return c==='H'?'High confidence':c==='M'?'Medium confidence':'Low confidence'; }
+function confNote(c) {
+  if(c==='H') return 'Multiple validated public datasets available for this region.';
+  if(c==='M') return 'Regional proxy data used. \u00b115% score uncertainty estimated.';
+  return 'Sparse public data. \u00b130% score uncertainty. Corrections welcome.';
+}
+function confRange(score,c) { var m=c==='H'?5:c==='M'?15:30; return [Math.max(0,score-m),Math.min(100,score+m)]; }
+
+var weights = {solar:1,humidity:1,storage:1,grid:1,land:1};
 var activeRegion = 'All';
 var activeMarker = null;
 var searchTerm = '';
 
 var sites = SITES_RAW.map(function(r) {
-  return { name:r[0], country:r[1], region:r[2], lat:r[3], lng:r[4],
-    solar:r[5], humidity:r[6], storage:r[7], grid:r[8], land:r[9] };
+  return {name:r[0],country:r[1],region:r[2],lat:r[3],lng:r[4],solar:r[5],humidity:r[6],storage:r[7],grid:r[8],land:r[9]};
 });
 
 function computeScore(s) {
-  var total = weights.solar + weights.humidity + weights.storage + weights.grid + weights.land;
-  if (total === 0) return 0;
-  var raw = (s.solar*weights.solar + s.humidity*weights.humidity + s.storage*weights.storage + s.grid*weights.grid + s.land*weights.land) / total;
-  return Math.round(raw);
+  var total = weights.solar+weights.humidity+weights.storage+weights.grid+weights.land;
+  if(!total) return 0;
+  return Math.round((s.solar*weights.solar+s.humidity*weights.humidity+s.storage*weights.storage+s.grid*weights.grid+s.land*weights.land)/total);
 }
 
 function scoreColor(score) {
-  if (score >= 75) return '#4ade80';
-  if (score >= 60) return '#a3e635';
-  if (score >= 50) return '#facc15';
-  if (score >= 35) return '#f97316';
-  return '#ef4444';
+  if(score>=75) return '#4ade80'; if(score>=60) return '#a3e635'; if(score>=50) return '#facc15'; if(score>=35) return '#f97316'; return '#ef4444';
 }
+function scoreClass(score) { return score>=65?'score-high':score>=45?'score-mid':'score-low'; }
 
-function scoreClass(score) {
-  if (score >= 65) return 'score-high';
-  if (score >= 45) return 'score-mid';
-  return 'score-low';
-}
-
-var map = L.map('map', {center:[25,15], zoom:2, zoomControl:false, minZoom:2, maxZoom:10, worldCopyJump:true});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-  attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:19
-}).addTo(map);
-
-document.getElementById('btn-zoom-in').onclick = function() { map.zoomIn(); };
-document.getElementById('btn-zoom-out').onclick = function() { map.zoomOut(); };
+var map = L.map('map',{center:[25,15],zoom:2,zoomControl:false,minZoom:2,maxZoom:10,worldCopyJump:true});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap contributors &copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+document.getElementById('btn-zoom-in').onclick = function(){map.zoomIn();};
+document.getElementById('btn-zoom-out').onclick = function(){map.zoomOut();};
 
 var markers = [];
 var markersLayer = L.layerGroup().addTo(map);
 
 function createMarker(site) {
-  var score = computeScore(site);
-  var color = scoreColor(score);
-  var r = score >= 75 ? 9 : score >= 60 ? 7 : score >= 45 ? 6 : 5;
-  var marker = L.circleMarker([site.lat, site.lng], {
-    radius:r, fillColor:color, fillOpacity:score>=60?0.85:0.5,
-    color:color, weight:1.5, opacity:score>=60?0.9:0.4
-  });
-  marker.on('mouseover', function(e) { showTooltip(site, e.originalEvent); });
-  marker.on('mouseout', function() { hideTooltip(); });
-  marker.on('click', function() { selectSite(site, marker); });
+  var score=computeScore(site), color=scoreColor(score);
+  var r=score>=75?9:score>=60?7:score>=45?6:5;
+  var marker=L.circleMarker([site.lat,site.lng],{radius:r,fillColor:color,fillOpacity:score>=60?0.85:0.5,color:color,weight:1.5,opacity:score>=60?0.9:0.4});
+  marker.on('mouseover',function(e){showTooltip(site,e.originalEvent);});
+  marker.on('mouseout',function(){hideTooltip();});
+  marker.on('click',function(){selectSite(site,marker);});
   return marker;
 }
 
 function renderMarkers() {
-  markersLayer.clearLayers(); markers = [];
-  getFiltered().forEach(function(site) {
-    var m = createMarker(site);
-    m.addTo(markersLayer);
-    markers.push({site:site, marker:m});
-  });
+  markersLayer.clearLayers(); markers=[];
+  getFiltered().forEach(function(site){var m=createMarker(site);m.addTo(markersLayer);markers.push({site:site,marker:m});});
 }
 
 function getFiltered() {
-  return sites.filter(function(s) {
-    var regionOk = activeRegion==='All' || s.region===activeRegion;
-    var searchOk = !searchTerm || s.name.toLowerCase().includes(searchTerm) || s.country.toLowerCase().includes(searchTerm);
-    return regionOk && searchOk;
-  }).sort(function(a,b) { return computeScore(b)-computeScore(a); });
+  return sites.filter(function(s){
+    return (activeRegion==='All'||s.region===activeRegion)&&(!searchTerm||s.name.toLowerCase().includes(searchTerm)||s.country.toLowerCase().includes(searchTerm));
+  }).sort(function(a,b){return computeScore(b)-computeScore(a);});
 }
 
-var tooltip = document.getElementById('tooltip');
-function showTooltip(site, ev) {
-  var score = computeScore(site);
-  var color = scoreColor(score);
-  var html = '<div class="tt-name">'+site.name+'</div>';
-  html += '<div class="tt-country">'+site.country+' · '+site.region+'</div>';
-  FACTORS.forEach(function(f) {
-    html += '<div class="tt-row"><div class="tt-key"><div class="tt-dot" style="background:'+f.color+'"></div>'+f.label+'</div><div class="tt-val">'+site[f.key]+'</div></div>';
+var tooltip=document.getElementById('tooltip');
+
+function showTooltip(site,ev) {
+  var score=computeScore(site),color=scoreColor(score),conf=getConf(site),range=confRange(score,conf),cc='conf-'+conf.toLowerCase();
+  var html='<div class="tt-name">'+site.name+'</div>';
+  html+='<div class="tt-country">'+site.country+' \u00b7 '+site.region+'</div>';
+  html+='<div class="tt-conf-row"><span class="tt-conf-label">Data confidence</span><span class="'+cc+'">'+conf+' \u2014 '+confLabel(conf)+'</span></div>';
+  FACTORS.forEach(function(f){
+    html+='<div class="tt-row"><div class="tt-key"><div class="tt-dot" style="background:'+f.color+'"></div>'+f.label+'</div><div class="tt-val">'+site[f.key]+'</div></div>';
   });
-  html += '<div class="tt-total"><div class="tt-total-label">Composite score</div><div class="tt-total-val" style="color:'+color+'">'+score+'/100</div></div>';
-  var issueTitle = encodeURIComponent('Data correction: '+site.name+' ('+site.country+')');
-  var issueBody = encodeURIComponent(
-    '**Site:** '+site.name+', '+site.country+'\n'+
-    '**Current scores:** Solar='+site.solar+' | Humidity='+site.humidity+' | Storage='+site.storage+' | Grid='+site.grid+' | Land='+site.land+'\n\n'+
-    '**Factor to correct:** \n\n**Suggested value:** \n\n**Source / citation:** \n\n**Notes:** '
-  );
-  var issueUrl = 'https://github.com/CO2Ri/CDR-Intelligence/issues/new?title='+issueTitle+'&body='+issueBody+'&labels=data-correction';
-  html += '<a class="tt-report" href="'+issueUrl+'" target="_blank"><span class="tt-report-dot"></span>report a data error</a>';
-  tooltip.innerHTML = html;
-  tooltip.style.display = 'block';
-  var wrap = document.getElementById('map-wrap');
-  var rect = wrap.getBoundingClientRect();
-  var x = ev.clientX-rect.left+12;
-  var y = ev.clientY-rect.top-10;
-  if (x+240 > rect.width) x = ev.clientX-rect.left-252;
-  tooltip.style.left = x+'px';
-  tooltip.style.top = y+'px';
+  html+='<div class="tt-total"><div class="tt-total-label">Score <span style="font-size:10px;color:var(--text3)">'+range[0]+'\u2013'+range[1]+'</span></div><div class="tt-total-val" style="color:'+color+'">'+score+'/100</div></div>';
+  html+='<div class="tt-unc-bar" style="background:rgba(255,255,255,0.06);width:100%"><div style="height:2px;width:'+(range[1]-range[0])+'%;margin-left:'+range[0]+'%;background:'+color+';opacity:.5;border-radius:1px"></div></div>';
+  html+='<div style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.4">'+confNote(conf)+'</div>';
+  var iT=encodeURIComponent('Data correction: '+site.name+' ('+site.country+')');
+  var iB=encodeURIComponent('**Site:** '+site.name+', '+site.country+'\n**Current scores:** Solar='+site.solar+' | Humidity='+site.humidity+' | Storage='+site.storage+' | Grid='+site.grid+' | Land='+site.land+'\n**Confidence:** '+conf+'\n\n**Factor to correct:** \n\n**Suggested value:** \n\n**Source / citation:** \n\n**Notes:** ');
+  html+='<a class="tt-report" href="https://github.com/CO2Ri/CDR-Intelligence/issues/new?title='+iT+'&body='+iB+'&labels=data-correction" target="_blank" onclick="event.stopPropagation()"><span class="tt-report-dot"></span>report a data error \u2197</a>';
+  tooltip.innerHTML=html;
+  tooltip.style.display='block';
+  positionTooltip(ev);
 }
-function hideTooltip() { tooltip.style.display='none'; }
-document.getElementById('map-wrap').addEventListener('mousemove', function(e) {
-  if (tooltip.style.display==='block') {
-    var wrap=document.getElementById('map-wrap');
-    var rect=wrap.getBoundingClientRect();
-    var x=e.clientX-rect.left+12, y=e.clientY-rect.top-10;
-    if (x+240>rect.width) x=e.clientX-rect.left-252;
-    tooltip.style.left=x+'px'; tooltip.style.top=y+'px';
-  }
-});
 
-function selectSite(site, marker) {
-  activeMarker = marker;
-  map.flyTo([site.lat, site.lng], 6, {duration:1.2});
-  renderSiteList();
-  setTimeout(function() {
-    document.querySelectorAll('.site-item').forEach(function(el) {
-      el.classList.toggle('active', el.dataset.name===site.name);
-      if (el.dataset.name===site.name) el.scrollIntoView({behavior:'smooth',block:'nearest'});
-    });
-  }, 100);
+function hideTooltip(){tooltip.style.display='none';}
+
+function positionTooltip(ev) {
+  var wrap=document.getElementById('map-wrap'),rect=wrap.getBoundingClientRect();
+  var x=ev.clientX-rect.left+14, y=ev.clientY-rect.top-10;
+  if(x+260>rect.width) x=ev.clientX-rect.left-272;
+  if(y+340>rect.height) y=ev.clientY-rect.top-340;
+  tooltip.style.left=x+'px'; tooltip.style.top=y+'px';
 }
+
+function selectSite(site,marker) {
+  activeMarker=marker;
+  map.flyTo([site.lat,site.lng],6,{duration:1.2});
+  renderSiteList();
+  setTimeout(function(){
+    document.querySelectorAll('.site-item').forEach(function(el){
+      el.classList.toggle('active',el.dataset.name===site.name);
+      if(el.dataset.name===site.name) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
+  },100);
+}
+
+document.getElementById('map-wrap').addEventListener('mousemove',function(e){if(tooltip.style.display==='block') positionTooltip(e);});
 
 function buildWeights() {
-  var container = document.getElementById('weights-container');
-  container.innerHTML = '';
-  FACTORS.forEach(function(f) {
-    var row = document.createElement('div');
-    row.className = 'weight-row';
-    var pct = Math.round(weights[f.key]*100);
-    row.innerHTML = '<div class="weight-meta"><span class="weight-name">'+f.label+'</span><span class="weight-val" id="wv-'+f.key+'">'+pct+'%</span></div>'+
-      '<input type="range" min="0" max="200" step="10" value="'+(weights[f.key]*100)+'" data-key="'+f.key+'" style="accent-color:'+f.color+'">';
+  var container=document.getElementById('weights-container');
+  container.innerHTML='';
+  FACTORS.forEach(function(f){
+    var row=document.createElement('div');
+    row.className='weight-row';
+    row.innerHTML='<div class="weight-meta"><span class="weight-name">'+f.label+'</span><span class="weight-val" id="wv-'+f.key+'">100%</span></div><input type="range" min="0" max="200" step="10" value="100" data-key="'+f.key+'" style="accent-color:'+f.color+'">';
     container.appendChild(row);
-    row.querySelector('input').addEventListener('input', function() {
-      weights[this.dataset.key] = parseFloat(this.value)/100;
-      document.getElementById('wv-'+this.dataset.key).textContent = this.value+'%';
+    row.querySelector('input').addEventListener('input',function(){
+      weights[this.dataset.key]=parseFloat(this.value)/100;
+      document.getElementById('wv-'+this.dataset.key).textContent=this.value+'%';
       refresh();
     });
   });
 }
 
 function buildRegionFilters() {
-  var container = document.getElementById('region-filters');
-  container.innerHTML = '';
-  REGIONS.forEach(function(r) {
-    var btn = document.createElement('button');
-    btn.className = 'filter-btn'+(r===activeRegion?' active':'');
-    btn.textContent = r;
-    btn.onclick = function() {
-      activeRegion = r;
-      document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});
-      btn.classList.add('active');
-      refresh();
-    };
+  var container=document.getElementById('region-filters');
+  container.innerHTML='';
+  REGIONS.forEach(function(r){
+    var btn=document.createElement('button');
+    btn.className='filter-btn'+(r===activeRegion?' active':'');
+    btn.textContent=r;
+    btn.onclick=function(){activeRegion=r;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');refresh();};
     container.appendChild(btn);
   });
 }
 
 function renderStats() {
-  var filtered = getFiltered();
-  var scores = filtered.map(function(s){return computeScore(s)});
-  var top = scores.length ? Math.max.apply(null,scores) : 0;
-  var viable = scores.filter(function(s){return s>=60}).length;
-  var countries = new Set(filtered.map(function(s){return s.country})).size;
-  var avg = scores.length ? Math.round(scores.reduce(function(a,b){return a+b},0)/scores.length) : 0;
-  document.getElementById('st-top').textContent = top;
-  document.getElementById('st-viable').textContent = viable;
-  document.getElementById('st-countries').textContent = countries;
-  document.getElementById('st-avg').textContent = avg;
-  document.getElementById('mh-val').textContent = filtered.length;
-  document.getElementById('mh-sub').textContent = filtered.length===sites.length ? 'global candidate sites' : 'filtered candidate sites';
+  var filtered=getFiltered(),scores=filtered.map(function(s){return computeScore(s);});
+  var top=scores.length?Math.max.apply(null,scores):0;
+  var viable=scores.filter(function(s){return s>=60;}).length;
+  var countries=new Set(filtered.map(function(s){return s.country;})).size;
+  var avg=scores.length?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):0;
+  document.getElementById('st-top').textContent=top;
+  document.getElementById('st-viable').textContent=viable;
+  document.getElementById('st-countries').textContent=countries;
+  document.getElementById('st-avg').textContent=avg;
+  document.getElementById('mh-val').textContent=filtered.length;
+  document.getElementById('mh-sub').textContent=filtered.length===sites.length?'global candidate sites':'filtered candidate sites';
 }
 
 function renderSiteList() {
-  var filtered = getFiltered().slice(0,30);
-  var container = document.getElementById('site-list');
-  document.getElementById('site-count').textContent = '(top '+Math.min(30,getFiltered().length)+')';
-  if (!filtered.length) { container.innerHTML='<div class="no-sites">No sites match this filter.</div>'; return; }
-  container.innerHTML = '';
-  filtered.forEach(function(site) {
-    var score = computeScore(site);
-    var item = document.createElement('div');
-    item.className = 'site-item';
-    item.dataset.name = site.name;
-    var barHtml = FACTORS.map(function(f){
-      return '<div class="mini-bar"><div class="mini-fill" style="width:'+site[f.key]+'%;background:'+f.color+'"></div></div>';
-    }).join('');
-    item.innerHTML = '<div class="site-top"><div><div class="site-name">'+site.name+'</div><div class="site-country">'+site.country+' · '+site.region+'</div></div>'+
-      '<div class="site-score '+scoreClass(score)+'">'+score+'</div></div><div class="site-bars">'+barHtml+'</div>';
-    item.onclick = function() {
-      map.flyTo([site.lat,site.lng],6,{duration:1.2});
-      document.querySelectorAll('.site-item').forEach(function(el){el.classList.remove('active')});
-      item.classList.add('active');
-    };
+  var filtered=getFiltered().slice(0,30);
+  var container=document.getElementById('site-list');
+  document.getElementById('site-count').textContent='(top '+Math.min(30,getFiltered().length)+')';
+  if(!filtered.length){container.innerHTML='<div class="no-sites">No sites match this filter.</div>';return;}
+  container.innerHTML='';
+  filtered.forEach(function(site){
+    var score=computeScore(site),conf=getConf(site),range=confRange(score,conf),cc='conf-'+conf.toLowerCase();
+    var item=document.createElement('div');
+    item.className='site-item'; item.dataset.name=site.name;
+    var barHtml=FACTORS.map(function(f){return '<div class="mini-bar"><div class="mini-fill" style="width:'+site[f.key]+'%;background:'+f.color+'"></div></div>';}).join('');
+    item.innerHTML='<div class="site-top"><div><div class="site-name">'+site.name+' <span class="site-unc '+cc+'">'+conf+'</span></div><div class="site-country">'+site.country+' \u00b7 '+site.region+'</div></div>'+
+      '<div><div class="site-score '+scoreClass(score)+'">'+score+'</div><div style="font-size:9px;color:var(--text3);text-align:right;font-family:var(--mono)">'+range[0]+'\u2013'+range[1]+'</div></div></div>'+
+      '<div class="site-bars">'+barHtml+'</div>';
+    item.onclick=function(){map.flyTo([site.lat,site.lng],6,{duration:1.2});document.querySelectorAll('.site-item').forEach(function(el){el.classList.remove('active');});item.classList.add('active');};
     container.appendChild(item);
   });
 }
 
-function refresh() { renderMarkers(); renderStats(); renderSiteList(); }
+function exportCSV() {
+  var filtered=getFiltered();
+  var headers=['Rank','Name','Country','Region','Lat','Lng','Solar','Humidity','Storage','Grid','Land','Score','Score_min','Score_max','Confidence'];
+  var rows=filtered.map(function(s,i){
+    var score=computeScore(s),conf=getConf(s),range=confRange(score,conf);
+    return [i+1,'"'+s.name+'"','"'+s.country+'"','"'+s.region+'"',s.lat,s.lng,s.solar,s.humidity,s.storage,s.grid,s.land,score,range[0],range[1],conf].join(',');
+  });
+  var csv=headers.join(',')+'\n'+rows.join('\n');
+  var blob=new Blob([csv],{type:'text/csv'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='dac-suitability-'+(activeRegion==='All'?'global':activeRegion.replace(/\./g,'').replace(/ /g,'-').toLowerCase())+'-v01.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-document.getElementById('search').addEventListener('input', function() {
-  searchTerm = this.value.toLowerCase().trim();
-  refresh();
-});
+document.getElementById('csv-btn').onclick=exportCSV;
+
+function refresh(){renderMarkers();renderStats();renderSiteList();}
+
+document.getElementById('search').addEventListener('input',function(){searchTerm=this.value.toLowerCase().trim();refresh();});
 
 buildWeights();
 buildRegionFilters();
