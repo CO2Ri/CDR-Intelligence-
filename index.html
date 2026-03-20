@@ -10,100 +10,99 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
-  --bg: #0a0f0d; --bg2: #111812; --bg3: #182118;
-  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
-  --text: #e8ede9; --text2: #8fa890; --text3: #4d5e4e;
-  --accent: #4ade80; --accent2: #22c55e; --teal: #2dd4bf; --amber: #f59e0b; --red: #f87171;
-  --mono: 'DM Mono', monospace; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif;
+  --bg:#0a0f0d;--bg2:#111812;--bg3:#182118;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e8ede9;--text2:#8fa890;--text3:#4d5e4e;
+  --accent:#4ade80;--amber:#f59e0b;--red:#f87171;
+  --mono:'DM Mono',monospace;--serif:'Instrument Serif',serif;--sans:'DM Sans',sans-serif;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--sans); }
-#app { display: flex; height: 100vh; width: 100vw; }
-#sidebar { width: 340px; min-width: 340px; height: 100%; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; z-index: 1000; }
-#map-wrap { flex: 1; position: relative; }
-#map { width: 100%; height: 100%; }
-#s-head { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
-.logo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(.85)} }
-.logo-label { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; }
-.s-title { font-family: var(--serif); font-size: 22px; color: var(--text); line-height: 1.2; }
-.s-title em { font-style: italic; color: var(--accent); }
-.s-sub { font-size: 12px; color: var(--text3); margin-top: 5px; line-height: 1.5; }
-#s-body { flex: 1; overflow-y: auto; padding: 16px 20px; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
-#s-body::-webkit-scrollbar { width: 4px; }
-#s-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-.global-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-.stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
-.stat-val { font-family: var(--mono); font-size: 20px; font-weight: 500; color: var(--accent); }
-.stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.sec-head { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-.weights { margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
-.weight-row { display: flex; flex-direction: column; gap: 5px; }
-.weight-meta { display: flex; justify-content: space-between; align-items: center; }
-.weight-name { font-size: 12px; color: var(--text2); }
-.weight-val { font-family: var(--mono); font-size: 11px; color: var(--accent); min-width: 28px; text-align: right; }
-input[type=range] { width: 100%; height: 3px; background: var(--bg3); border-radius: 2px; outline: none; appearance: none; cursor: pointer; }
-input[type=range]::-webkit-slider-thumb { appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg2); cursor: pointer; }
-input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg2); cursor: pointer; border: none; }
-.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
-.filter-btn { font-family: var(--mono); font-size: 10px; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border2); background: transparent; color: var(--text3); cursor: pointer; letter-spacing: .06em; transition: all .15s; }
-.filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-#site-list { display: flex; flex-direction: column; gap: 6px; }
-.site-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: border-color .15s; }
-.site-item:hover, .site-item.active { border-color: var(--accent); }
-.site-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
-.site-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; }
-.site-score { font-family: var(--mono); font-size: 14px; font-weight: 500; }
-.score-high { color: var(--accent); } .score-mid { color: var(--amber); } .score-low { color: var(--red); }
-.site-country { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.site-bars { display: flex; gap: 4px; margin-top: 7px; }
-.mini-bar { flex: 1; height: 3px; border-radius: 1px; background: var(--bg); overflow: hidden; }
-.mini-fill { height: 100%; border-radius: 1px; transition: width .4s ease; }
-.legend { margin-bottom: 20px; }
-.legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-.legend-text { font-size: 12px; color: var(--text2); }
-#map-header { position: absolute; top: 16px; left: 16px; z-index: 500; background: rgba(10,15,13,0.88); backdrop-filter: blur(8px); border: 1px solid var(--border2); border-radius: 10px; padding: 10px 14px; pointer-events: none; }
-.mh-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; }
-.mh-val { font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--accent); line-height: 1; margin-top: 2px; }
-.mh-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
-#tooltip { position: absolute; z-index: 800; background: rgba(10,15,13,0.95); border: 1px solid var(--border2); border-radius: 10px; padding: 12px 14px; display: none; min-width: 240px; max-width: 260px; pointer-events: all !important; }
-.tt-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-.tt-country { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-bottom: 10px; }
-.tt-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-.tt-key { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
-.tt-dot { width: 8px; height: 8px; border-radius: 50%; }
-.tt-val { font-family: var(--mono); font-size: 12px; color: var(--text); }
-.tt-total { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px; display: flex; justify-content: space-between; align-items: center; }
-.tt-total-label { font-size: 12px; color: var(--text2); }
-.tt-total-val { font-family: var(--mono); font-size: 16px; font-weight: 500; }
-#map-controls { position: absolute; bottom: 20px; right: 16px; z-index: 500; display: flex; flex-direction: column; gap: 6px; }
-.map-btn { width: 36px; height: 36px; background: rgba(10,15,13,0.88); backdrop-filter: blur(8px); border: 1px solid var(--border2); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 16px; transition: all .15s; }
-.map-btn:hover { border-color: var(--accent); color: var(--accent); }
-#methodology { position: absolute; bottom: 20px; left: 16px; z-index: 500; background: rgba(10,15,13,0.88); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; max-width: 320px; }
-.meth-head { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
-.meth-text { font-size: 11px; color: var(--text3); line-height: 1.5; }
-.meth-sources { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-.src-tag { font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 3px; background: var(--bg3); color: var(--text3); border: 1px solid var(--border); letter-spacing: .04em; }
-.leaflet-container { background: #0d1410; }
-.tt-report { display: block; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: var(--text3); text-decoration: none; font-family: var(--mono); letter-spacing: .04em; cursor: pointer; transition: color .15s; pointer-events: all; }
-.tt-report:hover { color: var(--accent); }
-.tt-report-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text3); margin-right: 5px; vertical-align: middle; position: relative; top: -1px; transition: background .15s; }
-.tt-report:hover .tt-report-dot { background: var(--accent); }
-.conf-h { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 3px; background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); letter-spacing:.05em; }
-.conf-m { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 3px; background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25); letter-spacing:.05em; }
-.conf-l { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 3px; background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); letter-spacing:.05em; }
-.tt-conf-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.tt-conf-label { font-size: 11px; color: var(--text3); }
-.tt-unc-bar { height: 2px; margin-top: 3px; border-radius: 1px; }
-#csv-btn { width: 100%; padding: 8px 0; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); background: transparent; border: 1px solid var(--border2); border-radius: 6px; cursor: pointer; transition: all .15s; margin-bottom: 16px; }
-#csv-btn:hover { color: var(--accent); border-color: var(--accent); }
-.site-unc { display: inline-block; font-family: var(--mono); font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
-#search { position: absolute; top: 16px; right: 60px; z-index: 500; background: rgba(10,15,13,0.88); backdrop-filter: blur(8px); border: 1px solid var(--border2); border-radius: 8px; padding: 8px 14px; font-family: var(--mono); font-size: 12px; color: var(--text); outline: none; width: 200px; }
-#search::placeholder { color: var(--text3); }
-#search:focus { border-color: var(--accent); }
-.no-sites { text-align: center; padding: 24px 0; color: var(--text3); font-size: 13px; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans)}
+#app{display:flex;height:100vh;width:100vw}
+#sidebar{width:340px;min-width:340px;height:100%;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:1000}
+#map-wrap{flex:1;position:relative}
+#map{width:100%;height:100%}
+#s-head{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.logo-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+.logo-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase}
+.s-title{font-family:var(--serif);font-size:22px;color:var(--text);line-height:1.2}
+.s-title em{font-style:italic;color:var(--accent)}
+.s-sub{font-size:12px;color:var(--text3);margin-top:5px;line-height:1.5}
+#s-body{flex:1;overflow-y:auto;padding:16px 20px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+#s-body::-webkit-scrollbar{width:4px}
+#s-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.global-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.stat-val{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--accent)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:2px}
+.sec-head{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.weights{margin-bottom:20px;display:flex;flex-direction:column;gap:10px}
+.weight-row{display:flex;flex-direction:column;gap:5px}
+.weight-meta{display:flex;justify-content:space-between;align-items:center}
+.weight-name{font-size:12px;color:var(--text2)}
+.weight-val{font-family:var(--mono);font-size:11px;color:var(--accent);min-width:28px;text-align:right}
+input[type=range]{width:100%;height:3px;background:var(--bg3);border-radius:2px;outline:none;appearance:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);border:2px solid var(--bg2);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--accent);border:2px solid var(--bg2);cursor:pointer}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.filter-btn{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;letter-spacing:.06em;transition:all .15s}
+.filter-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+#site-list{display:flex;flex-direction:column;gap:6px}
+.site-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s}
+.site-item:hover,.site-item.active{border-color:var(--accent)}
+.site-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.site-name{font-size:13px;font-weight:500;color:var(--text);line-height:1.3}
+.site-score{font-family:var(--mono);font-size:14px;font-weight:500}
+.score-high{color:var(--accent)}.score-mid{color:var(--amber)}.score-low{color:var(--red)}
+.site-country{font-size:11px;color:var(--text3);margin-top:2px}
+.site-bars{display:flex;gap:4px;margin-top:7px}
+.mini-bar{flex:1;height:3px;border-radius:1px;background:var(--bg);overflow:hidden}
+.mini-fill{height:100%;border-radius:1px;transition:width .4s ease}
+.legend{margin-bottom:20px}
+.legend-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.legend-text{font-size:12px;color:var(--text2)}
+#map-header{position:absolute;top:16px;left:16px;z-index:500;background:rgba(10,15,13,0.88);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;pointer-events:none}
+.mh-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.mh-val{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--accent);line-height:1;margin-top:2px}
+.mh-sub{font-size:11px;color:var(--text3);margin-top:3px}
+#tooltip{position:absolute;z-index:800;background:rgba(10,15,13,0.95);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;display:none;min-width:240px;max-width:262px;pointer-events:all!important}
+.tt-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.tt-country{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px}
+.tt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.tt-key{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.tt-dot{width:8px;height:8px;border-radius:50%}
+.tt-val{font-family:var(--mono);font-size:12px;color:var(--text)}
+.tt-total{border-top:1px solid var(--border);padding-top:8px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.tt-total-label{font-size:12px;color:var(--text2)}
+.tt-total-val{font-family:var(--mono);font-size:16px;font-weight:500}
+#map-controls{position:absolute;bottom:20px;right:16px;z-index:500;display:flex;flex-direction:column;gap:6px}
+.map-btn{width:36px;height:36px;background:rgba(10,15,13,0.88);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:16px;transition:all .15s}
+.map-btn:hover{border-color:var(--accent);color:var(--accent)}
+#methodology{position:absolute;bottom:20px;left:16px;z-index:500;background:rgba(10,15,13,0.88);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:10px;padding:10px 14px;max-width:320px}
+.meth-head{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.meth-text{font-size:11px;color:var(--text3);line-height:1.5}
+.meth-sources{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.src-tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:var(--bg3);color:var(--text3);border:1px solid var(--border);letter-spacing:.04em}
+.leaflet-container{background:#0d1410}
+.tt-report{display:block;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:var(--text3);text-decoration:none;font-family:var(--mono);letter-spacing:.04em;cursor:pointer;transition:color .15s;pointer-events:all}
+.tt-report:hover{color:var(--accent)}
+.tt-report-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text3);margin-right:5px;vertical-align:middle;position:relative;top:-1px;transition:background .15s}
+.tt-report:hover .tt-report-dot{background:var(--accent)}
+.conf-h{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);letter-spacing:.05em}
+.conf-m{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);letter-spacing:.05em}
+.conf-l{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);letter-spacing:.05em}
+.tt-conf-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tt-conf-label{font-size:11px;color:var(--text3)}
+#csv-btn{width:100%;padding:8px 0;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);background:transparent;border:1px solid var(--border2);border-radius:6px;cursor:pointer;transition:all .15s;margin-bottom:16px}
+#csv-btn:hover{color:var(--accent);border-color:var(--accent)}
+.site-unc{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+#search{position:absolute;top:16px;right:60px;z-index:500;background:rgba(10,15,13,0.88);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:8px;padding:8px 14px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;width:200px}
+#search::placeholder{color:var(--text3)}
+#search:focus{border-color:var(--accent)}
+.no-sites{text-align:center;padding:24px 0;color:var(--text3);font-size:13px}
 </style>
 </head>
 <body>
@@ -112,7 +111,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
     <div id="s-head">
       <div class="logo-row"><div class="logo-dot"></div><span class="logo-label">CDR Site Intelligence · v0.1</span></div>
       <div class="s-title">DAC <em>Suitability</em><br>Index</div>
-      <div class="s-sub">Scoring 312 global locations across 5 factors. Public data only. Open methodology.</div>
+      <div class="s-sub">Scoring 309 global locations across 5 factors. Public data only. Open methodology.</div>
     </div>
     <div id="s-body">
       <div class="global-stats">
@@ -133,7 +132,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
         <div class="legend-row"><div class="legend-dot" style="background:#ef4444;opacity:.5"></div><div class="legend-text">Low suitability (&lt;30)</div></div>
       </div>
       <div class="sec-head">Top sites <span id="site-count" style="color:var(--accent)"></span></div>
-      <button id="csv-btn">&#8595; export as CSV</button>
+      <button id="csv-btn">↓ export as CSV</button>
       <div id="site-list"></div>
     </div>
   </div>
@@ -141,7 +140,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
     <div id="map"></div>
     <div id="map-header">
       <div class="mh-label">viewing</div>
-      <div class="mh-val" id="mh-val">312</div>
+      <div class="mh-val" id="mh-val">309</div>
       <div class="mh-sub" id="mh-sub">global candidate sites</div>
     </div>
     <input id="search" placeholder="Search location…" autocomplete="off">
@@ -160,7 +159,7 @@ input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 
   </div>
 </div>
 <script>
-var SITES_RAW = [
+var SITES_RAW=[
   ["Tucson","USA","N. America",32.2,-110.9,95,90,78,58,82],
   ["Phoenix","USA","N. America",33.4,-112.1,96,88,80,55,78],
   ["Las Vegas","USA","N. America",36.1,-115.2,94,87,75,52,72],
@@ -182,159 +181,6 @@ var SITES_RAW = [
   ["Houston","USA","N. America",29.8,-95.4,78,52,94,44,60],
   ["Corpus Christi","USA","N. America",27.8,-97.4,82,58,92,45,62],
   ["Atlanta","USA","N. America",33.7,-84.4,74,55,60,48,58],
-  ["Reykjavik","Iceland","Europe",64.1,-21.9,28,22,98,85,70],
-  ["Akureyri","Iceland","Europe",65.7,-18.1,25,20,96,85,68],
-  ["Keflavik","Iceland","Europe",63.9,-22.6,29,24,95,85,72],
-  ["Stavanger","Norway","Europe",58.9,5.7,42,72,88,96,65],
-  ["Bergen","Norway","Europe",60.4,5.3,38,68,85,97,62],
-  ["Oslo","Norway","Europe",59.9,10.7,44,70,82,95,65],
-  ["Hammerfest","Norway","Europe",70.7,23.7,30,75,80,97,55],
-  ["Aberdeen","UK","Europe",57.1,-2.1,40,68,82,78,62],
-  ["Newcastle","UK","Europe",54.9,-1.6,42,66,80,76,60],
-  ["Copenhagen","Denmark","Europe",55.7,12.6,46,68,75,88,63],
-  ["Esbjerg","Denmark","Europe",55.5,8.4,48,70,80,90,65],
-  ["Rotterdam","Netherlands","Europe",51.9,4.5,50,65,82,72,58],
-  ["Groningen","Netherlands","Europe",53.2,6.6,48,66,80,74,60],
-  ["Hamburg","Germany","Europe",53.6,10.0,50,65,75,70,58],
-  ["Magdeburg","Germany","Europe",52.1,11.6,54,64,72,68,60],
-  ["Seville","Spain","Europe",37.4,-5.9,88,78,68,55,72],
-  ["Zaragoza","Spain","Europe",41.6,-0.9,82,76,65,54,70],
-  ["Almería","Spain","Europe",36.8,-2.5,91,82,62,52,68],
-  ["Badajoz","Spain","Europe",38.9,-6.9,87,79,64,53,70],
-  ["Évora","Portugal","Europe",38.6,-7.9,88,80,60,60,70],
-  ["Beja","Portugal","Europe",37.9,-7.9,89,81,60,58,70],
-  ["Palermo","Italy","Europe",38.1,13.4,82,74,55,52,62],
-  ["Athens","Greece","Europe",38.0,23.7,83,76,58,50,62],
-  ["Thessaloniki","Greece","Europe",40.6,22.9,80,74,60,50,62],
-  ["Alice Springs","Australia","Oceania",-23.7,133.9,97,92,72,45,85],
-  ["Port Augusta","Australia","Oceania",-32.5,137.8,90,86,80,48,80],
-  ["Broken Hill","Australia","Oceania",-32.0,141.5,91,88,75,46,82],
-  ["Mildura","Australia","Oceania",-34.2,142.2,88,84,72,46,78],
-  ["Kalgoorlie","Australia","Oceania",-30.7,121.5,92,89,68,44,80],
-  ["Carnarvon","Australia","Oceania",-24.9,113.7,95,90,70,42,78],
-  ["Darwin","Australia","Oceania",-12.5,130.8,82,40,65,38,65],
-  ["Whyalla","Australia","Oceania",-33.0,137.6,89,85,78,46,78],
-  ["Coober Pedy","Australia","Oceania",-29.0,134.8,95,91,70,40,82],
-  ["Mount Isa","Australia","Oceania",-20.7,139.5,90,88,62,36,75],
-  ["Adelaide","Australia","Oceania",-34.9,138.6,82,78,70,52,70],
-  ["Melbourne","Australia","Oceania",-37.8,145.0,68,68,68,54,68],
-  ["Antofagasta","Chile","S. America",-23.6,-70.4,97,95,65,52,72],
-  ["Calama","Chile","S. America",-22.5,-68.9,96,96,60,48,70],
-  ["Iquique","Chile","S. America",-20.2,-70.1,94,94,62,50,70],
-  ["Arica","Chile","S. America",-18.5,-70.3,93,93,60,50,68],
-  ["Copiapó","Chile","S. America",-27.4,-70.3,92,92,62,50,70],
-  ["Punta Arenas","Chile","S. America",-53.1,-70.9,38,82,58,55,72],
-  ["Puerto Natales","Chile","S. America",-51.7,-72.5,36,80,55,52,70],
-  ["Mendoza","Argentina","S. America",-32.9,-68.8,85,86,68,44,74],
-  ["San Juan","Argentina","S. America",-31.5,-68.5,87,87,65,42,72],
-  ["Neuquén","Argentina","S. America",-38.9,-68.1,78,82,75,44,74],
-  ["Comodoro Rivadavia","Argentina","S. America",-45.9,-67.5,68,84,80,44,72],
-  ["Bahía Blanca","Argentina","S. America",-38.7,-62.3,78,80,72,42,70],
-  ["Fortaleza","Brazil","S. America",-3.7,-38.5,82,52,55,40,55],
-  ["Petrolina","Brazil","S. America",-9.4,-40.5,88,60,60,38,60],
-  ["Riyadh","Saudi Arabia","Middle East",24.7,46.7,94,92,78,45,72],
-  ["Jeddah","Saudi Arabia","Middle East",21.5,39.2,88,72,72,44,60],
-  ["Dammam","Saudi Arabia","Middle East",26.4,50.1,90,82,82,46,68],
-  ["Tabuk","Saudi Arabia","Middle East",28.4,36.6,93,90,70,42,72],
-  ["Neom","Saudi Arabia","Middle East",28.0,35.5,92,88,68,44,75],
-  ["Abu Dhabi","UAE","Middle East",24.5,54.4,91,80,80,44,68],
-  ["Dubai","UAE","Middle East",25.2,55.3,90,78,78,44,65],
-  ["Kuwait City","Kuwait","Middle East",29.4,47.9,91,84,82,43,65],
-  ["Oman Duqm","Oman","Middle East",19.6,57.7,90,86,70,42,70],
-  ["Qatar","Qatar","Middle East",25.3,51.5,90,80,80,42,65],
-  ["Ouarzazate","Morocco","Africa",30.9,-6.9,93,88,60,45,72],
-  ["Laayoune","Morocco","Africa",27.2,-13.2,92,86,55,42,68],
-  ["Agadir","Morocco","Africa",30.4,-9.6,88,82,55,44,65],
-  ["Ouargla","Algeria","Africa",31.9,5.3,93,90,65,38,70],
-  ["Hassi Messaoud","Algeria","Africa",31.7,6.1,92,91,78,38,68],
-  ["Tamanrasset","Algeria","Africa",22.8,5.5,95,93,58,34,65],
-  ["Tripoli","Libya","Africa",32.9,13.2,88,82,72,38,60],
-  ["Benghazi","Libya","Africa",32.1,20.1,86,80,70,38,58],
-  ["Aswan","Egypt","Africa",24.1,32.9,96,92,75,40,68],
-  ["Cairo","Egypt","Africa",30.1,31.2,90,85,70,40,62],
-  ["Hurghada","Egypt","Africa",27.3,33.8,93,86,70,40,65],
-  ["Dakhla","Egypt","Africa",25.5,29.0,94,91,68,38,65],
-  ["Nouakchott","Mauritania","Africa",18.1,-15.9,90,84,50,32,55],
-  ["Agadez","Niger","Africa",16.9,7.9,92,86,48,30,52],
-  ["Khartoum","Sudan","Africa",15.6,32.5,90,88,55,32,55],
-  ["Windhoek","Namibia","Africa",-22.6,17.1,88,85,58,38,65],
-  ["Upington","South Africa","Africa",-28.4,21.2,90,87,65,44,68],
-  ["Prieska","South Africa","Africa",-29.7,22.7,88,86,62,44,66],
-  ["Cape Town","South Africa","Africa",-33.9,18.4,78,72,60,46,62],
-  ["Nairobi","Kenya","Africa",-1.3,36.8,72,58,48,42,52],
-  ["Jodhpur","India","Asia",26.3,73.0,90,82,65,35,62],
-  ["Jaisalmer","India","Asia",26.9,70.9,91,84,60,34,60],
-  ["Kutch","India","Asia",23.7,69.9,88,82,62,35,58],
-  ["Bikaner","India","Asia",28.0,73.3,89,80,62,35,60],
-  ["Rajkot","India","Asia",22.3,70.8,86,78,60,36,58],
-  ["Chennai","India","Asia",13.1,80.3,82,45,58,35,52],
-  ["Almaty","Kazakhstan","Asia",43.2,76.9,68,72,78,45,65],
-  ["Astana","Kazakhstan","Asia",51.2,71.5,62,74,82,44,65],
-  ["Aktau","Kazakhstan","Asia",43.6,51.2,72,80,85,44,68],
-  ["Ashgabat","Turkmenistan","Asia",37.9,58.4,82,82,80,40,62],
-  ["Tashkent","Uzbekistan","Asia",41.3,69.3,76,78,72,40,60],
-  ["Bishkek","Kyrgyzstan","Asia",42.9,74.6,65,70,62,45,58],
-  ["Ulaanbaatar","Mongolia","Asia",47.9,106.9,62,72,65,38,60],
-  ["Dalanzadgad","Mongolia","Asia",43.6,104.4,65,80,62,36,62],
-  ["Dunhuang","China","Asia",40.1,94.7,82,84,68,35,65],
-  ["Turpan","China","Asia",42.9,89.2,84,88,65,35,62],
-  ["Hami","China","Asia",42.8,93.5,82,86,65,35,62],
-  ["Zhangye","China","Asia",38.9,100.5,80,80,62,38,60],
-  ["Jiuquan","China","Asia",39.7,98.5,78,82,65,38,62],
-  ["Yinchuan","China","Asia",38.5,106.3,76,78,70,40,62],
-  ["Sendai","Japan","Asia",38.3,140.9,60,62,68,52,52],
-  ["Seoul","South Korea","Asia",37.6,127.0,62,60,65,50,50],
-  ["Konya","Turkey","Middle East",37.9,32.5,82,75,60,50,65],
-  ["Ankara","Turkey","Middle East",39.9,32.9,72,72,58,52,62],
-  ["Gaziantep","Turkey","Middle East",37.1,37.4,78,73,55,48,60],
-  ["Isfahan","Iran","Middle East",32.7,51.7,84,80,68,38,62],
-  ["Kerman","Iran","Middle East",30.3,57.1,86,84,65,36,62],
-  ["Yazd","Iran","Middle East",31.9,54.4,85,86,62,36,60],
-  ["Hermosillo","Mexico","N. America",29.1,-110.9,92,82,72,48,70],
-  ["Chihuahua","Mexico","N. America",28.6,-106.1,88,80,75,46,68],
-  ["Monterrey","Mexico","N. America",25.7,-100.3,80,68,72,46,62],
-  ["Mexicali","Mexico","N. America",32.7,-115.5,94,86,70,46,68],
-  ["Medicine Hat","Canada","N. America",50.0,-110.7,72,72,85,58,78],
-  ["Lethbridge","Canada","N. America",49.7,-112.8,70,70,82,60,76],
-  ["Regina","Canada","N. America",50.5,-104.6,68,68,80,56,76],
-  ["Saskatoon","Canada","N. America",52.1,-106.7,66,68,82,56,76],
-  ["Grande Prairie","Canada","N. America",55.2,-118.8,56,65,80,54,72],
-  ["Fort McMurray","Canada","N. America",56.7,-111.4,52,62,88,52,68],
-  ["Estevan","Canada","N. America",49.1,-103.0,68,70,85,54,76],
-  ["Barreiras","Brazil","S. America",-12.1,-44.9,85,62,58,40,60],
-  ["Juazeiro","Brazil","S. America",-9.4,-40.5,87,60,55,38,58],
-  ["Lima","Peru","S. America",-12.0,-77.0,65,75,60,50,52],
-  ["Arequipa","Peru","S. America",-16.4,-71.5,82,80,58,50,60],
-  ["Bogotá","Colombia","S. America",4.7,-74.1,65,60,45,52,50],
-  ["Djibouti","Djibouti","Africa",11.6,43.1,88,72,55,36,55],
-  ["Aden","Yemen","Middle East",12.8,45.0,88,74,58,32,50],
-  ["Exmouth","Australia","Oceania",-21.9,114.1,94,90,65,40,75],
-  ["Newman","Australia","Oceania",-23.4,119.7,92,91,68,38,78],
-  ["Wellington","New Zealand","Oceania",-41.3,174.8,55,68,55,72,62],
-  ["Dunedin","New Zealand","Oceania",-45.9,170.5,50,65,50,70,60],
-  ["Bangkok","Thailand","Asia",13.8,100.5,72,28,45,38,42],
-  ["Manila","Philippines","Asia",14.6,121.0,70,30,40,36,40],
-  ["Novosibirsk","Russia","Asia",55.0,82.9,55,60,75,42,60],
-  ["Omsk","Russia","Asia",55.0,73.4,55,62,78,40,60],
-  ["Ufa","Russia","Asia",54.7,56.0,52,60,72,42,58],
-  ["Orenburg","Russia","Asia",51.8,55.1,60,68,80,42,62],
-  ["Astrakhan","Russia","Asia",46.4,48.0,68,72,82,42,65],
-  ["Stavropol","Russia","Europe",45.0,41.9,70,68,70,44,62],
-  ["Bucharest","Romania","Europe",44.4,26.1,68,65,68,52,62],
-  ["Sofia","Bulgaria","Europe",42.7,23.3,66,66,60,52,60],
-  ["Belgrade","Serbia","Europe",44.8,20.5,64,62,62,50,60],
-  ["Las Palmas","Spain (Canary Is.)","Europe",28.1,-15.4,84,76,55,52,65],
-  ["Fuerteventura","Spain (Canary Is.)","Europe",28.4,-14.1,86,80,52,52,68],
-  ["Praia","Cape Verde","Africa",14.9,-23.5,84,72,42,36,55],
-  ["Negev","Israel","Middle East",30.5,34.9,90,85,62,52,65],
-  ["Aqaba","Jordan","Middle East",29.5,35.0,90,85,60,48,65],
-  ["Wadi Rum","Jordan","Middle East",29.6,35.4,91,87,58,46,65],
-  ["Quetta","Pakistan","Asia",30.2,67.0,82,80,60,35,55],
-  ["Multan","Pakistan","Asia",30.2,71.4,84,72,62,35,52],
-  ["De Aar","South Africa","Africa",-30.7,24.0,88,85,60,44,65],
-  ["Beaufort West","South Africa","Africa",-32.4,22.6,85,82,58,44,62],
-  ["Dire Dawa","Ethiopia","Africa",9.6,41.9,82,62,45,30,48],
-  ["Azores","Portugal","Europe",37.7,-25.7,48,70,48,68,55],
   ["Permian Basin","USA","N. America",31.5,-102.8,89,85,98,50,82],
   ["Denver-Julesburg","USA","N. America",40.5,-103.5,74,74,88,62,80],
   ["Williston Basin","USA","N. America",48.2,-103.6,62,68,90,55,78],
@@ -354,259 +200,449 @@ var SITES_RAW = [
   ["Hobbs","USA","N. America",32.7,-103.1,88,84,92,48,78],
   ["Portales","USA","N. America",34.2,-103.3,86,82,88,50,78],
   ["San Angelo","USA","N. America",31.5,-100.4,86,80,86,50,76],
+  ["Hermosillo","Mexico","N. America",29.1,-110.9,92,82,72,48,70],
+  ["Chihuahua","Mexico","N. America",28.6,-106.1,88,80,75,46,68],
+  ["Monterrey","Mexico","N. America",25.7,-100.3,80,68,72,46,62],
+  ["Mexicali","Mexico","N. America",32.7,-115.5,94,86,70,46,68],
+  ["Medicine Hat","Canada","N. America",50.0,-110.7,72,72,85,58,78],
+  ["Lethbridge","Canada","N. America",49.7,-112.8,70,70,82,60,76],
+  ["Regina","Canada","N. America",50.5,-104.6,68,68,80,56,76],
+  ["Saskatoon","Canada","N. America",52.1,-106.7,66,68,82,56,76],
+  ["Grande Prairie","Canada","N. America",55.2,-118.8,56,65,80,54,72],
+  ["Fort McMurray","Canada","N. America",56.7,-111.4,52,62,88,52,68],
+  ["Estevan","Canada","N. America",49.1,-103.0,68,70,85,54,76],
+  ["Reykjavik","Iceland","Europe",64.1,-21.9,28,22,98,85,70],
+  ["Akureyri","Iceland","Europe",65.7,-18.1,25,20,96,85,68],
+  ["Keflavik","Iceland","Europe",63.9,-22.6,29,24,95,85,72],
+  ["Stavanger","Norway","Europe",58.9,5.7,42,72,88,96,65],
+  ["Bergen","Norway","Europe",60.4,5.3,38,68,85,97,62],
+  ["Oslo","Norway","Europe",59.9,10.7,44,70,82,95,65],
+  ["Hammerfest","Norway","Europe",70.7,23.7,30,75,80,97,55],
+  ["Alesund","Norway","Europe",62.5,6.2,36,66,75,96,55],
+  ["Aberdeen","UK","Europe",57.1,-2.1,40,68,82,78,62],
+  ["Newcastle","UK","Europe",54.9,-1.6,42,66,80,76,60],
   ["Humberside","UK","Europe",53.7,-0.3,42,62,82,70,58],
   ["Liverpool Bay","UK","Europe",53.5,-3.5,40,62,80,72,55],
-  ["St. Fergus","UK","Europe",57.5,-1.9,38,64,80,74,55],
+  ["St Fergus","UK","Europe",57.5,-1.9,38,64,80,74,55],
+  ["Copenhagen","Denmark","Europe",55.7,12.6,46,68,75,88,63],
+  ["Esbjerg","Denmark","Europe",55.5,8.4,48,70,80,90,65],
+  ["Rotterdam","Netherlands","Europe",51.9,4.5,50,65,82,72,58],
+  ["Groningen","Netherlands","Europe",53.2,6.6,48,66,80,74,60],
+  ["Hamburg","Germany","Europe",53.6,10.0,50,65,75,70,58],
+  ["Magdeburg","Germany","Europe",52.1,11.6,54,64,72,68,60],
   ["Stuttgart","Germany","Europe",48.8,9.2,58,62,65,68,60],
   ["Leipzig","Germany","Europe",51.3,12.4,54,62,68,65,60],
-  ["Linz","Austria","Europe",48.3,14.3,56,62,62,72,58],
-  ["Bratislava","Slovakia","Europe",48.1,17.1,60,64,65,58,60],
-  ["Krakow","Poland","Europe",50.1,19.9,56,62,68,52,58],
   ["Gothenburg","Sweden","Europe",57.7,12.0,44,68,75,90,62],
   ["Stockholm","Sweden","Europe",59.3,18.1,44,66,72,88,62],
   ["Helsinki","Finland","Europe",60.2,25.0,40,65,70,85,60],
   ["Oulu","Finland","Europe",65.0,25.5,35,65,68,88,58],
-  ["Ålesund","Norway","Europe",62.5,6.2,36,66,75,96,55],
-  ["Masdar City","UAE","Middle East",24.4,54.6,91,80,80,50,72],
-  ["Riyadh SE","Saudi Arabia","Middle East",24.2,47.0,93,90,80,44,70],
-  ["Jubail","Saudi Arabia","Middle East",27.0,49.6,89,82,82,44,65],
+  ["Seville","Spain","Europe",37.4,-5.9,88,78,68,55,72],
+  ["Zaragoza","Spain","Europe",41.6,-0.9,82,76,65,54,70],
+  ["Almeria","Spain","Europe",36.8,-2.5,91,82,62,52,68],
+  ["Badajoz","Spain","Europe",38.9,-6.9,87,79,64,53,70],
+  ["Las Palmas","Spain","Europe",28.1,-15.4,84,76,55,52,65],
+  ["Fuerteventura","Spain","Europe",28.4,-14.1,86,80,52,52,68],
+  ["Evora","Portugal","Europe",38.6,-7.9,88,80,60,60,70],
+  ["Beja","Portugal","Europe",37.9,-7.9,89,81,60,58,70],
+  ["Azores","Portugal","Europe",37.7,-25.7,48,70,48,68,55],
+  ["Palermo","Italy","Europe",38.1,13.4,82,74,55,52,62],
+  ["Athens","Greece","Europe",38.0,23.7,83,76,58,50,62],
+  ["Thessaloniki","Greece","Europe",40.6,22.9,80,74,60,50,62],
+  ["Bucharest","Romania","Europe",44.4,26.1,68,65,68,52,62],
+  ["Sofia","Bulgaria","Europe",42.7,23.3,66,66,60,52,60],
+  ["Belgrade","Serbia","Europe",44.8,20.5,64,62,62,50,60],
+  ["Krakow","Poland","Europe",50.1,19.9,56,62,68,52,58],
+  ["Bratislava","Slovakia","Europe",48.1,17.1,60,64,65,58,60],
+  ["Linz","Austria","Europe",48.3,14.3,56,62,62,72,58],
+  ["Volgograd","Russia","Europe",48.7,44.5,68,68,78,42,62],
+  ["Saratov","Russia","Europe",51.5,46.0,64,65,76,42,60],
+  ["Samara","Russia","Europe",53.2,50.2,60,64,78,42,60],
+  ["Stavropol","Russia","Europe",45.0,41.9,70,68,70,44,62],
+  ["Dnipro","Ukraine","Europe",48.5,35.0,65,62,75,45,58],
+  ["Kharkiv","Ukraine","Europe",50.0,36.3,62,60,72,44,56],
+  ["Riyadh","Saudi Arabia","Middle East",24.7,46.7,94,92,78,45,72],
+  ["Jeddah","Saudi Arabia","Middle East",21.5,39.2,88,72,72,44,60],
+  ["Dammam","Saudi Arabia","Middle East",26.4,50.1,90,82,82,46,68],
+  ["Tabuk","Saudi Arabia","Middle East",28.4,36.6,93,90,70,42,72],
   ["NEOM","Saudi Arabia","Middle East",27.5,36.0,93,90,68,44,75],
-  ["Ouagadougou","Burkina Faso","Africa",12.4,-1.5,88,72,40,28,45],
-  ["Bamako","Mali","Africa",12.6,-8.0,86,70,38,28,44],
+  ["Jubail","Saudi Arabia","Middle East",27.0,49.6,89,82,82,44,65],
+  ["Riyadh SE","Saudi Arabia","Middle East",24.2,47.0,93,90,80,44,70],
+  ["Abu Dhabi","UAE","Middle East",24.5,54.4,91,80,80,44,68],
+  ["Dubai","UAE","Middle East",25.2,55.3,90,78,78,44,65],
+  ["Masdar City","UAE","Middle East",24.4,54.6,91,80,80,50,72],
+  ["Kuwait City","Kuwait","Middle East",29.4,47.9,91,84,82,43,65],
+  ["Oman Duqm","Oman","Middle East",19.6,57.7,90,86,70,42,70],
+  ["Doha","Qatar","Middle East",25.3,51.5,90,80,80,42,65],
+  ["Konya","Turkey","Middle East",37.9,32.5,82,75,60,50,65],
+  ["Ankara","Turkey","Middle East",39.9,32.9,72,72,58,52,62],
+  ["Gaziantep","Turkey","Middle East",37.1,37.4,78,73,55,48,60],
+  ["Negev","Israel","Middle East",30.5,34.9,90,85,62,52,65],
+  ["Aqaba","Jordan","Middle East",29.5,35.0,90,85,60,48,65],
+  ["Wadi Rum","Jordan","Middle East",29.6,35.4,91,87,58,46,65],
+  ["Isfahan","Iran","Middle East",32.7,51.7,84,80,68,38,62],
+  ["Kerman","Iran","Middle East",30.3,57.1,86,84,65,36,62],
+  ["Yazd","Iran","Middle East",31.9,54.4,85,86,62,36,60],
+  ["Aden","Yemen","Middle East",12.8,45.0,88,74,58,32,50],
+  ["Ouarzazate","Morocco","Africa",30.9,-6.9,93,88,60,45,72],
+  ["Laayoune","Morocco","Africa",27.2,-13.2,92,86,55,42,68],
+  ["Agadir","Morocco","Africa",30.4,-9.6,88,82,55,44,65],
+  ["Ouargla","Algeria","Africa",31.9,5.3,93,90,65,38,70],
+  ["Hassi Messaoud","Algeria","Africa",31.7,6.1,92,91,78,38,68],
+  ["Tamanrasset","Algeria","Africa",22.8,5.5,95,93,58,34,65],
+  ["Tripoli","Libya","Africa",32.9,13.2,88,82,72,38,60],
+  ["Benghazi","Libya","Africa",32.1,20.1,86,80,70,38,58],
+  ["Aswan","Egypt","Africa",24.1,32.9,96,92,75,40,68],
+  ["Cairo","Egypt","Africa",30.1,31.2,90,85,70,40,62],
+  ["Hurghada","Egypt","Africa",27.3,33.8,93,86,70,40,65],
+  ["Dakhla","Egypt","Africa",25.5,29.0,94,91,68,38,65],
+  ["Nouakchott","Mauritania","Africa",18.1,-15.9,90,84,50,32,55],
+  ["Agadez","Niger","Africa",16.9,7.9,92,86,48,30,52],
   ["Niamey","Niger","Africa",13.5,2.1,90,78,40,28,45],
-  ["Addis Ababa","Ethiopia","Africa",9.0,38.7,72,62,42,36,48],
+  ["Khartoum","Sudan","Africa",15.6,32.5,90,88,55,32,55],
+  ["Bamako","Mali","Africa",12.6,-8.0,86,70,38,28,44],
+  ["Ouagadougou","Burkina Faso","Africa",12.4,-1.5,88,72,40,28,45],
+  ["Windhoek","Namibia","Africa",-22.6,17.1,88,85,58,38,65],
+  ["Upington","South Africa","Africa",-28.4,21.2,90,87,65,44,68],
+  ["Prieska","South Africa","Africa",-29.7,22.7,88,86,62,44,66],
+  ["De Aar","South Africa","Africa",-30.7,24.0,88,85,60,44,65],
+  ["Beaufort West","South Africa","Africa",-32.4,22.6,85,82,58,44,62],
+  ["Cape Town","South Africa","Africa",-33.9,18.4,78,72,60,46,62],
+  ["Nairobi","Kenya","Africa",-1.3,36.8,72,58,48,42,52],
   ["Mombasa","Kenya","Africa",-4.1,39.6,72,42,45,38,48],
-  ["Chittagong","Bangladesh","Asia",22.3,91.8,68,28,42,30,38],
-  ["Cebu","Philippines","Asia",10.3,124.0,68,30,38,34,40],
-  ["Jakarta","Indonesia","Asia",-6.2,106.8,62,25,42,30,38],
-  ["Surabaya","Indonesia","Asia",-7.2,112.7,65,28,40,30,40],
-  ["Ho Chi Minh","Vietnam","Asia",10.8,106.7,72,32,38,32,40],
-  ["Nakhon Ratchasima","Thailand","Asia",15.0,102.1,72,35,40,38,44],
-  ["Karachi","Pakistan","Asia",24.9,67.0,82,65,55,35,48],
-  ["Hyderabad","Pakistan","Asia",25.4,68.4,84,70,52,34,48],
+  ["Dire Dawa","Ethiopia","Africa",9.6,41.9,82,62,45,30,48],
+  ["Addis Ababa","Ethiopia","Africa",9.0,38.7,72,62,42,36,48],
+  ["Djibouti","Djibouti","Africa",11.6,43.1,88,72,55,36,55],
+  ["Praia","Cape Verde","Africa",14.9,-23.5,84,72,42,36,55],
+  ["Alice Springs","Australia","Oceania",-23.7,133.9,97,92,72,45,85],
+  ["Port Augusta","Australia","Oceania",-32.5,137.8,90,86,80,48,80],
+  ["Broken Hill","Australia","Oceania",-32.0,141.5,91,88,75,46,82],
+  ["Mildura","Australia","Oceania",-34.2,142.2,88,84,72,46,78],
+  ["Kalgoorlie","Australia","Oceania",-30.7,121.5,92,89,68,44,80],
+  ["Carnarvon","Australia","Oceania",-24.9,113.7,95,90,70,42,78],
+  ["Exmouth","Australia","Oceania",-21.9,114.1,94,90,65,40,75],
+  ["Newman","Australia","Oceania",-23.4,119.7,92,91,68,38,78],
+  ["Coober Pedy","Australia","Oceania",-29.0,134.8,95,91,70,40,82],
+  ["Mount Isa","Australia","Oceania",-20.7,139.5,90,88,62,36,75],
+  ["Whyalla","Australia","Oceania",-33.0,137.6,89,85,78,46,78],
+  ["Darwin","Australia","Oceania",-12.5,130.8,82,40,65,38,65],
+  ["Adelaide","Australia","Oceania",-34.9,138.6,82,78,70,52,70],
+  ["Melbourne","Australia","Oceania",-37.8,145.0,68,68,68,54,68],
+  ["Broome","Australia","Oceania",-17.9,122.2,88,72,62,36,68],
+  ["Karratha","Australia","Oceania",-20.7,116.8,91,85,65,38,72],
+  ["Port Hedland","Australia","Oceania",-20.3,118.6,90,86,66,38,70],
+  ["Geraldton","Australia","Oceania",-28.8,114.6,88,84,68,42,72],
+  ["Wellington","New Zealand","Oceania",-41.3,174.8,55,68,55,72,62],
+  ["Dunedin","New Zealand","Oceania",-45.9,170.5,50,65,50,70,60],
+  ["Antofagasta","Chile","S. America",-23.6,-70.4,97,95,65,52,72],
+  ["Calama","Chile","S. America",-22.5,-68.9,96,96,60,48,70],
+  ["Iquique","Chile","S. America",-20.2,-70.1,94,94,62,50,70],
+  ["Arica","Chile","S. America",-18.5,-70.3,93,93,60,50,68],
+  ["Copiapo","Chile","S. America",-27.4,-70.3,92,92,62,50,70],
+  ["Punta Arenas","Chile","S. America",-53.1,-70.9,38,82,58,55,72],
+  ["Puerto Natales","Chile","S. America",-51.7,-72.5,36,80,55,52,70],
+  ["Mendoza","Argentina","S. America",-32.9,-68.8,85,86,68,44,74],
+  ["San Juan","Argentina","S. America",-31.5,-68.5,87,87,65,42,72],
+  ["Neuquen","Argentina","S. America",-38.9,-68.1,78,82,75,44,74],
+  ["Comodoro Rivadavia","Argentina","S. America",-45.9,-67.5,68,84,80,44,72],
+  ["Bahia Blanca","Argentina","S. America",-38.7,-62.3,78,80,72,42,70],
+  ["Viedma","Argentina","S. America",-40.8,-63.0,72,78,70,42,68],
+  ["Fortaleza","Brazil","S. America",-3.7,-38.5,82,52,55,40,55],
+  ["Petrolina","Brazil","S. America",-9.4,-40.5,88,60,60,38,60],
+  ["Barreiras","Brazil","S. America",-12.1,-44.9,85,62,58,40,60],
+  ["Lima","Peru","S. America",-12.0,-77.0,65,75,60,50,52],
+  ["Arequipa","Peru","S. America",-16.4,-71.5,82,80,58,50,60],
+  ["Bogota","Colombia","S. America",4.7,-74.1,65,60,45,52,50],
+  ["Jodhpur","India","Asia",26.3,73.0,90,82,65,35,62],
+  ["Jaisalmer","India","Asia",26.9,70.9,91,84,60,34,60],
+  ["Kutch","India","Asia",23.7,69.9,88,82,62,35,58],
+  ["Bikaner","India","Asia",28.0,73.3,89,80,62,35,60],
+  ["Rajkot","India","Asia",22.3,70.8,86,78,60,36,58],
   ["Barmer","India","Asia",25.7,71.4,90,82,58,34,58],
   ["Pokhran","India","Asia",26.9,71.9,91,83,56,34,58],
   ["Bhuj","India","Asia",23.3,69.7,88,80,58,35,58],
   ["Anantapur","India","Asia",14.7,77.6,84,70,52,36,54],
   ["Tirunelveli","India","Asia",8.7,77.7,80,62,50,36,52],
-  ["Volgograd","Russia","Europe",48.7,44.5,68,68,78,42,62],
-  ["Saratov","Russia","Europe",51.5,46.0,64,65,76,42,60],
-  ["Samara","Russia","Europe",53.2,50.2,60,64,78,42,60],
-  ["Dnipro","Ukraine","Europe",48.5,35.0,65,62,75,45,58],
-  ["Kharkiv","Ukraine","Europe",50.0,36.3,62,60,72,44,56],
+  ["Chennai","India","Asia",13.1,80.3,82,45,58,35,52],
+  ["Almaty","Kazakhstan","Asia",43.2,76.9,68,72,78,45,65],
+  ["Astana","Kazakhstan","Asia",51.2,71.5,62,74,82,44,65],
+  ["Aktau","Kazakhstan","Asia",43.6,51.2,72,80,85,44,68],
   ["Atyrau","Kazakhstan","Asia",47.1,52.1,72,78,88,42,65],
   ["Aktobe","Kazakhstan","Asia",50.3,57.2,66,72,82,42,62],
-  ["Shymkent","Kazakhstan","Asia",42.3,69.6,72,72,70,40,58]
+  ["Shymkent","Kazakhstan","Asia",42.3,69.6,72,72,70,40,58],
+  ["Ashgabat","Turkmenistan","Asia",37.9,58.4,82,82,80,40,62],
+  ["Tashkent","Uzbekistan","Asia",41.3,69.3,76,78,72,40,60],
+  ["Bishkek","Kyrgyzstan","Asia",42.9,74.6,65,70,62,45,58],
+  ["Ulaanbaatar","Mongolia","Asia",47.9,106.9,62,72,65,38,60],
+  ["Dalanzadgad","Mongolia","Asia",43.6,104.4,65,80,62,36,62],
+  ["Dunhuang","China","Asia",40.1,94.7,82,84,68,35,65],
+  ["Turpan","China","Asia",42.9,89.2,84,88,65,35,62],
+  ["Hami","China","Asia",42.8,93.5,82,86,65,35,62],
+  ["Zhangye","China","Asia",38.9,100.5,80,80,62,38,60],
+  ["Jiuquan","China","Asia",39.7,98.5,78,82,65,38,62],
+  ["Yinchuan","China","Asia",38.5,106.3,76,78,70,40,62],
+  ["Urumqi","China","Asia",43.8,87.6,76,82,65,35,60],
+  ["Sendai","Japan","Asia",38.3,140.9,60,62,68,52,52],
+  ["Seoul","South Korea","Asia",37.6,127.0,62,60,65,50,50],
+  ["Novosibirsk","Russia","Asia",55.0,82.9,55,60,75,42,60],
+  ["Omsk","Russia","Asia",55.0,73.4,55,62,78,40,60],
+  ["Ufa","Russia","Asia",54.7,56.0,52,60,72,42,58],
+  ["Orenburg","Russia","Asia",51.8,55.1,60,68,80,42,62],
+  ["Astrakhan","Russia","Asia",46.4,48.0,68,72,82,42,65],
+  ["Quetta","Pakistan","Asia",30.2,67.0,82,80,60,35,55],
+  ["Multan","Pakistan","Asia",30.2,71.4,84,72,62,35,52],
+  ["Karachi","Pakistan","Asia",24.9,67.0,82,65,55,35,48],
+  ["Hyderabad","Pakistan","Asia",25.4,68.4,84,70,52,34,48],
+  ["Bangkok","Thailand","Asia",13.8,100.5,72,28,45,38,42],
+  ["Nakhon Ratchasima","Thailand","Asia",15.0,102.1,72,35,40,38,44],
+  ["Manila","Philippines","Asia",14.6,121.0,70,30,40,36,40],
+  ["Cebu","Philippines","Asia",10.3,124.0,68,30,38,34,40],
+  ["Jakarta","Indonesia","Asia",-6.2,106.8,62,25,42,30,38],
+  ["Surabaya","Indonesia","Asia",-7.2,112.7,65,28,40,30,40],
+  ["Ho Chi Minh City","Vietnam","Asia",10.8,106.7,72,32,38,32,40],
+  ["Hanoi","Vietnam","Asia",21.0,105.8,68,35,40,34,42],
+  ["Chittagong","Bangladesh","Asia",22.3,91.8,68,28,42,30,38],
+  ["Yangon","Myanmar","Asia",16.9,96.2,72,30,40,30,38],
+  ["Phnom Penh","Cambodia","Asia",11.6,104.9,70,28,38,30,38],
+  ["Ubon Ratchathani","Thailand","Asia",15.2,104.9,74,38,42,36,44],
+  ["Davao","Philippines","Asia",7.2,125.5,68,28,36,32,40],
+  ["Makassar","Indonesia","Asia",-5.1,119.4,72,30,40,28,38],
+  ["Medan","Indonesia","Asia",3.6,98.7,65,25,38,28,36],
+  ["Palembang","Indonesia","Asia",-3.0,104.8,66,26,42,30,38],
+  ["Islamabad","Pakistan","Asia",33.7,73.1,76,72,58,35,52],
+  ["Lahore","Pakistan","Asia",31.5,74.3,80,68,60,34,50],
+  ["Peshawar","Pakistan","Asia",34.0,71.6,74,70,55,34,50],
+  ["Tabriz","Iran","Middle East",38.1,46.3,72,70,62,36,58],
+  ["Mashhad","Iran","Middle East",36.3,59.6,78,74,65,36,58],
+  ["Shiraz","Iran","Middle East",29.6,52.5,82,80,62,36,60],
+  ["Muscat","Oman","Middle East",23.6,58.6,88,72,68,42,62],
+  ["Salalah","Oman","Middle East",17.0,54.1,84,70,65,40,60],
+  ["Sanaa","Yemen","Middle East",15.4,44.2,82,72,48,28,45],
+  ["Amman","Jordan","Middle East",31.9,35.9,82,76,58,48,62],
+  ["Tel Aviv","Israel","Middle East",32.1,34.8,84,70,58,55,60],
+  ["Beirut","Lebanon","Middle East",33.9,35.5,76,62,45,44,50],
+  ["Tripoli Libya South","Libya","Africa",26.0,13.5,90,90,68,32,60],
+  ["Sebha","Libya","Africa",27.0,14.4,92,91,65,30,58],
+  ["Luxor","Egypt","Africa",25.7,32.7,95,92,72,38,65],
+  ["Timbuktu","Mali","Africa",16.8,-3.0,88,86,38,26,42],
+  ["Ndjamena","Chad","Africa",12.1,15.1,88,80,42,26,42],
+  ["Diffa","Niger","Africa",13.3,12.6,90,84,42,26,42],
+  ["Maroua","Cameroon","Africa",10.6,14.3,82,66,38,28,40],
+  ["Kampala","Uganda","Africa",0.3,32.6,68,45,40,34,44],
+  ["Dar es Salaam","Tanzania","Africa",-6.8,39.3,72,42,42,36,44],
+  ["Lusaka","Zambia","Africa",-15.4,28.3,78,52,48,36,48],
+  ["Harare","Zimbabwe","Africa",-17.8,31.1,80,55,50,38,50],
+  ["Gaborone","Botswana","Africa",-24.7,25.9,86,78,55,40,58],
+  ["Kimberley","South Africa","Africa",-28.7,24.8,88,84,62,44,65],
+  ["Bloemfontein","South Africa","Africa",-29.1,26.2,84,80,60,44,62],
+  ["Maputo","Mozambique","Africa",-25.9,32.6,76,48,42,34,46],
+  ["Antananarivo","Madagascar","Africa",-18.9,47.5,72,45,38,30,42],
+  ["Dakar","Senegal","Africa",14.7,-17.4,82,60,38,32,48],
+  ["Abuja","Nigeria","Africa",9.1,7.5,78,52,50,30,44],
+  ["Accra","Ghana","Africa",5.6,-0.2,76,42,42,32,44],
+  ["Cali","Colombia","S. America",3.4,-76.5,68,45,42,48,48],
+  ["Medellin","Colombia","S. America",6.2,-75.6,66,48,40,48,46],
+  ["Montevideo","Uruguay","S. America",-34.9,-56.2,68,70,55,52,58],
+  ["Cordoba","Argentina","S. America",-31.4,-64.2,78,76,65,44,68],
+  ["Resistencia","Argentina","S. America",-27.5,-59.0,78,65,68,42,64],
+  ["Santa Cruz","Bolivia","S. America",-17.8,-63.2,72,50,55,36,50],
+  ["La Paz","Bolivia","S. America",-16.5,-68.1,68,55,45,36,48],
+  ["Asuncion","Paraguay","S. America",-25.3,-57.6,74,58,55,38,52],
+  ["Recife","Brazil","S. America",-8.1,-34.9,82,48,52,38,52],
+  ["Salvador","Brazil","S. America",-12.9,-38.5,80,46,50,38,50],
+  ["Manaus","Brazil","S. America",-3.1,-60.0,65,25,40,34,40],
+  ["Thessaly","Greece","Europe",39.6,22.4,80,70,55,50,60],
+  ["Plovdiv","Bulgaria","Europe",42.1,24.7,68,64,60,50,58],
+  ["Craiova","Romania","Europe",44.3,23.8,66,63,65,48,58],
+  ["Baku","Azerbaijan","Europe",40.4,49.9,72,70,78,42,60],
+  ["Tbilisi","Georgia","Europe",41.7,44.8,68,62,60,46,56],
+  ["Yerevan","Armenia","Europe",40.2,44.5,72,65,58,46,56],
+  ["Irkutsk","Russia","Asia",52.3,104.3,52,62,70,40,55],
+  ["Yakutsk","Russia","Asia",62.0,129.7,40,58,65,36,45],
+  ["Chita","Russia","Asia",52.0,113.5,54,62,68,38,55],
+  ["Krasnodar","Russia","Europe",45.0,39.0,68,65,70,44,60],
+  ["Ekaterinburg","Russia","Asia",56.8,60.6,52,62,72,42,58],
+  ["Chelyabinsk","Russia","Asia",55.2,61.4,54,62,70,42,58],
+  ["Perm","Russia","Asia",58.0,56.3,50,60,68,42,56],
+  ["Kazan","Russia","Europe",55.8,49.1,56,62,72,42,58],
+  ["Nizhny Novgorod","Russia","Europe",56.3,44.0,54,60,68,44,58],
+  ["Ulan-Ude","Russia","Asia",51.8,107.6,55,62,62,38,55],
+  ["Norilsk","Russia","Asia",69.3,88.2,28,55,60,35,42],
+  ["Vladivostok","Russia","Asia",43.1,131.9,58,60,62,42,50]
 ];
 
-var FACTORS = [
-  {key:'solar',    label:'Renewable energy potential', color:'#f59e0b'},
-  {key:'humidity', label:'Low humidity (drying cost)', color:'#60a5fa'},
-  {key:'storage',  label:'Geological storage access',  color:'#34d399'},
-  {key:'grid',     label:'Clean / cheap electricity',  color:'#c084fc'},
-  {key:'land',     label:'Land & infrastructure',      color:'#fb923c'},
+var FACTORS=[
+  {key:"solar",label:"Renewable energy potential",color:"#f59e0b"},
+  {key:"humidity",label:"Low humidity (drying cost)",color:"#60a5fa"},
+  {key:"storage",label:"Geological storage access",color:"#34d399"},
+  {key:"grid",label:"Clean / cheap electricity",color:"#c084fc"},
+  {key:"land",label:"Land & infrastructure",color:"#fb923c"}
 ];
 
-var REGIONS = ['All','N. America','Europe','Middle East','Africa','Asia','Oceania','S. America'];
+var REGIONS=["All","N. America","Europe","Middle East","Africa","Asia","Oceania","S. America"];
 
-var CONF_OVERRIDES = {
-  'USA':'H','Canada':'H','Iceland':'H','Norway':'H','Denmark':'H','Netherlands':'H','Germany':'H','UK':'H','Sweden':'H','Finland':'H','Australia':'H','New Zealand':'H','Chile':'H','France':'H','Spain':'H','Portugal':'H','Austria':'H',
-  'Saudi Arabia':'M','UAE':'M','Kuwait':'M','Qatar':'M','Oman':'M','Morocco':'M','Egypt':'M','South Africa':'M','Israel':'M','Jordan':'M','Mexico':'M','Argentina':'M','Brazil':'M','Peru':'M','Turkey':'M','Kazakhstan':'M','Romania':'M','Bulgaria':'M','Serbia':'M','Poland':'M','Slovakia':'M','India':'M','China':'M','Japan':'M','South Korea':'M',
-  'Algeria':'L','Libya':'L','Sudan':'L','Mauritania':'L','Niger':'L','Mali':'L','Burkina Faso':'L','Ethiopia':'L','Kenya':'L','Namibia':'L','Djibouti':'L','Cape Verde':'L','Turkmenistan':'L','Uzbekistan':'L','Kyrgyzstan':'L','Mongolia':'L','Pakistan':'L','Bangladesh':'L','Indonesia':'L','Vietnam':'L','Philippines':'L','Thailand':'L','Yemen':'L','Iran':'L','Russia':'L','Ukraine':'L'
+var CONF_OVERRIDES={
+  "USA":"H","Canada":"H","Iceland":"H","Norway":"H","Denmark":"H","Netherlands":"H","Germany":"H","UK":"H","Sweden":"H","Finland":"H","Australia":"H","New Zealand":"H","Chile":"H","France":"H","Spain":"H","Portugal":"H","Austria":"H",
+  "Saudi Arabia":"M","UAE":"M","Kuwait":"M","Qatar":"M","Oman":"M","Morocco":"M","Egypt":"M","South Africa":"M","Israel":"M","Jordan":"M","Mexico":"M","Argentina":"M","Brazil":"M","Peru":"M","Turkey":"M","Kazakhstan":"M","Romania":"M","Bulgaria":"M","Serbia":"M","Poland":"M","Slovakia":"M","India":"M","China":"M","Japan":"M","South Korea":"M","Colombia":"M",
+  "Algeria":"L","Libya":"L","Sudan":"L","Mauritania":"L","Niger":"L","Mali":"L","Burkina Faso":"L","Ethiopia":"L","Kenya":"L","Namibia":"L","Djibouti":"L","Cape Verde":"L","Turkmenistan":"L","Uzbekistan":"L","Kyrgyzstan":"L","Mongolia":"L","Pakistan":"L","Bangladesh":"L","Indonesia":"L","Vietnam":"L","Philippines":"L","Thailand":"L","Yemen":"L","Iran":"L","Russia":"L","Ukraine":"L"
 };
+var CONF_REGION={"N. America":"H","Europe":"H","Oceania":"H","Middle East":"M","S. America":"M","Asia":"M","Africa":"L"};
 
-var CONF_REGION = {'N. America':'H','Europe':'H','Oceania':'H','Middle East':'M','S. America':'M','Asia':'M','Africa':'L'};
-
-function getConf(site) { return CONF_OVERRIDES[site.country] || CONF_REGION[site.region] || 'M'; }
-function confLabel(c) { return c==='H'?'High confidence':c==='M'?'Medium confidence':'Low confidence'; }
-function confNote(c) {
-  if(c==='H') return 'Multiple validated public datasets available for this region.';
-  if(c==='M') return 'Regional proxy data used. \u00b115% score uncertainty estimated.';
-  return 'Sparse public data. \u00b130% score uncertainty. Corrections welcome.';
+function getConf(s){return CONF_OVERRIDES[s.country]||CONF_REGION[s.region]||"M";}
+function confLabel(c){return c==="H"?"High confidence":c==="M"?"Medium confidence":"Low confidence";}
+function confNote(c){
+  if(c==="H")return "Multiple validated public datasets available for this region.";
+  if(c==="M")return "Regional proxy data used. \u00b115% score uncertainty estimated.";
+  return "Sparse public data. \u00b130% score uncertainty. Corrections welcome.";
 }
-function confRange(score,c) { var m=c==='H'?5:c==='M'?15:30; return [Math.max(0,score-m),Math.min(100,score+m)]; }
+function confRange(score,c){var m=c==="H"?5:c==="M"?15:30;return[Math.max(0,score-m),Math.min(100,score+m)];}
 
-var weights = {solar:1,humidity:1,storage:1,grid:1,land:1};
-var activeRegion = 'All';
-var activeMarker = null;
-var searchTerm = '';
+var weights={solar:1,humidity:1,storage:1,grid:1,land:1};
+var activeRegion="All",activeMarker=null,searchTerm="";
 
-var sites = SITES_RAW.map(function(r) {
-  return {name:r[0],country:r[1],region:r[2],lat:r[3],lng:r[4],solar:r[5],humidity:r[6],storage:r[7],grid:r[8],land:r[9]};
+var sites=SITES_RAW.map(function(r){
+  return{name:r[0],country:r[1],region:r[2],lat:r[3],lng:r[4],solar:r[5],humidity:r[6],storage:r[7],grid:r[8],land:r[9]};
 });
 
-function computeScore(s) {
-  var total = weights.solar+weights.humidity+weights.storage+weights.grid+weights.land;
-  if(!total) return 0;
-  return Math.round((s.solar*weights.solar+s.humidity*weights.humidity+s.storage*weights.storage+s.grid*weights.grid+s.land*weights.land)/total);
+function computeScore(s){
+  var t=weights.solar+weights.humidity+weights.storage+weights.grid+weights.land;
+  if(!t)return 0;
+  return Math.round((s.solar*weights.solar+s.humidity*weights.humidity+s.storage*weights.storage+s.grid*weights.grid+s.land*weights.land)/t);
+}
+function scoreColor(v){return v>=75?"#4ade80":v>=60?"#a3e635":v>=50?"#facc15":v>=35?"#f97316":"#ef4444";}
+function scoreClass(v){return v>=65?"score-high":v>=45?"score-mid":"score-low";}
+
+var map=L.map("map",{center:[25,15],zoom:2,zoomControl:false,minZoom:2,maxZoom:10,worldCopyJump:true});
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap contributors &copy; CARTO",subdomains:"abcd",maxZoom:19}).addTo(map);
+document.getElementById("btn-zoom-in").onclick=function(){map.zoomIn();};
+document.getElementById("btn-zoom-out").onclick=function(){map.zoomOut();};
+
+var markersLayer=L.layerGroup().addTo(map);
+
+function createMarker(site){
+  var score=computeScore(site),color=scoreColor(score),r=score>=75?9:score>=60?7:score>=45?6:5;
+  var m=L.circleMarker([site.lat,site.lng],{radius:r,fillColor:color,fillOpacity:score>=60?0.85:0.5,color:color,weight:1.5,opacity:score>=60?0.9:0.4});
+  m.on("mouseover",function(e){showTooltip(site,e.originalEvent);});
+  m.on("mouseout",function(){hideTooltip();});
+  m.on("click",function(){selectSite(site,m);});
+  return m;
 }
 
-function scoreColor(score) {
-  if(score>=75) return '#4ade80'; if(score>=60) return '#a3e635'; if(score>=50) return '#facc15'; if(score>=35) return '#f97316'; return '#ef4444';
-}
-function scoreClass(score) { return score>=65?'score-high':score>=45?'score-mid':'score-low'; }
-
-var map = L.map('map',{center:[25,15],zoom:2,zoomControl:false,minZoom:2,maxZoom:10,worldCopyJump:true});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap contributors &copy; CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
-document.getElementById('btn-zoom-in').onclick = function(){map.zoomIn();};
-document.getElementById('btn-zoom-out').onclick = function(){map.zoomOut();};
-
-var markers = [];
-var markersLayer = L.layerGroup().addTo(map);
-
-function createMarker(site) {
-  var score=computeScore(site), color=scoreColor(score);
-  var r=score>=75?9:score>=60?7:score>=45?6:5;
-  var marker=L.circleMarker([site.lat,site.lng],{radius:r,fillColor:color,fillOpacity:score>=60?0.85:0.5,color:color,weight:1.5,opacity:score>=60?0.9:0.4});
-  marker.on('mouseover',function(e){showTooltip(site,e.originalEvent);});
-  marker.on('mouseout',function(){hideTooltip();});
-  marker.on('click',function(){selectSite(site,marker);});
-  return marker;
+function renderMarkers(){
+  markersLayer.clearLayers();
+  getFiltered().forEach(function(s){createMarker(s).addTo(markersLayer);});
 }
 
-function renderMarkers() {
-  markersLayer.clearLayers(); markers=[];
-  getFiltered().forEach(function(site){var m=createMarker(site);m.addTo(markersLayer);markers.push({site:site,marker:m});});
-}
-
-function getFiltered() {
+function getFiltered(){
   return sites.filter(function(s){
-    return (activeRegion==='All'||s.region===activeRegion)&&(!searchTerm||s.name.toLowerCase().includes(searchTerm)||s.country.toLowerCase().includes(searchTerm));
+    return(activeRegion==="All"||s.region===activeRegion)&&(!searchTerm||s.name.toLowerCase().includes(searchTerm)||s.country.toLowerCase().includes(searchTerm));
   }).sort(function(a,b){return computeScore(b)-computeScore(a);});
 }
 
-var tooltip=document.getElementById('tooltip');
-
-function showTooltip(site,ev) {
-  var score=computeScore(site),color=scoreColor(score),conf=getConf(site),range=confRange(score,conf),cc='conf-'+conf.toLowerCase();
-  var html='<div class="tt-name">'+site.name+'</div>';
-  html+='<div class="tt-country">'+site.country+' \u00b7 '+site.region+'</div>';
-  html+='<div class="tt-conf-row"><span class="tt-conf-label">Data confidence</span><span class="'+cc+'">'+conf+' \u2014 '+confLabel(conf)+'</span></div>';
-  FACTORS.forEach(function(f){
-    html+='<div class="tt-row"><div class="tt-key"><div class="tt-dot" style="background:'+f.color+'"></div>'+f.label+'</div><div class="tt-val">'+site[f.key]+'</div></div>';
-  });
-  html+='<div class="tt-total"><div class="tt-total-label">Score <span style="font-size:10px;color:var(--text3)">'+range[0]+'\u2013'+range[1]+'</span></div><div class="tt-total-val" style="color:'+color+'">'+score+'/100</div></div>';
-  html+='<div class="tt-unc-bar" style="background:rgba(255,255,255,0.06);width:100%"><div style="height:2px;width:'+(range[1]-range[0])+'%;margin-left:'+range[0]+'%;background:'+color+';opacity:.5;border-radius:1px"></div></div>';
-  html+='<div style="font-size:10px;color:var(--text3);margin-top:5px;line-height:1.4">'+confNote(conf)+'</div>';
-  var iT=encodeURIComponent('Data correction: '+site.name+' ('+site.country+')');
-  var iB=encodeURIComponent('**Site:** '+site.name+', '+site.country+'\n**Current scores:** Solar='+site.solar+' | Humidity='+site.humidity+' | Storage='+site.storage+' | Grid='+site.grid+' | Land='+site.land+'\n**Confidence:** '+conf+'\n\n**Factor to correct:** \n\n**Suggested value:** \n\n**Source / citation:** \n\n**Notes:** ');
-  html+='<a class="tt-report" href="https://github.com/CO2Ri/CDR-Intelligence/issues/new?title='+iT+'&body='+iB+'&labels=data-correction" target="_blank" onclick="event.stopPropagation()"><span class="tt-report-dot"></span>report a data error \u2197</a>';
-  tooltip.innerHTML=html;
-  tooltip.style.display='block';
+var tooltip=document.getElementById("tooltip");
+function showTooltip(site,ev){
+  var score=computeScore(site),color=scoreColor(score),conf=getConf(site),range=confRange(score,conf),cc="conf-"+conf.toLowerCase();
+  var h="<div class='tt-name'>"+site.name+"</div>";
+  h+="<div class='tt-country'>"+site.country+" \u00b7 "+site.region+"</div>";
+  h+="<div class='tt-conf-row'><span class='tt-conf-label'>Data confidence</span><span class='"+cc+"'>"+conf+" \u2014 "+confLabel(conf)+"</span></div>";
+  FACTORS.forEach(function(f){h+="<div class='tt-row'><div class='tt-key'><div class='tt-dot' style='background:"+f.color+"'></div>"+f.label+"</div><div class='tt-val'>"+site[f.key]+"</div></div>";});
+  h+="<div class='tt-total'><div class='tt-total-label'>Score <span style='font-size:10px;color:var(--text3)'>"+range[0]+"\u2013"+range[1]+"</span></div><div class='tt-total-val' style='color:"+color+"'>"+score+"/100</div></div>";
+  h+="<div style='height:2px;background:rgba(255,255,255,0.06);width:100%;margin-top:3px;border-radius:1px'><div style='height:2px;width:"+(range[1]-range[0])+"%;margin-left:"+range[0]+"%;background:"+color+";opacity:.5;border-radius:1px'></div></div>";
+  h+="<div style='font-size:10px;color:var(--text3);margin-top:5px;line-height:1.4'>"+confNote(conf)+"</div>";
+  var iT=encodeURIComponent("Data correction: "+site.name+" ("+site.country+")");
+  var iB=encodeURIComponent("**Site:** "+site.name+", "+site.country+"\n**Current scores:** Solar="+site.solar+" | Humidity="+site.humidity+" | Storage="+site.storage+" | Grid="+site.grid+" | Land="+site.land+"\n**Confidence:** "+conf+"\n\n**Factor to correct:** \n\n**Suggested value:** \n\n**Source / citation:** \n\n**Notes:** ");
+  h+="<a class='tt-report' href='https://github.com/CO2Ri/CDR-Intelligence/issues/new?title="+iT+"&body="+iB+"&labels=data-correction' target='_blank' onclick='event.stopPropagation()'><span class='tt-report-dot'></span>report a data error \u2197</a>";
+  tooltip.innerHTML=h;
+  tooltip.style.display="block";
   positionTooltip(ev);
 }
-
-function hideTooltip(){tooltip.style.display='none';}
-
-function positionTooltip(ev) {
-  var wrap=document.getElementById('map-wrap'),rect=wrap.getBoundingClientRect();
-  var x=ev.clientX-rect.left+14, y=ev.clientY-rect.top-10;
-  if(x+260>rect.width) x=ev.clientX-rect.left-272;
-  if(y+340>rect.height) y=ev.clientY-rect.top-340;
-  tooltip.style.left=x+'px'; tooltip.style.top=y+'px';
+function hideTooltip(){tooltip.style.display="none";}
+function positionTooltip(ev){
+  var wrap=document.getElementById("map-wrap"),rect=wrap.getBoundingClientRect();
+  var x=ev.clientX-rect.left+14,y=ev.clientY-rect.top-10;
+  if(x+265>rect.width)x=ev.clientX-rect.left-277;
+  if(y+340>rect.height)y=ev.clientY-rect.top-340;
+  tooltip.style.left=x+"px";tooltip.style.top=y+"px";
 }
+document.getElementById("map-wrap").addEventListener("mousemove",function(e){if(tooltip.style.display==="block")positionTooltip(e);});
 
-function selectSite(site,marker) {
+function selectSite(site,marker){
   activeMarker=marker;
   map.flyTo([site.lat,site.lng],6,{duration:1.2});
   renderSiteList();
   setTimeout(function(){
-    document.querySelectorAll('.site-item').forEach(function(el){
-      el.classList.toggle('active',el.dataset.name===site.name);
-      if(el.dataset.name===site.name) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    document.querySelectorAll(".site-item").forEach(function(el){
+      el.classList.toggle("active",el.dataset.name===site.name);
+      if(el.dataset.name===site.name)el.scrollIntoView({behavior:"smooth",block:"nearest"});
     });
   },100);
 }
 
-document.getElementById('map-wrap').addEventListener('mousemove',function(e){if(tooltip.style.display==='block') positionTooltip(e);});
-
-function buildWeights() {
-  var container=document.getElementById('weights-container');
-  container.innerHTML='';
+function buildWeights(){
+  var container=document.getElementById("weights-container");
+  container.innerHTML="";
   FACTORS.forEach(function(f){
-    var row=document.createElement('div');
-    row.className='weight-row';
-    row.innerHTML='<div class="weight-meta"><span class="weight-name">'+f.label+'</span><span class="weight-val" id="wv-'+f.key+'">100%</span></div><input type="range" min="0" max="200" step="10" value="100" data-key="'+f.key+'" style="accent-color:'+f.color+'">';
+    var row=document.createElement("div");row.className="weight-row";
+    row.innerHTML="<div class='weight-meta'><span class='weight-name'>"+f.label+"</span><span class='weight-val' id='wv-"+f.key+"'>100%</span></div><input type='range' min='0' max='200' step='10' value='100' data-key='"+f.key+"' style='accent-color:"+f.color+"'>";
     container.appendChild(row);
-    row.querySelector('input').addEventListener('input',function(){
+    row.querySelector("input").addEventListener("input",function(){
       weights[this.dataset.key]=parseFloat(this.value)/100;
-      document.getElementById('wv-'+this.dataset.key).textContent=this.value+'%';
+      document.getElementById("wv-"+this.dataset.key).textContent=this.value+"%";
       refresh();
     });
   });
 }
 
-function buildRegionFilters() {
-  var container=document.getElementById('region-filters');
-  container.innerHTML='';
+function buildRegionFilters(){
+  var container=document.getElementById("region-filters");container.innerHTML="";
   REGIONS.forEach(function(r){
-    var btn=document.createElement('button');
-    btn.className='filter-btn'+(r===activeRegion?' active':'');
-    btn.textContent=r;
-    btn.onclick=function(){activeRegion=r;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');refresh();};
+    var btn=document.createElement("button");btn.className="filter-btn"+(r===activeRegion?" active":"");btn.textContent=r;
+    btn.onclick=function(){activeRegion=r;document.querySelectorAll(".filter-btn").forEach(function(b){b.classList.remove("active");});btn.classList.add("active");refresh();};
     container.appendChild(btn);
   });
 }
 
-function renderStats() {
+function renderStats(){
   var filtered=getFiltered(),scores=filtered.map(function(s){return computeScore(s);});
-  var top=scores.length?Math.max.apply(null,scores):0;
-  var viable=scores.filter(function(s){return s>=60;}).length;
-  var countries=new Set(filtered.map(function(s){return s.country;})).size;
-  var avg=scores.length?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):0;
-  document.getElementById('st-top').textContent=top;
-  document.getElementById('st-viable').textContent=viable;
-  document.getElementById('st-countries').textContent=countries;
-  document.getElementById('st-avg').textContent=avg;
-  document.getElementById('mh-val').textContent=filtered.length;
-  document.getElementById('mh-sub').textContent=filtered.length===sites.length?'global candidate sites':'filtered candidate sites';
+  document.getElementById("st-top").textContent=scores.length?Math.max.apply(null,scores):0;
+  document.getElementById("st-viable").textContent=scores.filter(function(s){return s>=60;}).length;
+  document.getElementById("st-countries").textContent=new Set(filtered.map(function(s){return s.country;})).size;
+  document.getElementById("st-avg").textContent=scores.length?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):0;
+  document.getElementById("mh-val").textContent=filtered.length;
+  document.getElementById("mh-sub").textContent=filtered.length===sites.length?"global candidate sites":"filtered candidate sites";
 }
 
-function renderSiteList() {
-  var filtered=getFiltered().slice(0,30);
-  var container=document.getElementById('site-list');
-  document.getElementById('site-count').textContent='(top '+Math.min(30,getFiltered().length)+')';
-  if(!filtered.length){container.innerHTML='<div class="no-sites">No sites match this filter.</div>';return;}
-  container.innerHTML='';
+function renderSiteList(){
+  var filtered=getFiltered().slice(0,30),container=document.getElementById("site-list");
+  document.getElementById("site-count").textContent="(top "+Math.min(30,getFiltered().length)+")";
+  if(!filtered.length){container.innerHTML="<div class='no-sites'>No sites match this filter.</div>";return;}
+  container.innerHTML="";
   filtered.forEach(function(site){
-    var score=computeScore(site),conf=getConf(site),range=confRange(score,conf),cc='conf-'+conf.toLowerCase();
-    var item=document.createElement('div');
-    item.className='site-item'; item.dataset.name=site.name;
-    var barHtml=FACTORS.map(function(f){return '<div class="mini-bar"><div class="mini-fill" style="width:'+site[f.key]+'%;background:'+f.color+'"></div></div>';}).join('');
-    item.innerHTML='<div class="site-top"><div><div class="site-name">'+site.name+' <span class="site-unc '+cc+'">'+conf+'</span></div><div class="site-country">'+site.country+' \u00b7 '+site.region+'</div></div>'+
-      '<div><div class="site-score '+scoreClass(score)+'">'+score+'</div><div style="font-size:9px;color:var(--text3);text-align:right;font-family:var(--mono)">'+range[0]+'\u2013'+range[1]+'</div></div></div>'+
-      '<div class="site-bars">'+barHtml+'</div>';
-    item.onclick=function(){map.flyTo([site.lat,site.lng],6,{duration:1.2});document.querySelectorAll('.site-item').forEach(function(el){el.classList.remove('active');});item.classList.add('active');};
+    var score=computeScore(site),conf=getConf(site),range=confRange(score,conf),cc="conf-"+conf.toLowerCase();
+    var item=document.createElement("div");item.className="site-item";item.dataset.name=site.name;
+    var bars=FACTORS.map(function(f){return "<div class='mini-bar'><div class='mini-fill' style='width:"+site[f.key]+"%;background:"+f.color+"'></div></div>";}).join("");
+    item.innerHTML="<div class='site-top'><div><div class='site-name'>"+site.name+" <span class='site-unc "+cc+"'>"+conf+"</span></div><div class='site-country'>"+site.country+" \u00b7 "+site.region+"</div></div><div><div class='site-score "+scoreClass(score)+"'>"+score+"</div><div style='font-size:9px;color:var(--text3);text-align:right;font-family:var(--mono)'>"+range[0]+"\u2013"+range[1]+"</div></div></div><div class='site-bars'>"+bars+"</div>";
+    item.onclick=function(){map.flyTo([site.lat,site.lng],6,{duration:1.2});document.querySelectorAll(".site-item").forEach(function(el){el.classList.remove("active");});item.classList.add("active");};
     container.appendChild(item);
   });
 }
 
-function exportCSV() {
+function exportCSV(){
   var filtered=getFiltered();
-  var headers=['Rank','Name','Country','Region','Lat','Lng','Solar','Humidity','Storage','Grid','Land','Score','Score_min','Score_max','Confidence'];
   var rows=filtered.map(function(s,i){
     var score=computeScore(s),conf=getConf(s),range=confRange(score,conf);
-    return [i+1,'"'+s.name+'"','"'+s.country+'"','"'+s.region+'"',s.lat,s.lng,s.solar,s.humidity,s.storage,s.grid,s.land,score,range[0],range[1],conf].join(',');
+    return[i+1,'"'+s.name+'"','"'+s.country+'"','"'+s.region+'"',s.lat,s.lng,s.solar,s.humidity,s.storage,s.grid,s.land,score,range[0],range[1],conf].join(",");
   });
-  var csv=headers.join(',')+'\n'+rows.join('\n');
-  var blob=new Blob([csv],{type:'text/csv'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;
-  a.download='dac-suitability-'+(activeRegion==='All'?'global':activeRegion.replace(/\./g,'').replace(/ /g,'-').toLowerCase())+'-v01.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+  var csv="Rank,Name,Country,Region,Lat,Lng,Solar,Humidity,Storage,Grid,Land,Score,Score_min,Score_max,Confidence\n"+rows.join("\n");
+  var url=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  var a=document.createElement("a");a.href=url;
+  a.download="dac-suitability-"+(activeRegion==="All"?"global":activeRegion.replace(/\./g,"").replace(/ /g,"-").toLowerCase())+"-v01.csv";
+  a.click();URL.revokeObjectURL(url);
 }
-
-document.getElementById('csv-btn').onclick=exportCSV;
+document.getElementById("csv-btn").onclick=exportCSV;
+document.getElementById("search").addEventListener("input",function(){searchTerm=this.value.toLowerCase().trim();refresh();});
 
 function refresh(){renderMarkers();renderStats();renderSiteList();}
-
-document.getElementById('search').addEventListener('input',function(){searchTerm=this.value.toLowerCase().trim();refresh();});
-
-buildWeights();
-buildRegionFilters();
-refresh();
+buildWeights();buildRegionFilters();refresh();
 </script>
 </body>
 </html>
