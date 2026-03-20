@@ -2,7 +2,7 @@
 
 **Open DAC site suitability index. Public data. Reproducible methodology.**
 
-→ **[Launch the tool](https://co2ri.github.io/cdr-site-intelligence)**
+→ **[Launch the tool](https://co2ri.github.io/cdr-intelligence)**
 
 ---
 
@@ -30,7 +30,7 @@ Weights are equal by default. The interactive sliders let you reprioritise — u
 
 ## Use it
 
-**In the browser:** [co2ri.github.io/cdr-site-intelligence](https://co2ri.github.io/cdr-site-intelligence)
+**In the browser:** [co2ri.github.io/cdr-site-intelligence](https://co2ri.github.io/cdr-intelligence)
 
 **Locally:**
 ```bash
