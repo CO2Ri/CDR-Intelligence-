@@ -517,17 +517,25 @@ document.getElementById("btn-zoom-in").onclick=function(){map.zoomIn();};
 document.getElementById("btn-zoom-out").onclick=function(){map.zoomOut();};
 
 var markersLayer=L.layerGroup().addTo(map);
+var tooltipPinned=false;
 
 function createMarker(site){
   var score=computeScore(site),color=scoreColor(score),r=score>=75?9:score>=60?7:score>=45?6:5;
   var m=L.circleMarker([site.lat,site.lng],{radius:r,fillColor:color,fillOpacity:score>=60?0.85:0.5,color:color,weight:1.5,opacity:score>=60?0.9:0.4});
-  m.on("mouseover",function(e){showTooltip(site,e.originalEvent);});
+  m.on("mouseover",function(e){
+    if(!tooltipPinned) showTooltip(site,e.originalEvent,false);
+  });
   m.on("mouseout",function(e){
+    if(tooltipPinned) return;
     var rel=e.originalEvent.relatedTarget;
-    if(rel&&(rel===tooltip||tooltip.contains(rel)))return;
+    if(rel&&(rel===tooltip||tooltip.contains(rel))) return;
     hideTooltip();
   });
-  m.on("click",function(){selectSite(site,m);});
+  m.on("click",function(e){
+    L.DomEvent.stopPropagation(e);
+    showTooltip(site,e.originalEvent,true);
+    selectSite(site,m);
+  });
   return m;
 }
 
@@ -543,9 +551,12 @@ function getFiltered(){
 }
 
 var tooltip=document.getElementById("tooltip");
-function showTooltip(site,ev){
+
+function showTooltip(site,ev,pinned){
+  tooltipPinned=!!pinned;
   var score=computeScore(site),color=scoreColor(score),conf=getConf(site),range=confRange(score,conf),cc="conf-"+conf.toLowerCase();
-  var h="<div class='tt-name'>"+site.name+"</div>";
+  var pinIndicator=pinned?"<div style='font-size:9px;color:var(--text3);font-family:var(--mono);margin-bottom:8px;letter-spacing:.05em'>PINNED \u2014 click map to close</div>":"";
+  var h=pinIndicator+"<div class='tt-name'>"+site.name+"</div>";
   h+="<div class='tt-country'>"+site.country+" \u00b7 "+site.region+"</div>";
   h+="<div class='tt-conf-row'><span class='tt-conf-label'>Data confidence</span><span class='"+cc+"'>"+conf+" \u2014 "+confLabel(conf)+"</span></div>";
   FACTORS.forEach(function(f){h+="<div class='tt-row'><div class='tt-key'><div class='tt-dot' style='background:"+f.color+"'></div>"+f.label+"</div><div class='tt-val'>"+site[f.key]+"</div></div>";});
@@ -554,25 +565,43 @@ function showTooltip(site,ev){
   h+="<div style='font-size:10px;color:var(--text3);margin-top:5px;line-height:1.4'>"+confNote(conf)+"</div>";
   var iT=encodeURIComponent("Data correction: "+site.name+" ("+site.country+")");
   var iB=encodeURIComponent("**Site:** "+site.name+", "+site.country+"\n**Current scores:** Solar="+site.solar+" | Humidity="+site.humidity+" | Storage="+site.storage+" | Grid="+site.grid+" | Land="+site.land+"\n**Confidence:** "+conf+"\n\n**Factor to correct:** \n\n**Suggested value:** \n\n**Source / citation:** \n\n**Notes:** ");
-  h+="<a class='tt-report' href='https://github.com/CO2Ri/CDR-Intelligence/issues/new?title="+iT+"&body="+iB+"&labels=data-correction' target='_blank' onclick='event.stopPropagation()'><span class='tt-report-dot'></span>report a data error \u2197</a>";
+  h+="<a class='tt-report' href='https://github.com/CO2Ri/CDR-Intelligence/issues/new?title="+iT+"&body="+iB+"&labels=data-correction' target='_blank'><span class='tt-report-dot'></span>report a data error \u2197</a>";
   tooltip.innerHTML=h;
   tooltip.style.display="block";
+  tooltip.style.borderColor=pinned?"rgba(74,222,128,0.4)":"var(--border2)";
   positionTooltip(ev);
 }
-function hideTooltip(){tooltip.style.display="none";}
+
+function hideTooltip(){
+  if(tooltipPinned) return;
+  tooltip.style.display="none";
+}
+
+function forceHideTooltip(){
+  tooltipPinned=false;
+  tooltip.style.display="none";
+}
+
 tooltip.addEventListener("mouseleave",function(e){
+  if(tooltipPinned) return;
   var rel=e.relatedTarget;
-  if(rel&&rel.closest&&rel.closest(".leaflet-interactive"))return;
+  if(rel&&rel.closest&&rel.closest(".leaflet-interactive")) return;
   hideTooltip();
 });
+
 function positionTooltip(ev){
   var wrap=document.getElementById("map-wrap"),rect=wrap.getBoundingClientRect();
   var x=ev.clientX-rect.left+14,y=ev.clientY-rect.top-10;
   if(x+265>rect.width)x=ev.clientX-rect.left-277;
-  if(y+340>rect.height)y=ev.clientY-rect.top-340;
+  if(y+360>rect.height)y=ev.clientY-rect.top-360;
   tooltip.style.left=x+"px";tooltip.style.top=y+"px";
 }
-document.getElementById("map-wrap").addEventListener("mousemove",function(e){if(tooltip.style.display==="block")positionTooltip(e);});
+
+document.getElementById("map-wrap").addEventListener("mousemove",function(e){
+  if(tooltip.style.display==="block"&&!tooltipPinned) positionTooltip(e);
+});
+
+map.on("click",function(){forceHideTooltip();});
 
 function selectSite(site,marker){
   activeMarker=marker;
