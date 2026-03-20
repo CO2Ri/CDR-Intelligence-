@@ -40,7 +40,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--cream);color:v
 @keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
 
 /* FARHAN BIO */
-.farhan-bar{display:flex;align-items:center;gap:10px;padding:10px 22px;background:var(--cream2);border-bottom:1px solid var(--cream3);flex-shrink:0}
+.farhan-bar{display:flex;align-items:center;gap:10px;padding:10px 22px;background:var(--cream2);border-top:1px solid var(--cream3);flex-shrink:0}
 .farhan-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--moss) 0%,var(--clay) 100%);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;font-weight:600;color:white;flex-shrink:0}
 .farhan-name{font-size:12px;font-weight:600;color:var(--bark);line-height:1.2}
 .farhan-role{font-size:10px;color:var(--bark3);font-weight:300}
@@ -277,20 +277,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
     <div class="open-pill"><div class="open-pill-dot"></div>Public data &middot; corrections welcome</div>
   </div>
 
-  <!-- FARHAN -->
-  <div class="farhan-bar">
-    <div class="farhan-avatar">F</div>
-    <div>
-      <div class="farhan-name">Farhan M</div>
-      <div class="farhan-role">CDR researcher &amp; tool builder</div>
-    </div>
-    <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" class="linkedin-btn">
-      <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-      </svg>
-      Connect
-    </a>
-  </div>
+  <!-- FARHAN BAR MOVED TO BOTTOM -->
 
   <div id="s-body">
     <div class="global-stats">
@@ -330,9 +317,18 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
     <button id="csv-btn">&#8595; &nbsp;export CSV with cost estimates</button>
     <div id="site-list"></div>
   </div>
+  <!-- FARHAN BAR AT BOTTOM -->
+  <div class="farhan-bar">
+    <div class="farhan-avatar">F</div>
+    <div class="farhan-name">Farhan M</div>
+    <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" class="linkedin-btn">
+      <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+      Connect
+    </a>
+  </div>
 </div>
-
-<!-- ── MAP AREA ───────────────────────────────────────────────── -->
 <div id="map-wrap">
   <div id="map"></div>
 
@@ -520,12 +516,14 @@ function showTooltip(site,ev,pinned){
   h+='<div class="tt-range-note">Range: '+range[0]+'–'+range[1]+' ('+confLabel(conf)+')</div>';
   if(penalty>0||bonus>0){h+='<div style="font-size:10px;color:var(--bark3);margin-top:2px">Base '+bs+(penalty>0?' − '+penalty+' water':'')+(bonus>0?' + '+bonus+' curtailment':'')+'</div>';}
   h+='<div class="tt-actions">';
-  h+='<button class="tt-report" onclick="window.open(''+issueUrl+'','_blank')">Report data error</button>';
+  h+='<button class="tt-report" id="tt-report-btn" data-url="'+issueUrl+'">Report data error</button>';
   h+='<a class="tt-request" href="'+linkedIn+'" target="_blank"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>Get site report</a>';
   h+='</div>';
   tooltip.innerHTML=h;tooltip.style.display='block';
   tooltip.style.borderColor=pinned?'rgba(181,98,42,0.35)':'var(--cream3)';
   positionTooltip(ev);
+  var reportBtn=document.getElementById('tt-report-btn');
+  if(reportBtn)reportBtn.onclick=function(){window.open(this.getAttribute('data-url'),'_blank');};
 }
 function hideTooltip(){if(!tooltipPinned)tooltip.style.display='none';}
 function forceHideTooltip(){tooltipPinned=false;tooltip.style.display='none';}
@@ -592,7 +590,7 @@ function renderDrawer(){
               '<span class="ccs-'+site.ccs+'">'+CCS_LABELS[site.ccs]+'</span>'+
               (site.curtail>=40?'<span class="curtail-tag" style="margin-left:3px">Curtail '+site.curtail+'</span>':'');
     col.innerHTML=
-      '<div class="compare-remove" onclick="removeCompare(''+site.name+'')">&#10005;</div>'+
+      '<div class="compare-remove" data-name="'+site.name+'">&#10005;</div>+iv>'+
       '<div class="compare-col-head">'+
         '<div class="compare-col-name">'+site.name+'</div>'+
         '<div class="compare-col-country">'+site.country+'</div>'+
@@ -601,6 +599,8 @@ function renderDrawer(){
       '</div>'+
       '<div class="compare-factors">'+factors_html+'</div>'+
       '<div class="compare-flags">'+flags+'</div>';
+    // Wire up remove button via event delegation (avoids quote issues)
+    col.querySelector('.compare-remove').addEventListener('click',function(){removeCompare(this.getAttribute('data-name'));});
     table.appendChild(col);
   });
   // Add empty slot hint if <3
@@ -706,7 +706,7 @@ function exportCSV(){
       s.solar,s.humidity,s.stor_cap,s.stor_inj,s.grid,s.land,
       s.water,'"'+WATER_LABELS[s.water]+'"',s.ccs,'"'+CCS_LABELS[s.ccs]+'"',s.curtail,conf].join(',');
   });
-  var csv=hdr+'\n'+rows.join('\n');
+  var csv=[hdr].concat(rows).join('\n');
   var url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   var a=document.createElement('a');a.href=url;
   a.download='dac-suitability-'+(activeRegion==='All'?'global':activeRegion.replace(/\./g,'').replace(/ /g,'-').toLowerCase())+'.csv';
