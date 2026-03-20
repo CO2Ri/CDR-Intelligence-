@@ -522,7 +522,11 @@ function createMarker(site){
   var score=computeScore(site),color=scoreColor(score),r=score>=75?9:score>=60?7:score>=45?6:5;
   var m=L.circleMarker([site.lat,site.lng],{radius:r,fillColor:color,fillOpacity:score>=60?0.85:0.5,color:color,weight:1.5,opacity:score>=60?0.9:0.4});
   m.on("mouseover",function(e){showTooltip(site,e.originalEvent);});
-  m.on("mouseout",function(){hideTooltip();});
+  m.on("mouseout",function(e){
+    var rel=e.originalEvent.relatedTarget;
+    if(rel&&(rel===tooltip||tooltip.contains(rel)))return;
+    hideTooltip();
+  });
   m.on("click",function(){selectSite(site,m);});
   return m;
 }
@@ -556,6 +560,11 @@ function showTooltip(site,ev){
   positionTooltip(ev);
 }
 function hideTooltip(){tooltip.style.display="none";}
+tooltip.addEventListener("mouseleave",function(e){
+  var rel=e.relatedTarget;
+  if(rel&&rel.closest&&rel.closest(".leaflet-interactive"))return;
+  hideTooltip();
+});
 function positionTooltip(ev){
   var wrap=document.getElementById("map-wrap"),rect=wrap.getBoundingClientRect();
   var x=ev.clientX-rect.left+14,y=ev.clientY-rect.top-10;
