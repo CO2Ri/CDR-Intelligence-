@@ -130,7 +130,7 @@ This project is openly maintained. Contributions are welcome in the following fo
 
 If you use this tool in research, please cite:
 
-> CDR Site Intelligence. *DAC Site Suitability Index, v0.1*. 2026. Available at: https://github.com/[yourusername]/cdr-site-intelligence. Licensed under CC BY 4.0.
+> CDR Site Intelligence. *DAC Site Suitability Index, v0.1*. 2026. Available at: https://github.com/CO2Ri/cdr-intelligence. Licensed under CC BY 4.0.
 
 ---
 
