@@ -330,6 +330,71 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
 .status-construction{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(61,122,138,0.1);color:var(--sky);border:1px solid rgba(61,122,138,0.2)}
 .status-planned{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(107,92,69,0.1);color:var(--bark2);border:1px solid rgba(107,92,69,0.18)}
 .status-cancelled{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(181,98,42,0.1);color:var(--clay);border:1px solid rgba(181,98,42,0.2);text-decoration:line-through}
+
+/* ── TAB NAVIGATION ─────────────────────────────────────────── */
+#tab-nav{display:flex;gap:2px;padding:8px 10px;background:var(--cream2);border-bottom:1px solid var(--cream3);flex-shrink:0}
+.tab-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 4px;border:none;background:transparent;border-radius:8px;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--bark3);cursor:pointer;letter-spacing:.04em;transition:all .18s;white-space:nowrap}
+.tab-btn svg{flex-shrink:0;opacity:.7}
+.tab-btn:hover{background:rgba(255,255,255,.6);color:var(--bark2)}
+.tab-btn.active{background:white;color:var(--bark);box-shadow:0 1px 4px rgba(44,36,22,0.12);border:0.5px solid var(--cream3)}
+.tab-btn.active svg{opacity:1}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* TAB INTRO */
+.tab-intro{display:flex;align-items:baseline;gap:8px;margin-bottom:18px;padding:14px 14px 12px;background:white;border:0.5px solid var(--cream3);border-radius:12px;box-shadow:0 1px 4px rgba(44,36,22,0.05)}
+.tab-intro-stat{font-family:var(--serif);font-size:28px;font-weight:500;color:var(--clay);line-height:1}
+.tab-intro-label{font-size:12px;color:var(--bark3);font-weight:300}
+
+/* COMPANY LIST IN SIDEBAR */
+#company-list{display:flex;flex-direction:column;gap:5px}
+.company-item{background:white;border:0.5px solid var(--cream3);border-radius:10px;padding:9px 11px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(44,36,22,0.04)}
+.company-item:hover{border-color:var(--sky);box-shadow:0 3px 10px rgba(44,36,22,0.09);transform:translateY(-1px)}
+.ci-top{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.ci-name{font-family:var(--serif);font-size:13px;font-weight:500;color:var(--bark);flex:1;line-height:1.2}
+.ci-loc{font-size:10px;color:var(--bark3);font-weight:300}
+.ci-tech{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(61,122,138,0.1);color:var(--sky);border:0.5px solid rgba(61,122,138,0.2);flex-shrink:0}
+.ci-web{display:block;margin-top:6px;padding:5px 10px;background:var(--sky);color:white;border-radius:6px;font-family:var(--mono);font-size:9px;text-align:center;text-decoration:none;transition:background .15s;letter-spacing:.04em}
+.ci-web:hover{background:var(--sky2)}
+.ci-na{display:block;margin-top:6px;padding:5px 10px;background:var(--cream2);color:var(--bark3);border-radius:6px;font-family:var(--mono);font-size:9px;text-align:center;border:0.5px dashed var(--cream3)}
+
+/* POLICY LIST */
+#policy-list{display:flex;flex-direction:column;gap:5px}
+.policy-item{background:white;border:0.5px solid rgba(122,109,88,0.2);border-radius:10px;padding:9px 11px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(44,36,22,0.04)}
+.policy-item:hover{border-color:rgba(122,109,88,0.5);box-shadow:0 3px 10px rgba(44,36,22,0.09);transform:translateY(-1px)}
+.pi-name{font-family:var(--serif);font-size:13px;font-weight:500;color:var(--bark);margin-bottom:2px}
+.pi-incentive{font-family:var(--mono);font-size:9px;color:var(--bark3);margin-bottom:5px;letter-spacing:.03em}
+.pi-amount{font-family:var(--serif);font-size:16px;font-weight:500;color:#7a6d58}
+.pi-mech{font-size:10px;color:var(--bark3);margin-top:3px;font-weight:300}
+
+/* BUYER LIST */
+#buyer-list{display:flex;flex-direction:column;gap:5px}
+.buyer-item{background:white;border:0.5px solid rgba(24,95,165,0.18);border-radius:10px;padding:9px 11px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(44,36,22,0.04)}
+.buyer-item:hover{border-color:rgba(24,95,165,0.4);box-shadow:0 3px 10px rgba(44,36,22,0.09);transform:translateY(-1px)}
+.bi-name{font-family:var(--serif);font-size:13px;font-weight:500;color:var(--bark);margin-bottom:2px}
+.bi-tonnes{font-family:var(--serif);font-size:15px;font-weight:500;color:#185fa5;margin-bottom:2px}
+.bi-value{font-size:10px;color:var(--bark3);font-weight:300}
+
+/* PROJECT LIST */
+#project-list{display:flex;flex-direction:column;gap:5px}
+.project-item{background:white;border:0.5px solid var(--cream3);border-radius:10px;padding:9px 11px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(44,36,22,0.04)}
+.project-item:hover{border-color:var(--moss);box-shadow:0 3px 10px rgba(44,36,22,0.09);transform:translateY(-1px)}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:4px}
+.proj-name{font-family:var(--serif);font-size:13px;font-weight:500;color:var(--bark);line-height:1.2;flex:1}
+.proj-cap-badge{font-family:var(--mono);font-size:10px;font-weight:500;text-align:right;flex-shrink:0}
+.proj-company{font-size:10px;color:var(--bark3);font-weight:300}
+.proj-loc{font-size:10px;color:var(--bark3)}
+
+/* POLICY LEGEND */
+.policy-legend{display:flex;gap:14px;margin-bottom:14px;padding:8px 11px;background:var(--cream2);border-radius:8px}
+.pol-leg-item{display:flex;align-items:center;gap:6px}
+.pol-leg-hex{width:12px;height:12px;background:#7a6d58;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);flex-shrink:0}
+.buy-leg-dot{width:12px;height:12px;border-radius:50%;background:#185fa5;flex-shrink:0}
+.pol-leg-text{font-family:var(--mono);font-size:9px;color:var(--bark3);letter-spacing:.04em}
+.tab-note{font-size:10px;color:var(--bark3);font-style:italic;margin-bottom:8px;font-weight:300}
+
+/* MAP HEADER updates per tab */
+#map-mode-badge{position:absolute;top:14px;left:14px;z-index:499;background:rgba(245,240,232,0.94);backdrop-filter:blur(10px);border:1px solid var(--cream3);border-radius:20px;padding:5px 12px;font-family:var(--mono);font-size:10px;color:var(--bark3);pointer-events:none;display:none;box-shadow:0 2px 8px rgba(44,36,22,0.08);letter-spacing:.06em}
 </style>
 </head>
 <body>
@@ -337,7 +402,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
 
 <!-- ── SIDEBAR ────────────────────────────────────────────────── -->
 <div id="sidebar">
-  <div id="s-head">
+    <div id="s-head">
     <div class="wordmark">
       <div class="leaf-mark">
         <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -349,88 +414,32 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
       </div>
       <span class="brand-name">CDR Intelligence</span>
     </div>
-    <div class="s-title">DAC <em>Site Suitability</em> Map</div>
-    <div class="s-sub">308 locations &middot; cost estimates &middot; water stress &middot; CCS readiness &middot; open methodology</div>
-    <div class="open-pill"><div class="open-pill-dot"></div>Public data &middot; open methodology</div>
+    <div class="s-title">DAC <em>Intelligence</em> Platform</div>
+    <div class="s-sub">308 sites &middot; 163 companies &middot; 20 projects &middot; 12 policy zones</div>
+    <div class="open-pill"><div class="open-pill-dot"></div>Open data &middot; open methodology</div>
   </div>
 
-  <!-- FARHAN BAR MOVED TO BOTTOM -->
-
-  <div id="s-body">
-    <div class="global-stats">
-      <div class="stat-card"><div class="stat-val" id="st-top">&mdash;</div><div class="stat-label">Top score</div></div>
-      <div class="stat-card"><div class="stat-val" id="st-viable">&mdash;</div><div class="stat-label">Viable sites (&ge;60)</div></div>
-      <div class="stat-card"><div class="stat-val" id="st-countries">&mdash;</div><div class="stat-label">Countries</div></div>
-      <div class="stat-card"><div class="stat-val" id="st-avg">&mdash;</div><div class="stat-label">Global avg</div></div>
-    </div>
-
-    
-      <div class="sec-head"><div class="sec-head-bar" style="background:var(--sky)"></div>DAC companies</div>
-      <div class="company-toggle-wrap">
-        <div class="company-toggle-row" onclick="toggleCompanyLayer()">
-          <div>
-            <div class="company-toggle-label">Show DAC companies worldwide</div>
-            <div class="company-toggle-count" id="company-count-label">163 companies mapped</div>
-          </div>
-          <div class="toggle-sky" id="tog-companies"></div>
-        </div>
-      </div>
-
-      <div class="sec-head" style="margin-top:2px"><div class="sec-head-bar" style="background:#7a6d58"></div>Strategic layers</div>
-      <div class="layer-section">
-        <div class="layer-toggle-row" onclick="toggleLayer('policy')">
-          <div>
-            <div class="layer-toggle-label">Policy incentives</div>
-            <div class="layer-toggle-src">45Q · EU Innovation Fund · UK CfD · 12 countries</div>
-          </div>
-          <div class="toggle-pol" id="tog-policy"></div>
-        </div>
-        <div class="layer-toggle-row" onclick="toggleLayer('buyer')">
-          <div>
-            <div class="layer-toggle-label">Corporate buyers</div>
-            <div class="layer-toggle-src">Microsoft · Frontier · Amazon · 16 companies</div>
-          </div>
-          <div class="toggle-buy" id="tog-buyer"></div>
-        </div>
-        <div class="layer-toggle-row" onclick="toggleLayer('project')">
-          <div>
-            <div class="layer-toggle-label">Deployed projects</div>
-            <div class="layer-toggle-src">Mammoth · Stratos · Cypress · 20 sites</div>
-          </div>
-          <div class="toggle-proj" id="tog-project"></div>
-        </div>
-      </div>
-<div class="sec-head"><div class="sec-head-bar"></div>Factor weights</div>
-    <div class="weights" id="weights-container"></div>
-
-    <div class="sec-head"><div class="sec-head-bar"></div>Overlay layers</div>
-    <div class="overlays-wrap">
-      <div class="overlay-row" onclick="toggleOverlay('water')">
-        <div><div class="overlay-label">Water stress penalty</div><div class="overlay-src">WRI Aqueduct &mdash; on by default</div></div>
-        <div class="toggle on" id="tog-water"></div>
-      </div>
-      <div class="overlay-row" onclick="toggleOverlay('curtail')">
-        <div><div class="overlay-label">Curtailed renewables bonus</div><div class="overlay-src">ERCOT &middot; CAISO &middot; AEMO &middot; Entso-E</div></div>
-        <div class="toggle" id="tog-curtail"></div>
-      </div>
-    </div>
-
-    <div class="sec-head"><div class="sec-head-bar"></div>Filter by region</div>
-    <div class="filter-row" id="region-filters"></div>
-
-    <div class="sec-head"><div class="sec-head-bar"></div>Legend</div>
-    <div class="legend">
-      <div class="legend-row"><div class="legend-dot" style="background:#5c8251"></div><div class="legend-text">High suitability (&ge;75)</div></div>
-      <div class="legend-row"><div class="legend-dot" style="background:#c9a96e"></div><div class="legend-text">Moderate (50&ndash;74)</div></div>
-      <div class="legend-row"><div class="legend-dot" style="background:#d4773a"></div><div class="legend-text">Marginal (30&ndash;49)</div></div>
-      <div class="legend-row"><div class="legend-dot" style="background:#b5622a;opacity:.5"></div><div class="legend-text">Low suitability (&lt;30)</div></div>
-    </div>
-
-    <div class="sec-head"><div class="sec-head-bar"></div>Top sites <span id="site-count" style="color:var(--clay);font-family:var(--mono);font-size:9px;margin-left:4px"></span></div>
-    <button id="csv-btn">&#8595; &nbsp;export CSV with cost estimates</button>
-    <div id="site-list"></div>
+  <!-- TAB NAV -->
+  <div id="tab-nav">
+    <button class="tab-btn active" data-tab="suitability" onclick="switchTab('suitability',this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      Suitability
+    </button>
+    <button class="tab-btn" data-tab="companies" onclick="switchTab('companies',this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Companies
+    </button>
+    <button class="tab-btn" data-tab="policy" onclick="switchTab('policy',this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Policy
+    </button>
+    <button class="tab-btn" data-tab="projects" onclick="switchTab('projects',this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Projects
+    </button>
   </div>
-  <!-- FARHAN BAR AT BOTTOM -->
+
+  <!-- FARHAN BAR -->
   <div class="farhan-bar">
     <div class="farhan-avatar">F</div>
     <div class="farhan-name">Farhan M</div>
@@ -441,11 +450,109 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
       Connect
     </a>
   </div>
-</div>
+
+  <div id="s-body">
+
+    <!-- ── TAB: SUITABILITY ─────────────────────────────── -->
+    <div id="tab-suitability" class="tab-pane active">
+      <div class="global-stats">
+        <div class="stat-card"><div class="stat-val" id="st-top">&mdash;</div><div class="stat-label">Top score</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-viable">&mdash;</div><div class="stat-label">Viable sites (&ge;60)</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-countries">&mdash;</div><div class="stat-label">Countries</div></div>
+        <div class="stat-card"><div class="stat-val" id="st-avg">&mdash;</div><div class="stat-label">Global avg</div></div>
+      </div>
+      <div class="sec-head"><div class="sec-head-bar"></div>Factor weights</div>
+      <div class="weights" id="weights-container"></div>
+      <div class="sec-head"><div class="sec-head-bar"></div>Overlay layers</div>
+      <div class="overlays-wrap">
+        <div class="overlay-row" onclick="toggleOverlay('water')">
+          <div><div class="overlay-label">Water stress penalty</div><div class="overlay-src">WRI Aqueduct &mdash; on by default</div></div>
+          <div class="toggle on" id="tog-water"></div>
+        </div>
+        <div class="overlay-row" onclick="toggleOverlay('curtail')">
+          <div><div class="overlay-label">Curtailed renewables bonus</div><div class="overlay-src">ERCOT &middot; CAISO &middot; AEMO &middot; Entso-E</div></div>
+          <div class="toggle" id="tog-curtail"></div>
+        </div>
+      </div>
+      <div class="sec-head"><div class="sec-head-bar"></div>Filter by region</div>
+      <div class="filter-row" id="region-filters"></div>
+      <div class="sec-head"><div class="sec-head-bar"></div>Legend</div>
+      <div class="legend">
+        <div class="legend-row"><div class="legend-dot" style="background:#5c8251"></div><div class="legend-text">High suitability (&ge;75)</div></div>
+        <div class="legend-row"><div class="legend-dot" style="background:#c9a96e"></div><div class="legend-text">Moderate (50&ndash;74)</div></div>
+        <div class="legend-row"><div class="legend-dot" style="background:#d4773a"></div><div class="legend-text">Marginal (30&ndash;49)</div></div>
+        <div class="legend-row"><div class="legend-dot" style="background:#b5622a;opacity:.5"></div><div class="legend-text">Low suitability (&lt;30)</div></div>
+      </div>
+      <div class="sec-head"><div class="sec-head-bar"></div>Top sites <span id="site-count" style="color:var(--clay);font-family:var(--mono);font-size:9px;margin-left:4px"></span></div>
+      <button id="csv-btn">&#8595; &nbsp;export CSV with cost estimates</button>
+      <div id="site-list"></div>
+    </div>
+
+    <!-- ── TAB: COMPANIES ────────────────────────────────── -->
+    <div id="tab-companies" class="tab-pane">
+      <div class="tab-intro">
+        <div class="tab-intro-stat">163</div>
+        <div class="tab-intro-label">DAC companies worldwide</div>
+      </div>
+      <div class="sec-head"><div class="sec-head-bar" style="background:var(--sky)"></div>Filter by technology</div>
+      <div class="filter-row" id="company-tech-filters"></div>
+      <div class="sec-head" style="margin-top:4px"><div class="sec-head-bar" style="background:var(--sky)"></div>Filter by region</div>
+      <div class="filter-row" id="company-region-filters"></div>
+      <div class="sec-head" style="margin-top:4px"><div class="sec-head-bar" style="background:var(--sky)"></div>Companies <span id="company-list-count" style="color:var(--sky);font-family:var(--mono);font-size:9px;margin-left:4px"></span></div>
+      <div id="company-list"></div>
+    </div>
+
+    <!-- ── TAB: POLICY ───────────────────────────────────── -->
+    <div id="tab-policy" class="tab-pane">
+      <div class="tab-intro">
+        <div class="tab-intro-stat">12</div>
+        <div class="tab-intro-label">Policy zones mapped</div>
+      </div>
+      <div class="policy-legend">
+        <div class="pol-leg-item">
+          <div class="pol-leg-hex"></div>
+          <div class="pol-leg-text">Policy incentive zone</div>
+        </div>
+        <div class="pol-leg-item">
+          <div class="buy-leg-dot"></div>
+          <div class="pol-leg-text">Corporate buyer HQ</div>
+        </div>
+      </div>
+      <div class="sec-head" style="margin-top:2px"><div class="sec-head-bar" style="background:#7a6d58"></div>Policy incentives</div>
+      <div id="policy-list"></div>
+      <div class="sec-head" style="margin-top:14px"><div class="sec-head-bar" style="background:#185fa5"></div>Corporate buyers</div>
+      <div class="tab-note">CDR.fyi 2024 data &middot; Click a buyer for details</div>
+      <div id="buyer-list"></div>
+    </div>
+
+    <!-- ── TAB: PROJECTS ─────────────────────────────────── -->
+    <div id="tab-projects" class="tab-pane">
+      <div class="global-stats">
+        <div class="stat-card"><div class="stat-val" id="proj-operational" style="color:var(--moss2)">&mdash;</div><div class="stat-label">Operational</div></div>
+        <div class="stat-card"><div class="stat-val" id="proj-building" style="color:var(--sky)">&mdash;</div><div class="stat-label">Building</div></div>
+        <div class="stat-card"><div class="stat-val" id="proj-capacity" style="color:var(--clay)">&mdash;</div><div class="stat-label">kt/yr online</div></div>
+        <div class="stat-card"><div class="stat-val" id="proj-pipeline" style="color:var(--bark3)">&mdash;</div><div class="stat-label">Mt/yr pipeline</div></div>
+      </div>
+      <div class="sec-head" style="margin-top:4px"><div class="sec-head-bar" style="background:var(--moss)"></div>Status filter</div>
+      <div class="filter-row" id="project-status-filters"></div>
+      <div class="sec-head" style="margin-top:4px"><div class="sec-head-bar" style="background:var(--moss)"></div>Projects</div>
+      <div id="project-list"></div>
+    </div>
+
+  </div>
+    <div class="farhan-name">Farhan M</div>
+    <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" class="linkedin-btn">
+      <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      </svg>
+      Connect
+    </a>
+  </div>
 <div id="map-wrap">
   <div id="map"></div>
 
-  <div id="map-header">
+  <div id="map-mode-badge"></div>
+    <div id="map-header">
     <div class="mh-label">viewing</div>
     <div class="mh-val" id="mh-val">308</div>
     <div class="mh-sub" id="mh-sub">global candidate sites</div>
@@ -910,7 +1017,7 @@ function toggleOverlay(id){overlays[id]=!overlays[id];document.getElementById('t
 // ── COMPANY LAYER ─────────────────────────────────────────────
 var companies=COMPANIES_RAW.map(function(r){
   return{name:r[0],country:r[1],city:r[2],lat:r[3],lng:r[4],
-    website:r[5],tech:r[6],stage:r[7]};
+    website:r[5],tech:r[6],stage:r[7],hq_region:r[7]};
 });
 var companyLayerVisible=false;
 var companyMarkersLayer=L.layerGroup();
@@ -1012,6 +1119,270 @@ function renderCompanyMarkers(){
   badge.style.display='block';
 }
 renderCompanyMarkers();
+
+
+// ── TAB SYSTEM ────────────────────────────────────────────────────
+var activeTab = 'suitability';
+
+function switchTab(tab, btn) {
+  activeTab = tab;
+
+  // Update nav buttons
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+
+  // Update panes
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('tab-'+tab).classList.add('active');
+
+  // Show/hide correct map layers
+  // Hide all
+  markersLayer.clearLayers();
+  map.removeLayer(companyMarkersLayer);
+  map.removeLayer(policyLayer);
+  map.removeLayer(buyerLayer);
+  map.removeLayer(projectLayer);
+  forceHideTooltip();
+  if(layerPopup) layerPopup.style.display='none';
+  if(companyPopup) companyPopup.style.display='none';
+
+  var badge = document.getElementById('map-mode-badge');
+  var header = document.getElementById('map-header');
+
+  if(tab === 'suitability') {
+    header.style.display = 'block';
+    badge.style.display = 'none';
+    renderMarkers();
+    renderStats();
+    renderSiteList();
+  } else if(tab === 'companies') {
+    header.style.display = 'none';
+    badge.textContent = '163 DAC COMPANIES';
+    badge.style.display = 'block';
+    companyMarkersLayer.addTo(map);
+    renderCompanyTab();
+  } else if(tab === 'policy') {
+    header.style.display = 'none';
+    badge.textContent = 'POLICY & BUYERS';
+    badge.style.display = 'block';
+    policyLayer.addTo(map);
+    buyerLayer.addTo(map);
+    renderPolicyTab();
+  } else if(tab === 'projects') {
+    header.style.display = 'none';
+    badge.textContent = 'DAC PROJECTS';
+    badge.style.display = 'block';
+    projectLayer.addTo(map);
+    renderProjectTab();
+  }
+}
+
+// ── COMPANY TAB ────────────────────────────────────────────────────
+var activeTechFilter = 'All';
+var activeCompanyRegion = 'All';
+
+function renderCompanyTab() {
+  var techFilters = document.getElementById('company-tech-filters');
+  if(!techFilters.hasChildNodes()) {
+    var techs = ['All','Solid sorbent','Liquid solvent','Membrane','Cryogenic','Other'];
+    techs.forEach(function(t) {
+      var btn = document.createElement('button');
+      btn.className = 'filter-btn' + (t === activeTechFilter ? ' active' : '');
+      btn.textContent = t;
+      btn.style.cssText = 'border-color:rgba(61,122,138,0.25);color:var(--bark3)';
+      btn.onclick = function() {
+        activeTechFilter = t;
+        document.querySelectorAll('#company-tech-filters .filter-btn').forEach(function(b){
+          b.classList.remove('active');
+          b.style.cssText = 'border-color:rgba(61,122,138,0.25);color:var(--bark3)';
+        });
+        btn.classList.add('active');
+        btn.style.cssText = 'background:var(--sky);color:white;border-color:var(--sky)';
+        renderCompanyList();
+      };
+      if(t === activeTechFilter) {
+        btn.classList.add('active');
+        btn.style.cssText = 'background:var(--sky);color:white;border-color:var(--sky)';
+      }
+      techFilters.appendChild(btn);
+    });
+  }
+  var regionFilters = document.getElementById('company-region-filters');
+  if(!regionFilters.hasChildNodes()) {
+    var regs = ['All','N. America','Europe','Asia','Oceania','Middle East','S. America','Africa'];
+    regs.forEach(function(r) {
+      var btn = document.createElement('button');
+      btn.className = 'filter-btn' + (r === activeCompanyRegion ? ' active' : '');
+      btn.textContent = r === 'N. America' ? 'Americas' : r === 'S. America' ? 'S.Am' : r;
+      btn.style.cssText = 'border-color:rgba(61,122,138,0.25);color:var(--bark3)';
+      btn.onclick = function() {
+        activeCompanyRegion = r;
+        document.querySelectorAll('#company-region-filters .filter-btn').forEach(function(b){
+          b.classList.remove('active');
+          b.style.cssText = 'border-color:rgba(61,122,138,0.25);color:var(--bark3)';
+        });
+        btn.classList.add('active');
+        btn.style.cssText = 'background:var(--sky);color:white;border-color:var(--sky)';
+        renderCompanyList();
+      };
+      if(r === activeCompanyRegion) {
+        btn.classList.add('active');
+        btn.style.cssText = 'background:var(--sky);color:white;border-color:var(--sky)';
+      }
+      regionFilters.appendChild(btn);
+    });
+  }
+  renderCompanyList();
+}
+
+function renderCompanyList() {
+  var filtered = companies.filter(function(c) {
+    var techOk = activeTechFilter === 'All' || c.tech === activeTechFilter;
+    var regionOk = activeCompanyRegion === 'All' ||
+      (activeCompanyRegion === 'N. America' && (c.country === 'U.S.' || c.country === 'Canada' || c.country === 'Mexico')) ||
+      (activeCompanyRegion !== 'N. America' && c.hq_region === activeCompanyRegion);
+    if(searchTerm) return techOk && (c.name.toLowerCase().includes(searchTerm) || c.country.toLowerCase().includes(searchTerm));
+    return techOk && regionOk;
+  });
+
+  var container = document.getElementById('company-list');
+  var countEl = document.getElementById('company-list-count');
+  if(countEl) countEl.textContent = filtered.length + ' shown';
+  container.innerHTML = '';
+
+  filtered.forEach(function(c) {
+    var item = document.createElement('div');
+    item.className = 'company-item';
+    var webHtml = c.website !== 'NA'
+      ? '<a class="ci-web" href="' + c.website + '" target="_blank">Visit website &rarr;</a>'
+      : '<div class="ci-na">No website available</div>';
+    item.innerHTML =
+      '<div class="ci-top">' +
+        '<div class="ci-name">' + c.name + '</div>' +
+        '<span class="ci-tech">' + c.tech + '</span>' +
+      '</div>' +
+      '<div class="ci-loc">' + c.city + ' &middot; ' + c.country + '</div>' +
+      webHtml;
+    item.addEventListener('click', function(e) {
+      if(e.target.tagName === 'A') return;
+      map.flyTo([c.lat, c.lng], 5, {duration:1.0});
+    });
+    container.appendChild(item);
+  });
+}
+
+// ── POLICY TAB ─────────────────────────────────────────────────────
+function renderPolicyTab() {
+  var plist = document.getElementById('policy-list');
+  if(plist.hasChildNodes()) return;
+  policies.forEach(function(p) {
+    var item = document.createElement('div');
+    item.className = 'policy-item';
+    item.innerHTML =
+      '<div class="pi-name">' + p.name + '</div>' +
+      '<div class="pi-incentive">' + p.incentive + '</div>' +
+      '<div class="pi-amount">' + p.amount + '</div>' +
+      '<div class="pi-mech">' + p.mechanism + '</div>';
+    item.addEventListener('click', function() {
+      map.flyTo([p.lat, p.lng], 4, {duration:1.0});
+      showLayerPopup('policy', p, {clientX: window.innerWidth/2, clientY: window.innerHeight/2});
+    });
+    plist.appendChild(item);
+  });
+
+  var blist = document.getElementById('buyer-list');
+  if(blist.hasChildNodes()) return;
+  buyers.forEach(function(b) {
+    var item = document.createElement('div');
+    item.className = 'buyer-item';
+    item.innerHTML =
+      '<div class="bi-name">' + b.company.substring(0,40) + (b.company.length>40?'...':'') + '</div>' +
+      '<div class="bi-tonnes">' + b.tonnes + '</div>' +
+      '<div class="bi-value">' + b.value + '</div>';
+    item.addEventListener('click', function() {
+      map.flyTo([b.lat, b.lng], 4, {duration:1.0});
+    });
+    blist.appendChild(item);
+  });
+}
+
+// ── PROJECTS TAB ────────────────────────────────────────────────────
+var activeStatusFilter = 'All';
+
+function renderProjectTab() {
+  // Stats
+  var operational = projects.filter(function(p){return p.status==='Operational';});
+  var building = projects.filter(function(p){return p.status==='Under construction'||p.status==='Commissioning';});
+  var onlineCap = operational.reduce(function(a,p){return a+p.capacity;},0);
+  var pipelineCap = projects.filter(function(p){return p.status!=='Cancelled'&&p.status!=='Operational';}).reduce(function(a,p){return a+p.capacity;},0);
+  document.getElementById('proj-operational').textContent = operational.length;
+  document.getElementById('proj-building').textContent = building.length;
+  document.getElementById('proj-capacity').textContent = (onlineCap/1000).toFixed(0);
+  document.getElementById('proj-pipeline').textContent = (pipelineCap/1000000).toFixed(1);
+
+  // Status filters
+  var sf = document.getElementById('project-status-filters');
+  if(!sf.hasChildNodes()) {
+    var statuses = ['All','Operational','Commissioning','Under construction','Planned','Development','Cancelled'];
+    statuses.forEach(function(s) {
+      var btn = document.createElement('button');
+      btn.className = 'filter-btn' + (s === activeStatusFilter ? ' active' : '');
+      btn.textContent = s === 'Under construction' ? 'Building' : s;
+      btn.onclick = function() {
+        activeStatusFilter = s;
+        document.querySelectorAll('#project-status-filters .filter-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        renderProjectList();
+        // Re-render map markers
+        projectLayer.clearLayers();
+        getFilteredProjects().forEach(function(p){createProjectMarker(p).addTo(projectLayer);});
+      };
+      sf.appendChild(btn);
+    });
+  }
+  renderProjectList();
+}
+
+function getFilteredProjects() {
+  return projects.filter(function(p) {
+    if(activeStatusFilter === 'All') return true;
+    if(activeStatusFilter === 'Under construction') return p.status === 'Under construction';
+    return p.status === activeStatusFilter;
+  });
+}
+
+function renderProjectList() {
+  var container = document.getElementById('project-list');
+  container.innerHTML = '';
+  var statusColors = {
+    'Operational':'#4a6741','Commissioning':'#8a6820','Under construction':'#185fa5',
+    'Advanced development':'#185fa5','Planned':'#7a6d58','Development':'#7a6d58',
+    'Pilot':'#3d7a8a','Cancelled':'#b5622a'
+  };
+  getFilteredProjects().sort(function(a,b){return b.capacity-a.capacity;}).forEach(function(p) {
+    if(p.capacity === 0 && p.status !== 'Cancelled') return;
+    var item = document.createElement('div');
+    item.className = 'project-item';
+    var capStr = p.capacity >= 1000000 ? (p.capacity/1000000).toFixed(1)+' Mt/yr' :
+                 p.capacity >= 1000 ? (p.capacity/1000).toFixed(0)+' kt/yr' :
+                 p.capacity > 0 ? p.capacity+' t/yr' : 'Cancelled';
+    var col = statusColors[p.status] || '#7a6d58';
+    item.innerHTML =
+      '<div class="proj-top">' +
+        '<div class="proj-name">' + p.name + '</div>' +
+        '<div class="proj-cap-badge" style="color:'+col+'">' + capStr + '</div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center">' +
+        '<div class="proj-company">' + p.company + '</div>' +
+        '<span style="font-family:var(--mono);font-size:9px;color:'+col+'">' + p.status + '</span>' +
+      '</div>' +
+      '<div class="proj-loc">' + p.city + ', ' + p.country + ' &middot; ' + p.year + '</div>';
+    item.addEventListener('click', function() {
+      map.flyTo([p.lat, p.lng], 6, {duration:1.0});
+    });
+    container.appendChild(item);
+  });
+}
 
 function buildWeights(){
   var c=document.getElementById('weights-container');c.innerHTML='';
