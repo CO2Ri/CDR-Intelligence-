@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CO2Ri — DAC Site Suitability</title>
+<title>CO2Ri</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -31,7 +31,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--cream);color:v
 .wordmark{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .leaf-mark{width:26px;height:26px;flex-shrink:0;position:relative}
 .leaf-mark svg{width:100%;height:100%}
-.brand-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--bark3)}
+.brand-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.16em;color:var(--bark3)}
 .s-title{font-family:var(--serif);font-size:20px;font-weight:500;color:var(--bark);line-height:1.2;white-space:nowrap;margin-bottom:7px}
 .s-title em{font-style:italic;color:var(--clay)}
 .s-sub{font-size:12px;color:var(--bark3);line-height:1.6;font-weight:300}
@@ -422,6 +422,17 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
 .ic-head{font-size:12px;font-weight:500;color:var(--bark);margin-bottom:3px}
 .ic-body{font-size:11px;color:var(--bark3);line-height:1.55;font-weight:300}
 .ic-metric{font-family:var(--mono);font-size:10px;color:var(--bark2);margin-top:4px;padding:3px 8px;background:var(--cream2);border-radius:4px;display:inline-block}
+
+.verified-badge{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(74,103,65,0.12);color:var(--moss);border:0.5px solid rgba(74,103,65,0.25);letter-spacing:.04em;flex-shrink:0}
+.verified-badge svg{width:8px;height:8px;flex-shrink:0}
+.company-item.verified{border-color:rgba(74,103,65,0.2);background:linear-gradient(135deg,white 0%,rgba(74,103,65,0.03) 100%)}
+.company-item.verified:hover{border-color:var(--moss);box-shadow:0 3px 10px rgba(74,103,65,0.12)}
+.claim-btn{display:block;margin-top:6px;padding:5px 10px;background:transparent;color:var(--clay);border:0.5px solid rgba(181,98,42,0.3);border-radius:6px;font-family:var(--mono);font-size:9px;text-align:center;text-decoration:none;transition:all .15s;letter-spacing:.04em;cursor:pointer;width:100%}
+.claim-btn:hover{background:rgba(181,98,42,0.06);border-color:var(--clay)}
+.company-item .claim-section{margin-top:6px;padding-top:6px;border-top:0.5px dashed var(--cream3)}
+.claim-note{font-size:9px;color:var(--bark3);font-weight:300;margin-bottom:5px;line-height:1.4}
+.operator-metrics{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.op-metric{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(74,103,65,0.08);color:var(--moss);border:0.5px solid rgba(74,103,65,0.18)}
 </style>
 </head>
 <body>
@@ -470,18 +481,6 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
     </button>
   </div>
 
-  <!-- FARHAN BAR -->
-  <div class="farhan-bar">
-    <div class="farhan-avatar">F</div>
-    <div class="farhan-name">Farhan M</div>
-    <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" class="linkedin-btn">
-      <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-      </svg>
-      Connect
-    </a>
-  </div>
-
   <div id="s-body">
 
     <!-- ── TAB: SUITABILITY ─────────────────────────────── -->
@@ -522,8 +521,21 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
     <!-- ── TAB: COMPANIES ────────────────────────────────── -->
     <div id="tab-companies" class="tab-pane">
       <div class="tab-intro">
-        <div class="tab-intro-stat">163</div>
-        <div class="tab-intro-label">DAC companies worldwide</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+            <div class="tab-intro-stat">163</div>
+            <div class="tab-intro-label">DAC companies worldwide</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--bark3)">
+            <span class="verified-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>
+            <span>= operational data confirmed &middot; visible to investors &amp; buyers</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(74,103,65,0.06);border:0.5px solid rgba(74,103,65,0.2);border-radius:10px;padding:10px 12px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:500;color:var(--moss);margin-bottom:4px">Are you a DAC operator?</div>
+        <div style="font-size:11px;color:var(--bark3);line-height:1.5;margin-bottom:7px">Claim your listing in 10 minutes. Get a Verified badge, appear in investor searches, and contribute to the sector benchmarking database.</div>
+        <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" style="display:block;padding:6px;background:var(--moss);color:white;border-radius:6px;font-family:var(--mono);font-size:9px;text-align:center;text-decoration:none;letter-spacing:.06em">Claim your listing &rarr;</a>
       </div>
       <div class="sec-head"><div class="sec-head-bar" style="background:var(--sky)"></div>Filter by technology</div>
       <div class="filter-row" id="company-tech-filters"></div>
@@ -617,6 +629,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
 
 
   </div>
+  <div class="farhan-bar">
+    <div class="farhan-avatar">F</div>
     <div class="farhan-name">Farhan M</div>
     <a href="https://www.linkedin.com/in/cheme-farhan/" target="_blank" class="linkedin-btn">
       <svg class="linkedin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -625,6 +639,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
       Connect
     </a>
   </div>
+</div>
 <div id="map-wrap">
   <div id="map"></div>
 
@@ -1200,6 +1215,15 @@ function renderCompanyMarkers(){
 renderCompanyMarkers();
 
 
+
+var VERIFIED_OPERATORS = {
+  'Climeworks': {metrics:['36 kt/yr nameplate','Basalt mineralisation','Geothermal powered']},
+  'Heirloom': {metrics:['1 kt/yr Phase 1','Limestone cycling','Solar + grid']},
+  '1PointFive (Stratos)': {metrics:['500 kt/yr target','KS-11 solvent','West Texas grid']},
+};
+
+var CLAIM_COMPANIES = ['Octavia Carbon','NEG8 Carbon','GreenCap Solutions','Soletair Power','44.01','AspiraDAC','Fugu','Direct Carbon','KORALL','Removr'];
+
 // ── TAB SYSTEM ────────────────────────────────────────────────────
 var activeTab = 'suitability';
 
@@ -1338,16 +1362,31 @@ function renderCompanyList() {
   filtered.forEach(function(c) {
     var item = document.createElement('div');
     item.className = 'company-item';
+    var isVerified = !!VERIFIED_OPERATORS[c.name];
+    var isClaim = CLAIM_COMPANIES.indexOf(c.name) > -1;
+    if(isVerified) item.classList.add('verified');
+    var verifiedBadgeHtml = isVerified
+      ? '<span class="verified-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified</span>'
+      : '';
     var webHtml = c.website !== 'NA'
       ? '<a class="ci-web" href="' + c.website + '" target="_blank">Visit website &rarr;</a>'
       : '<div class="ci-na">No website available</div>';
+    var metricsHtml = isVerified
+      ? '<div class="operator-metrics">' + VERIFIED_OPERATORS[c.name].metrics.map(function(m){return '<span class="op-metric">'+m+'</span>';}).join('') + '</div>'
+      : '';
+    var claimHtml = (!isVerified && isClaim)
+      ? '<div class="claim-section"><div class="claim-note">Claim your listing to get a Verified badge visible to investors &amp; carbon buyers.</div><a class="claim-btn" href="https://www.linkedin.com/in/cheme-farhan/" target="_blank">Claim this listing &rarr;</a></div>'
+      : '';
     item.innerHTML =
       '<div class="ci-top">' +
         '<div class="ci-name">' + c.name + '</div>' +
+        verifiedBadgeHtml +
         '<span class="ci-tech">' + c.tech + '</span>' +
       '</div>' +
       '<div class="ci-loc">' + c.city + ' &middot; ' + c.country + '</div>' +
-      webHtml;
+      metricsHtml +
+      webHtml +
+      claimHtml;
     item.addEventListener('click', function(e) {
       if(e.target.tagName === 'A') return;
       map.flyTo([c.lat, c.lng], 5, {duration:1.0});
