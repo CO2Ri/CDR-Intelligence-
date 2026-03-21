@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CDR Intelligence — DAC Site Suitability</title>
+<title>CO2Ri — DAC Site Suitability</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -395,6 +395,33 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
 
 /* MAP HEADER updates per tab */
 #map-mode-badge{position:absolute;top:14px;left:14px;z-index:499;background:rgba(245,240,232,0.94);backdrop-filter:blur(10px);border:1px solid var(--cream3);border-radius:20px;padding:5px 12px;font-family:var(--mono);font-size:10px;color:var(--bark3);pointer-events:none;display:none;box-shadow:0 2px 8px rgba(44,36,22,0.08);letter-spacing:.06em}
+
+/* ── GIGATON ANALYSIS ─────────────────────────────────────────── */
+.gap-card{background:linear-gradient(135deg,rgba(74,103,65,0.06) 0%,rgba(181,98,42,0.06) 100%);border:1px solid rgba(74,103,65,0.2);border-radius:14px;padding:14px 16px;margin-bottom:2px}
+.gap-card-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--bark3);margin-bottom:5px}
+.gap-card-number{font-family:var(--serif);font-size:32px;font-weight:500;color:var(--clay);line-height:1;margin-bottom:4px}
+.gap-card-sub{font-size:11px;color:var(--bark3);font-weight:300;line-height:1.5;margin-bottom:10px}
+.gap-bar-wrap{height:8px;background:var(--cream3);border-radius:4px;overflow:hidden;position:relative}
+.gap-bar-today{height:100%;width:0.005%;background:var(--clay);border-radius:4px;min-width:3px}
+.gap-bar-label{font-family:var(--mono);font-size:9px;color:var(--bark3);margin-top:4px;letter-spacing:.04em}
+
+.concentration-bars{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
+.conc-row{display:flex;align-items:center;gap:8px}
+.conc-label{font-size:11px;color:var(--bark3);width:80px;flex-shrink:0;font-weight:300}
+.conc-bar-wrap{flex:1;height:10px;background:var(--cream2);border-radius:5px;overflow:hidden}
+.conc-bar-fill{height:100%;border-radius:5px;transition:width .6s ease}
+.conc-pct{font-family:var(--mono);font-size:11px;font-weight:500;width:36px;text-align:right;flex-shrink:0}
+
+.zipf-note{font-size:10px;color:var(--bark3);font-style:italic;margin-bottom:8px;font-weight:300}
+.zipf-chart-wrap{background:white;border:0.5px solid var(--cream3);border-radius:10px;padding:10px;box-shadow:0 1px 3px rgba(44,36,22,0.04)}
+
+.investor-card{background:white;border-left:3px solid var(--clay);border:0.5px solid var(--cream3);border-left-width:3px;border-radius:0 10px 10px 0;padding:10px 12px;margin-bottom:7px;box-shadow:0 1px 3px rgba(44,36,22,0.04)}
+.investor-card.good{border-left-color:var(--moss2)}
+.investor-card.warn{border-left-color:var(--sand)}
+.investor-card.risk{border-left-color:var(--clay)}
+.ic-head{font-size:12px;font-weight:500;color:var(--bark);margin-bottom:3px}
+.ic-body{font-size:11px;color:var(--bark3);line-height:1.55;font-weight:300}
+.ic-metric{font-family:var(--mono);font-size:10px;color:var(--bark2);margin-top:4px;padding:3px 8px;background:var(--cream2);border-radius:4px;display:inline-block}
 </style>
 </head>
 <body>
@@ -412,7 +439,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
           <line x1="17" y1="14" x2="13" y2="17" stroke="rgba(255,255,255,0.3)" stroke-width="0.9" stroke-linecap="round"/>
         </svg>
       </div>
-      <span class="brand-name">CDR Intelligence</span>
+      <span class="brand-name">CO2Ri</span>
     </div>
     <div class="s-title">DAC <em>Intelligence</em> Platform</div>
     <div class="s-sub">308 sites &middot; 163 companies &middot; 20 projects &middot; 12 policy zones</div>
@@ -436,6 +463,10 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
     <button class="tab-btn" data-tab="projects" onclick="switchTab('projects',this)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       Projects
+    </button>
+    <button class="tab-btn" data-tab="gigaton" onclick="switchTab('gigaton',this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Gigaton
     </button>
   </div>
 
@@ -538,6 +569,52 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25)}
       <div class="sec-head" style="margin-top:4px"><div class="sec-head-bar" style="background:var(--moss)"></div>Projects</div>
       <div id="project-list"></div>
     </div>
+    <!-- ── TAB: GIGATON ANALYSIS ────────────────────────────── -->
+    <div id="tab-gigaton" class="tab-pane">
+      <div class="tab-intro" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="tab-intro-stat" style="color:var(--moss2)">1 Gt</div>
+          <div class="tab-intro-label">CO&#x2082;/yr target by 2050</div>
+        </div>
+        <div style="font-size:10px;color:var(--bark3);font-weight:300">Zipf&#8217;s law model &middot; Grant Faber DAC Company List</div>
+      </div>
+
+      <!-- KEY METRICS -->
+      <div class="global-stats" style="margin-bottom:12px">
+        <div class="stat-card"><div class="stat-val" style="color:var(--clay)">191</div><div class="stat-label">Total DAC companies</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--moss2)">48</div><div class="stat-label">Expected survivors</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--bark3)">75%</div><div class="stat-label">Failure rate</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--sky)">~49</div><div class="stat-label">kt/yr today</div></div>
+      </div>
+
+      <!-- GAP CARD -->
+      <div class="gap-card">
+        <div class="gap-card-label">Scale-up required by 2050</div>
+        <div class="gap-card-number">20,450&times;</div>
+        <div class="gap-card-sub">From ~49 kt/yr operational today to 1,000,000 kt/yr</div>
+        <div class="gap-bar-wrap">
+          <div class="gap-bar-today" title="Today: 0.005% of target"></div>
+          <div class="gap-bar-label">Today &lt; 0.01% of target</div>
+        </div>
+      </div>
+
+      <!-- CONCENTRATION -->
+      <div class="sec-head" style="margin-top:14px"><div class="sec-head-bar" style="background:var(--clay)"></div>Market concentration (Zipf model)</div>
+      <div class="concentration-bars" id="conc-bars"></div>
+
+      <!-- ZIPF CHART -->
+      <div class="sec-head" style="margin-top:14px"><div class="sec-head-bar" style="background:var(--moss)"></div>Required capacity per surviving company</div>
+      <div class="zipf-note">Assumes 48 survivors reaching 1 Gt/yr collectively by 2050</div>
+      <div class="zipf-chart-wrap">
+        <canvas id="zipf-chart" height="220"></canvas>
+      </div>
+
+      <!-- INVESTOR SUMMARY -->
+      <div class="sec-head" style="margin-top:14px"><div class="sec-head-bar" style="background:var(--sky)"></div>Investor implications</div>
+      <div id="investor-cards"></div>
+
+    </div>
+
 
   </div>
     <div class="farhan-name">Farhan M</div>
@@ -617,6 +694,8 @@ var COMPANIES_RAW=[["1PointFive","U.S.","Houston, TX",29.76,-95.39534,"https://w
 var POLICIES_RAW=[["United States","USA",38.9,-95.5,"45Q Tax Credit","$180/t DAC storage","Tax credit (transferable/direct pay)","12 years per project, build by 2033","IRS / OBBBA July 2025","Active"],["United States (California)","USA",36.7,-119.8,"CA Low Carbon Fuel Standard","~$44/t","LCFS credits","Ongoing","CARB 2024","Active"],["European Union","EU",50.8,4.4,"EU Innovation Fund","Up to 60% capex / \u20ac40M pilot / \u20ac100M+ large","Grant (competitive)","Ongoing, ~\u20ac5B in 2025 round","European Commission","Active"],["United Kingdom","UK",51.5,-0.1,"GGR Business Model (CfD)","Revenue support per tonne vs VCM reference","15-year contract for difference","\u00a321.7B CCUS commitment over 25 years","DESNZ 2024-2025","Active"],["Netherlands","NL",52.1,5.3,"SDE++","Up to \u20ac2.1B round (CCUS eligible)","Carbon contract for difference","Per project, annual rounds","Netherlands Enterprise Agency","Active"],["Denmark","DK",56.0,10.0,"CCUS Fund","Competitive tender, 2.3 Mtpa target by 2029","Fixed-price contract (CfD-style)","2024-2025 rounds","Danish Energy Agency","Active"],["Norway","NO",59.9,10.7,"Longship / CLIMIT","NOK 16.8B Longship CCS programme","Grant + capex support","Transport & storage infrastructure","Norwegian Government","Active"],["Canada","CA",56.0,-96.0,"ITC for CCS","30% investment tax credit (capture equipment)","Investment tax credit","Annual, Budget 2022","Canada Revenue Agency","Active"],["Japan","JP",35.7,139.7,"GI Fund (Green Innovation)","\u00a52 trillion total fund, CCUS eligible","Grant / co-investment","2030 targets","NEDO / METI","Active"],["Australia","AU",-25.3,133.8,"ARENA / CCS Hubs","AUD 300M+ CCUS programme","Grant / competitive","Project-based","ARENA / DCCEW","Active"],["Iceland","IS",64.1,-21.9,"CBAM adjacency + direct national support","Basalt storage = permanent, CarbFix MoU","National co-operation + EU ETS proximity","Ongoing","Icelandic Government / ON Power","Active"],["Switzerland","CH",47.4,8.5,"Swiss CO2 Law","CHF ~200/t CO2 levy (fossil fuels), DAC earmark","CO2 levy reinvestment","2025 revision","BAFU (Swiss FOEN)","Active"]];
 var BUYERS_RAW=[["Microsoft","USA","Redmond, WA",47.68,-122.12,"Technology","5,100,000 t in 2024","$10B+ cumulative CDR commitment","2024","CDR.fyi 2024 review \u2014 64% of total market"],["Frontier Buyers (Stripe, Google, Shopify, JPMorgan, McKinsey, H&M, Autodesk, Workday, Salesforce)","USA","San Francisco, CA",37.77,-122.42,"Technology / Finance","667,400 t in 2024","$1B+ AMC through 2030","2024","Frontier Climate / CDR.fyi 2024"],["Equinor","Norway","Stavanger",58.97,5.73,"Energy","330,000 t (\u00d8rsted deal) + own purchases","$200M+ committed","2024","CDR.fyi 2024"],["Amazon","USA","Seattle, WA",47.61,-122.33,"Technology","250,000 t (10-yr from 1PointFive)","Undisclosed","2024","IEA / Amazon sustainability"],["BCG (Boston Consulting Group)","USA","Boston, MA",42.36,-71.06,"Consulting","Significant durable CDR portfolio","Undisclosed","2024","CDR.fyi 2024 top 10"],["Morgan Stanley","USA","New York, NY",40.76,-73.98,"Finance","CDR portfolio buyer","Undisclosed","2024","CDR.fyi 2024 top 10"],["Swiss Re","Switzerland","Zurich",47.38,8.54,"Insurance","DAC credits purchase (Climeworks partner)","Undisclosed","2023-24","IEA / Climeworks customers"],["UBS","Switzerland","Zurich",47.37,8.54,"Finance","DAC credits from Climeworks","Undisclosed","2023-24","IEA / Climeworks customers"],["Shopify","Canada","Ottawa, ON",45.42,-75.7,"Technology","Part of Frontier 667K tonnes","$100M+ via Frontier","2022-24","Frontier Wikipedia"],["JPMorgan Chase","USA","New York, NY",40.75,-73.98,"Finance","$200M in durable CDR across multiple providers","$200M committed","2023-24","IEA 2024"],["H&M Group","Sweden","Stockholm",59.33,18.07,"Retail","Part of Frontier coalition","Frontier AMC member 2023","2023-24","Frontier Wikipedia"],["Airbus","France","Toulouse",43.6,1.44,"Aerospace","CDR credits (Climeworks customer)","Undisclosed","2023-24","IEA / Climeworks"],["Palo Alto Networks","USA","Santa Clara, CA",37.41,-121.96,"Technology","10,000 t from Stratos","Undisclosed","2025","Stratos press release"],["JP Morgan CDR","USA","New York, NY",40.74,-74.0,"Finance","50,000 t from Stratos","Undisclosed","2025","Stratos press releases"],["NextGen CDR","Singapore","Singapore",1.35,103.82,"CDR aggregator","1M+ CDR credits target","Undisclosed","2023-24","IEA 2024"],["Rockwell Automotive","USA","Milwaukee, WI",43.04,-87.91,"Automotive","10,000 t from 1PointFive Stratos","Undisclosed","2024","IEA 2024"]];
 var PROJECTS_RAW=[["Capricorn","Climeworks","Switzerland","Hinwil",47.42,8.73,900,"Solid sorbent","Operational","2017","Commercial customers","World's first commercial DAC plant"],["Orca","Climeworks","Iceland","Hellishei\u00f0i",63.99,-21.4,4000,"Solid sorbent","Operational","2021","Commercial customers","First kt-scale DAC plant; CarbFix basalt storage"],["Mammoth","Climeworks","Iceland","Hellishei\u00f0i",64.01,-21.41,36000,"Solid sorbent","Operational","2024","Multiple corporate buyers","World's largest DAC (Aug 2025); 36 ktCO\u2082/yr nameplate"],["Plant 1","Heirloom","USA","Tracy, CA",37.73,-121.43,1000,"High-temp (limestone)","Operational","2023","Frontier / Microsoft","First US DAC removal plant; 1 ktCO\u2082/yr"],["Project Bantam","Heimdal","USA","New York, NY",40.71,-74.01,7000,"Electrochemical","Operational","2024","Undisclosed buyers","7 ktCO\u2082/yr; electrochemical DAC"],["Alpha Test Site","Airhive","UK","London",51.51,-0.12,1000,"Solid sorbent","Operational","2024","Pilot customers","1 ktCO\u2082/yr pilot"],["Orca 2 / Arctic Fox","Climeworks","Iceland","Reykjavik area",64.1,-21.85,500,"Solid sorbent","Operational","2022","Testing","Climeworks pilot facility"],["Stratos","1PointFive / Occidental","USA","Ector County, TX",31.8,-102.67,500000,"Liquid solvent (CE tech)","Commissioning","2025","Microsoft 500kt, Amazon 250kt, JPMorgan, Palo Alto Networks","World's largest DAC; 500 ktCO\u2082/yr; commissioning late 2025"],["Project Cypress (Phase 1 - Climeworks)","Climeworks","USA","Calcasieu Parish, LA",30.22,-93.3,100000,"Solid sorbent","Under construction","2027","DOE-backed","$600M DOE funding; Phase 1 = 100 ktCO\u2082/yr; target 1 Mt/yr"],["Project Cypress (Phase 1 - Heirloom)","Heirloom","USA","Shreveport, LA",32.52,-93.75,17000,"High-temp","Under construction","2026","DOE-backed","Port Caddo-Bossier; 17 ktCO\u2082/yr Phase 1; 300 kt eventual"],["Deep Sky Demo","Deep Sky","Canada","Thetford Mines, QC",46.1,-71.3,3000,"Multiple techs","Under construction","2026","Undisclosed","Canadian DAC hub aggregator"],["South Texas DAC Hub","Occidental / 1PointFive","USA","San Patricio County, TX",27.95,-97.45,1000000,"Liquid solvent","Advanced development","2028-2030","DOE-backed","DOE DAC Hub; 1 Mt/yr target"],["Bison (cancelled)","CarbonCapture Inc.","USA","Wyoming",42.9,-107.5,0,"Solid sorbent","Cancelled","N/A","N/A","6 Mt/yr project cancelled 2025"],["Kollsnes DAC","Nordic DAC Group / Carbon Removal AS","Norway","Kollsnes",60.61,4.72,100000,"Liquid solvent","Planned","2028","Undisclosed","Norwegian fjord geothermal DAC project"],["Carbon Iceland","Carbon Iceland","Iceland","Reykjavik",64.12,-21.86,50000,"Solid sorbent","Planned","2027","Undisclosed","Iceland national DAC developer"],["44.01 Oman Project","44.01","Oman","Hajar Mountains",22.5,58.0,10000,"Liquid solvent / mineralisation","Pilot","2024","Undisclosed","Peridotite mineralisation storage; 10 ktCO\u2082/yr pilot"],["Octavia Carbon Kenya","Octavia Carbon","Kenya","Nairobi",-1.29,36.82,5000,"Solid sorbent","Development","2026","Undisclosed","First African DAC project"],["Project Bison (partial)","Carbon Engineering","USA","Sweetwater, TX",32.47,-100.41,0,"Liquid solvent","Cancelled","N/A","N/A","Large-scale project cancelled 2025"],["GreenCap Solutions","GreenCap","Norway","Stavanger",58.97,5.73,5000,"Solid sorbent","Pilot","2025","Undisclosed","Norwegian solid sorbent DAC"],["Carbfix Silverstone","Carbfix","Iceland","Hellishei\u00f0i",63.98,-21.42,10000,"Liquid solvent + mineralisation","Under construction","2026","EU Innovation Fund \u20ac115M","CarbFix standalone project, \u20ac115M Innovation Fund grant"]];
+
+var GIGATON_DATA={"params":{"active":155,"inactive":36,"total":191,"failure_rate":0.75,"surviving":48,"target_gt":1000000000,"x":224275732},"zipf":[{"rank":1,"fraction":0.2242757319378672,"capture":224275732,"cumulative":224275732},{"rank":2,"fraction":0.1121378659689336,"capture":112137866,"cumulative":336413598},{"rank":3,"fraction":0.07475857731262239,"capture":74758577,"cumulative":411172175},{"rank":4,"fraction":0.0560689329844668,"capture":56068933,"cumulative":467241108},{"rank":5,"fraction":0.044855146387573444,"capture":44855146,"cumulative":512096255},{"rank":6,"fraction":0.037379288656311196,"capture":37379289,"cumulative":549475543},{"rank":7,"fraction":0.03203939027683817,"capture":32039390,"cumulative":581514934},{"rank":8,"fraction":0.0280344664922334,"capture":28034466,"cumulative":609549400},{"rank":9,"fraction":0.024919525770874133,"capture":24919526,"cumulative":634468926},{"rank":10,"fraction":0.022427573193786722,"capture":22427573,"cumulative":656896499},{"rank":11,"fraction":0.020388702903442475,"capture":20388703,"cumulative":677285202},{"rank":12,"fraction":0.018689644328155598,"capture":18689644,"cumulative":695974846},{"rank":13,"fraction":0.01725197937983594,"capture":17251979,"cumulative":713226826},{"rank":14,"fraction":0.016019695138419086,"capture":16019695,"cumulative":729246521},{"rank":15,"fraction":0.01495171546252448,"capture":14951715,"cumulative":744198236},{"rank":16,"fraction":0.0140172332461167,"capture":14017233,"cumulative":758215469},{"rank":17,"fraction":0.013192690113992189,"capture":13192690,"cumulative":771408160},{"rank":18,"fraction":0.012459762885437067,"capture":12459763,"cumulative":783867922},{"rank":19,"fraction":0.011803985891466695,"capture":11803986,"cumulative":795671908},{"rank":20,"fraction":0.011213786596893361,"capture":11213787,"cumulative":806885695},{"rank":21,"fraction":0.010679796758946057,"capture":10679797,"cumulative":817565492},{"rank":22,"fraction":0.010194351451721238,"capture":10194351,"cumulative":827759843},{"rank":23,"fraction":0.00975111877990727,"capture":9751119,"cumulative":837510962},{"rank":24,"fraction":0.009344822164077799,"capture":9344822,"cumulative":846855784},{"rank":25,"fraction":0.008971029277514688,"capture":8971029,"cumulative":855826813},{"rank":26,"fraction":0.00862598968991797,"capture":8625990,"cumulative":864452803},{"rank":27,"fraction":0.008306508590291377,"capture":8306509,"cumulative":872759312},{"rank":28,"fraction":0.008009847569209543,"capture":8009848,"cumulative":880769159},{"rank":29,"fraction":0.007733645928891973,"capture":7733646,"cumulative":888502805},{"rank":30,"fraction":0.00747585773126224,"capture":7475858,"cumulative":895978663},{"rank":31,"fraction":0.007234701030253781,"capture":7234701,"cumulative":903213364},{"rank":32,"fraction":0.00700861662305835,"capture":7008617,"cumulative":910221981},{"rank":33,"fraction":0.0067962343011474914,"capture":6796234,"cumulative":917018215},{"rank":34,"fraction":0.0065963450569960945,"capture":6596345,"cumulative":923614560},{"rank":35,"fraction":0.006407878055367635,"capture":6407878,"cumulative":930022438},{"rank":36,"fraction":0.006229881442718533,"capture":6229881,"cumulative":936252319},{"rank":37,"fraction":0.006061506268591006,"capture":6061506,"cumulative":942313826},{"rank":38,"fraction":0.0059019929457333475,"capture":5901993,"cumulative":948215819},{"rank":39,"fraction":0.005750659793278646,"capture":5750660,"cumulative":953966478},{"rank":40,"fraction":0.0056068932984466805,"capture":5606893,"cumulative":959573372},{"rank":41,"fraction":0.005470139803362615,"capture":5470140,"cumulative":965043511},{"rank":42,"fraction":0.0053398983794730286,"capture":5339898,"cumulative":970383410},{"rank":43,"fraction":0.00521571469622947,"capture":5215715,"cumulative":975599125},{"rank":44,"fraction":0.005097175725860619,"capture":5097176,"cumulative":980696300},{"rank":45,"fraction":0.004983905154174827,"capture":4983905,"cumulative":985680205},{"rank":46,"fraction":0.004875559389953635,"capture":4875559,"cumulative":990555765},{"rank":47,"fraction":0.004771824083784408,"capture":4771824,"cumulative":995327589},{"rank":48,"fraction":0.0046724110820388996,"capture":4672411,"cumulative":1000000000}],"concentration":{"top1":22.4275732,"top5":51.2096254,"top10":65.68964980000001,"top20":80.6885693},"today":{"operational_kt":48.9,"gap_factor":20450}};
 
 var FACTORS=[
   {key:'solar',    label:'Renewable energy', color:'#b5622a'},
@@ -1174,6 +1253,12 @@ function switchTab(tab, btn) {
     badge.style.display = 'block';
     projectLayer.addTo(map);
     renderProjectTab();
+  } else if(tab === 'gigaton') {
+    header.style.display = 'none';
+    badge.textContent = 'GIGATON ANALYSIS';
+    badge.style.display = 'block';
+    // No map layer for gigaton - show clean base map
+    ensureChartJS(function(){ renderGigatonTab(); });
   }
 }
 
@@ -1382,6 +1467,174 @@ function renderProjectList() {
     });
     container.appendChild(item);
   });
+}
+
+
+// ── GIGATON ANALYSIS ──────────────────────────────────────────────
+var G = GIGATON_DATA;
+var zipfChart = null;
+
+function renderGigatonTab() {
+  renderConcentrationBars();
+  renderZipfChart();
+  renderInvestorCards();
+}
+
+function renderConcentrationBars() {
+  var container = document.getElementById('conc-bars');
+  if(container.hasChildNodes()) return;
+  var rows = [
+    {label:'Top 1 company', pct: G.concentration.top1, color:'#b5622a'},
+    {label:'Top 5 companies', pct: G.concentration.top5, color:'#c9a96e'},
+    {label:'Top 10 companies', pct: G.concentration.top10, color:'#5c8251'},
+    {label:'Top 20 companies', pct: G.concentration.top20, color:'#3d7a8a'},
+  ];
+  rows.forEach(function(r) {
+    var row = document.createElement('div');
+    row.className = 'conc-row';
+    row.innerHTML =
+      '<div class="conc-label">'+r.label+'</div>'+
+      '<div class="conc-bar-wrap"><div class="conc-bar-fill" style="width:'+r.pct.toFixed(1)+'%;background:'+r.color+'"></div></div>'+
+      '<div class="conc-pct" style="color:'+r.color+'">'+r.pct.toFixed(1)+'%</div>';
+    container.appendChild(row);
+  });
+}
+
+function renderZipfChart() {
+  if(zipfChart) { zipfChart.destroy(); zipfChart = null; }
+  var canvas = document.getElementById('zipf-chart');
+  if(!canvas || !window.Chart) { setTimeout(renderZipfChart, 200); return; }
+
+  var zipf = G.zipf;
+  var labels = zipf.map(function(d){ return 'Co. '+d.rank; });
+  var data = zipf.map(function(d){ return Math.round(d.capture/1e6*100)/100; });
+
+  // Color tiers
+  var colors = data.map(function(v, i) {
+    if(i === 0) return '#b5622a';       // #1 - clay (dominant)
+    if(i < 5)  return '#d4773a';        // top 5 - lighter clay
+    if(i < 10) return '#c9a96e';        // top 10 - sand
+    if(i < 20) return '#7aaa6a';        // top 20 - light moss
+    return '#4a6741';                   // rest - moss
+  });
+
+  zipfChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderRadius: 2,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: function(items) { return 'Rank ' + (items[0].dataIndex+1); },
+            label: function(item) {
+              var v = item.raw;
+              return v >= 1 ? v.toFixed(1)+' Mt/yr' : (v*1000).toFixed(0)+' kt/yr';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            maxTicksLimit: 10,
+            font: { size: 9, family: "'JetBrains Mono', monospace" },
+            color: '#7a6d58'
+          },
+          grid: { display: false },
+          border: { color: '#ddd5c4' }
+        },
+        y: {
+          ticks: {
+            font: { size: 9, family: "'JetBrains Mono', monospace" },
+            color: '#7a6d58',
+            callback: function(v) { return v >= 1 ? v+'M' : (v*1000)+'k'; }
+          },
+          grid: { color: 'rgba(200,190,170,0.3)' },
+          border: { dash: [2,2] },
+          title: {
+            display: true,
+            text: 't/yr (log scale approximated)',
+            font: { size: 9 },
+            color: '#7a6d58'
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderInvestorCards() {
+  var container = document.getElementById('investor-cards');
+  if(container.hasChildNodes()) return;
+
+  var cards = [
+    {
+      type:'risk',
+      head:'75% of companies will not survive',
+      body:'Historical startup failure rates suggest only ~48 of 163 active DAC companies will still be operating by 2050. For investors, picking winners early — before the shake-out — is the entire game.',
+      metric:'143 companies expected to fail · 48 expected survivors'
+    },
+    {
+      type:'risk',
+      head:'The gap between today and the target is almost incomprehensible',
+      body:'~49 kt/yr is operational today across all DAC globally. The 1 Gt/yr target requires 20,450× scale-up in 25 years. For context, the entire global oil industry took 100 years to reach similar scale from its first wells.',
+      metric:'~49 kt/yr today → 1,000,000 kt/yr needed by 2050'
+    },
+    {
+      type:'warn',
+      head:'The top company must deliver 224 Mt/yr — 6,230× Mammoth\u2019s current output',
+      body:'Under Zipf\u2019s law, the market leader must capture 224 million tonnes per year. Climeworks\u2019 Mammoth — the world\u2019s largest plant — captures 36 kt/yr today. The required scale-up for one company alone exceeds the entire current market by 4,600×.',
+      metric:'Rank 1 needs 224 Mt/yr · Mammoth today: 0.036 Mt/yr'
+    },
+    {
+      type:'warn',
+      head:'Even rank 48 (the smallest survivor) needs 4.7 Mt/yr',
+      body:'The \u201cfloor\u201d for survival under this model is 4.7 Mt/yr. No company is anywhere near this today. This suggests the entire sector is still in pre-commercial R&D \u2014 including the companies that will eventually dominate.',
+      metric:'Rank 48 minimum: 4.7 Mt/yr · ~130× Mammoth'
+    },
+    {
+      type:'good',
+      head:'Concentration means enormous winner-takes-most dynamics',
+      body:'The top 5 companies will collectively account for 51% of all DAC removal. The top 10 account for 66%. This is a winner-takes-most market — the kind that creates exceptional returns for early investors in eventual leaders.',
+      metric:'Top 5 = 51% of 1Gt · Top 10 = 66% · Top 20 = 81%'
+    },
+    {
+      type:'good',
+      head:'Market is nascent enough that no leader has emerged yet',
+      body:'The current landscape of 163 companies with Climeworks leading at 0.036 Mt/yr means we are still at near-zero on the adoption curve. Investors who identify the eventual rank-1 company at today\u2019s scale are buying the equivalent of Amazon in 1998.',
+      metric:'Climeworks = 0.016% of what rank-1 must achieve'
+    },
+  ];
+
+  cards.forEach(function(c) {
+    var div = document.createElement('div');
+    div.className = 'investor-card ' + c.type;
+    div.innerHTML =
+      '<div class="ic-head">'+c.head+'</div>'+
+      '<div class="ic-body">'+c.body+'</div>'+
+      '<div class="ic-metric">'+c.metric+'</div>';
+    container.appendChild(div);
+  });
+}
+
+// Load Chart.js if not present when gigaton tab opens
+function ensureChartJS(cb) {
+  if(window.Chart) { cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
+  s.onload = cb;
+  document.head.appendChild(s);
 }
 
 function buildWeights(){
