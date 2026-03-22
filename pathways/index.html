@@ -115,6 +115,35 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--cream);color:v
 .pop-link{display:block;padding:7px 12px;border-radius:8px;font-family:var(--mono);font-size:9px;text-align:center;text-decoration:none;color:white;transition:opacity .15s;letter-spacing:.04em}
 .pop-link:hover{opacity:.85}
 .pop-na{padding:7px 12px;background:var(--cream2);color:var(--bark3);border-radius:8px;font-family:var(--mono);font-size:9px;text-align:center;border:1px dashed var(--cream3)}
+
+/* ── PATHWAY DRAWER ─────────────────────────────────────────── */
+#pw-drawer{position:absolute;bottom:0;left:0;right:0;z-index:700;background:rgba(245,240,232,.98);border-top:1.5px solid var(--cream3);border-radius:16px 16px 0 0;padding:0;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);pointer-events:none;box-shadow:0 -8px 30px rgba(44,36,22,.15)}
+#pw-drawer.open{transform:translateY(0);pointer-events:all}
+.drawer-handle-wrap{padding:10px 0 4px;display:flex;justify-content:center;cursor:pointer}
+.drawer-handle{width:36px;height:4px;background:var(--cream3);border-radius:2px}
+.drawer-inner{padding:2px 20px 20px}
+.drawer-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.drawer-swatch{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+.drawer-pw-name{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--bark);flex:1;line-height:1.2}
+.drawer-close{width:22px;height:22px;border-radius:50%;background:var(--cream2);border:none;cursor:pointer;font-size:12px;color:var(--bark3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.drawer-close:hover{background:var(--em);color:white}
+.drawer-def{font-size:12px;color:var(--bark3);line-height:1.65;margin-bottom:12px;font-weight:300;border-left:2px solid var(--cream3);padding-left:10px;font-style:italic}
+.drawer-section-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--bark3);text-transform:uppercase;margin-bottom:7px;margin-top:2px}
+.drawer-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.d-chip{font-size:10px;padding:3px 9px;border-radius:12px;border:0.5px solid;font-weight:500;letter-spacing:.02em}
+.chip-critical{background:rgba(181,98,42,.1);color:#8a3a10;border-color:rgba(181,98,42,.35)}
+.chip-high{background:rgba(186,117,23,.1);color:#7a4e08;border-color:rgba(186,117,23,.35)}
+.chip-moderate{background:rgba(74,103,65,.1);color:#2d4f22;border-color:rgba(74,103,65,.3)}
+.chip-niche{background:rgba(122,109,88,.1);color:#5a4e3a;border-color:rgba(122,109,88,.3)}
+/* Missing tech in drawer */
+.drawer-gaps{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.gap-row{display:flex;align-items:flex-start;gap:5px;padding:3px 0;border-bottom:0.5px solid var(--cream3)}
+.gap-country{font-size:10px;font-weight:500;color:var(--bark2);min-width:72px;flex-shrink:0;line-height:1.4}
+.gap-missing{font-size:9px;color:var(--bark3);line-height:1.4;font-weight:300}
+.severity-badge{font-family:var(--mono);font-size:8px;padding:1px 6px;border-radius:3px;margin-left:auto;flex-shrink:0;letter-spacing:.04em;font-weight:500}
+.sev-critical{background:rgba(181,98,42,.12);color:#8a3a10}
+.sev-high{background:rgba(186,117,23,.12);color:#7a4e08}
+.sev-moderate{background:rgba(74,103,65,.1);color:#2d4f22}
 </style>
 </head>
 <body>
@@ -184,6 +213,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--cream);color:v
     <button class="zoom-btn" onclick="map.zoomOut()">&minus;</button>
   </div>
   <div id="co-popup"></div>
+
+  <div id="pw-drawer">
+    <div class="drawer-handle-wrap" id="drawer-handle"><div class="drawer-handle"></div></div>
+    <div class="drawer-inner">
+      <div class="drawer-header">
+        <div class="drawer-swatch" id="drawer-swatch"></div>
+        <div class="drawer-pw-name" id="drawer-pwname"></div>
+        <span class="severity-badge" id="drawer-severity"></span>
+        <button class="drawer-close" id="drawer-close">&#10005;</button>
+      </div>
+      <div class="drawer-section-label">Definition</div>
+      <div class="drawer-def" id="drawer-def"></div>
+      <div class="drawer-section-label">Limiting factors</div>
+      <div class="drawer-chips" id="drawer-chips"></div>
+      <div class="drawer-section-label" id="drawer-gaps-label"></div>
+      <div class="drawer-gaps" id="drawer-gaps"></div>
+    </div>
+  </div>
+
 </div>
 
 </div>
@@ -235,15 +283,25 @@ Object.keys(PATHWAYS).forEach(function(key){
     '<div class="pw-swatch" style="background:'+pw.color+'"></div>'+
     '<div class="pw-info">'+
       '<div class="pw-name">'+pw.label+'</div>'+
-      '<div class="pw-count">'+pw.count+' companies</div>'+
+      '<div class="pw-count">'+pw.count+' companies &middot; <span style="font-size:8px;color:var(--em)">tap for details</span></div>'+
     '</div>'+
     '<div class="pw-toggle on" id="pwt-'+key+'"></div>';
-  row.addEventListener('click', function(){
+  // Toggle is click on right side; pathway name opens drawer
+  row.querySelector('.pw-toggle').addEventListener('click', function(e){
+    e.stopPropagation();
     activePaths[key] = !activePaths[key];
     row.classList.toggle('off', !activePaths[key]);
     document.getElementById('pwt-'+key).classList.toggle('on', activePaths[key]);
     rebuildTechFilters();
     refresh();
+  });
+  row.querySelector('.pw-info').addEventListener('click', function(e){
+    e.stopPropagation();
+    openDrawer(key);
+  });
+  row.querySelector('.pw-swatch').addEventListener('click', function(e){
+    e.stopPropagation();
+    openDrawer(key);
   });
   pwList.appendChild(row);
 });
@@ -405,6 +463,188 @@ function refresh(){
 }
 
 refresh();
+
+// ── PATHWAY INTELLIGENCE DATA ─────────────────────────────────────
+var PW_DATA = {
+  DAC: {
+    severity: 'CRITICAL',
+    def: '"A technology that regenerates a capture medium in a closed loop and/or uses a mechanical air contactor to chemically or physically separate carbon dioxide directly from the outdoor or indoor ambient atmosphere without reliance on above-average carbon dioxide concentrations caused by nearby point sources of emissions."',
+    limits: [
+      {text:'Cost: $300\u20131,000/t today vs $100 target by 2050', sev:'critical'},
+      {text:'Energy: 1,500\u20132,500 kWh per tonne \u2014 must be renewable', sev:'critical'},
+      {text:'No binding CDR procurement mandates in most countries', sev:'high'},
+      {text:'Needs gigawatt-scale renewable energy \u2014 no company can build alone', sev:'critical'},
+      {text:'Sorbent degradation adds replacement cost', sev:'high'},
+      {text:'Perceived as expensive \u201chigh-tech fix\u201d in media & policy circles', sev:'moderate'},
+    ],
+    gaps: [
+      {c:'Germany', m:'Cryogenic DAC, Membrane DAC, N/A DAC tech, Project developer'},
+      {c:'UK', m:'Membrane DAC'},
+      {c:'Canada', m:'Cryogenic DAC'},
+      {c:'Sweden', m:'Membrane DAC, Cryogenic DAC, Project developer'},
+      {c:'Switzerland', m:'Liquid solvent, Membrane DAC, Cryogenic DAC, Project developer'},
+      {c:'Australia', m:'Membrane DAC, Cryogenic DAC'},
+      {c:'India', m:'Solid sorbent, Membrane DAC, Project developer'},
+      {c:'France', m:'Membrane DAC, Cryogenic DAC, Project developer'},
+      {c:'Netherlands', m:'Cryogenic DAC'},
+      {c:'Norway', m:'Liquid solvent, Membrane DAC, Cryogenic DAC'},
+      {c:'Austria', m:'Membrane DAC, Cryogenic DAC, Project developer'},
+      {c:'Kenya', m:'Liquid solvent, Membrane DAC, Cryogenic DAC'},
+      {c:'Denmark', m:'Solid sorbent, Liquid solvent, Membrane DAC, Project developer'},
+      {c:'Japan', m:'Membrane DAC, Cryogenic DAC'},
+    ]
+  },
+  BiCRS: {
+    severity: 'HIGH',
+    def: '"A process that (a) uses biomass to remove CO\u2082 from the atmosphere, (b) stores that CO\u2082 underground or in long-lived products, and (c) does no damage to\u2014and ideally promotes\u2014food security, rural livelihoods, biodiversity conservation and other important values." Common sub-pathways include biochar, BECCS, terrestrial biomass storage, bio-slurry, and bio-oil.',
+    limits: [
+      {text:'Land competition \u2014 biomass feedstock competes with food & ecosystems', sev:'critical'},
+      {text:'CCS infrastructure adds $60\u2013150/t on top of bioenergy costs (BECCS)', sev:'high'},
+      {text:'MRV permanence: complex lifecycle accounting, net negativity hard to prove', sev:'high'},
+      {text:'Biomass combustion efficiency 25\u201335% \u2014 energy balance sensitive to feedstock', sev:'high'},
+      {text:'Significant NGO opposition over biomass land use and biodiversity', sev:'high'},
+      {text:'Feedstock supply chain: competing uses (energy, compost) create price pressure', sev:'moderate'},
+    ],
+    gaps: [
+      {c:'Germany', m:'Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'UK', m:'TSB, Bio-slurry, Bio-oil'},
+      {c:'Canada', m:'BiCRS project developer, Bio-slurry, Biomass sinking'},
+      {c:'Sweden', m:'TSB, Bio-materials, Bio-slurry, Bio-oil'},
+      {c:'Switzerland', m:'BiCRS project developer, Bio-materials, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'Australia', m:'BECCS, BiCRS project developer, Bio-materials, Bio-slurry, Biomass sinking'},
+      {c:'India', m:'BECCS, TSB, BiCRS project developer, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'France', m:'TSB, BiCRS project developer, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'Netherlands', m:'BECCS, BiCRS project developer, Bio-materials, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'Norway', m:'TSB, Bio-materials, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'Austria', m:'BECCS, TSB, BiCRS project developer, Bio-materials, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'Kenya', m:'BECCS, TSB, BiCRS project developer, Bio-materials, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'Denmark', m:'TSB, BiCRS project developer, Bio-materials, Bio-slurry, Bio-oil, Biomass sinking'},
+      {c:'Japan', m:'TSB, BiCRS project developer, Bio-materials, Bio-slurry, Bio-oil, Biomass sinking'},
+    ]
+  },
+  EM: {
+    severity: 'HIGH',
+    def: '"An approach that uses technologies or modified land-use approaches to accelerate the decomposition of calcium- and magnesium-rich silicate rocks, which chemically react with CO\u2082 to form solid carbonate minerals, resulting in the removal of CO\u2082 from the atmosphere."',
+    limits: [
+      {text:'Energy-intensive rock crushing (5\u201315 kWh/tonne rock) \u2014 must use renewables', sev:'high'},
+      {text:'Slow sequestration: carbon captured over years in soil/water \u2014 difficult to measure', sev:'high'},
+      {text:'MRV uses proxy measurements only (cation exchange, stream alkalinity)', sev:'high'},
+      {text:'No dedicated regulatory framework for ERW credits globally', sev:'high'},
+      {text:'Transport cost from quarry to farm is dominant cost driver \u2014 very geography-sensitive', sev:'critical'},
+      {text:'Mining impacts biodiversity \u2014 heavy metal trace elements in some basalts', sev:'moderate'},
+    ],
+    gaps: [
+      {c:'Germany', m:'None missing'},
+      {c:'UK', m:'None missing'},
+      {c:'Canada', m:'ERW, Soil mineralization'},
+      {c:'Sweden', m:'ERW, Building materials, Mine tailings, Soil mineralization'},
+      {c:'Switzerland', m:'ERW, Mine tailings, Soil mineralization'},
+      {c:'Australia', m:'Building materials, Soil mineralization'},
+      {c:'India', m:'Building materials, Mine tailings, Soil mineralization'},
+      {c:'France', m:'Mine tailings, Soil mineralization'},
+      {c:'Netherlands', m:'Mine tailings, Soil mineralization'},
+      {c:'Norway', m:'ERW, Building materials, Mine tailings, Soil mineralization'},
+      {c:'Austria', m:'Building materials, Soil mineralization'},
+      {c:'Kenya', m:'Mine tailings, Soil mineralization'},
+      {c:'Denmark', m:'Building materials, Mine tailings, Soil mineralization'},
+      {c:'Japan', m:'ERW, Mine tailings, Soil mineralization'},
+    ]
+  },
+  mCDR: {
+    severity: 'CRITICAL',
+    def: '"Any ocean-based process or technique designed to remove carbon dioxide from the atmosphere and store it for long periods of time in the ocean." Common approaches include ocean alkalinity enhancement (OAE), direct ocean removal (DOR), and algal cultivation paired with durable storage.',
+    limits: [
+      {text:'London Protocol creates legal barriers for large-scale marine interventions', sev:'critical'},
+      {text:'MRV: most critical gap in all CDR \u2014 no accepted standard methodology exists', sev:'critical'},
+      {text:'Risk of harmful algal blooms, dead zones, and marine biodiversity disruption', sev:'critical'},
+      {text:'Ocean logistics, mineral distribution and monitoring buoys at massive scale', sev:'high'},
+      {text:'No commercial pricing established for any mCDR pathway', sev:'critical'},
+      {text:'Scientific community divided \u2014 strong opposition from marine conservation groups', sev:'high'},
+    ],
+    gaps: [
+      {c:'U.S.', m:'River alkalinity'},
+      {c:'Germany', m:'Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'UK', m:'Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Canada', m:'DOR, Iron fertilization, Upwelling, Pit lake alkalinity, Oceanic bio-slurry'},
+      {c:'Sweden', m:'OAE, DOR, Iron fertilization, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Switzerland', m:'OAE, Upwelling, Iron fertilization, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Australia', m:'OAE, DOR, Iron fertilization, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'India', m:'OAE, DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'France', m:'DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Netherlands', m:'OAE, DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Norway', m:'OAE, DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Austria', m:'OAE, DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Kenya', m:'OAE, DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Denmark', m:'OAE, DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+      {c:'Japan', m:'OAE, DOR, Iron fertilization, Upwelling, Pit lake alkalinity, River alkalinity, Oceanic bio-slurry'},
+    ]
+  }
+};
+
+// ── DRAWER LOGIC ──────────────────────────────────────────────────
+var drawer = document.getElementById('pw-drawer');
+var drawerOpen = false;
+var currentDrawerPW = null;
+
+function openDrawer(pwKey) {
+  var d = PW_DATA[pwKey];
+  var col = PATHWAYS[pwKey].color;
+  currentDrawerPW = pwKey;
+
+  document.getElementById('drawer-swatch').style.background = col;
+  document.getElementById('drawer-pwname').textContent = PATHWAYS[pwKey].label;
+
+  var sev = d.severity;
+  var sevEl = document.getElementById('drawer-severity');
+  sevEl.textContent = sev;
+  sevEl.className = 'severity-badge sev-' + sev.toLowerCase();
+
+  document.getElementById('drawer-def').textContent = d.def;
+
+  var chips = document.getElementById('drawer-chips');
+  chips.innerHTML = '';
+  d.limits.forEach(function(l) {
+    var span = document.createElement('span');
+    span.className = 'd-chip chip-' + l.sev;
+    span.textContent = l.text;
+    chips.appendChild(span);
+  });
+
+  var gapsLabel = document.getElementById('drawer-gaps-label');
+  var gapsEl = document.getElementById('drawer-gaps');
+  gapsEl.innerHTML = '';
+  if (d.gaps && d.gaps.length) {
+    gapsLabel.textContent = 'Missing tech by country (top 15)';
+    d.gaps.forEach(function(g) {
+      var isNone = g.m === 'None missing';
+      var row = document.createElement('div');
+      row.className = 'gap-row';
+      row.innerHTML =
+        '<div class="gap-country">' + g.c + '</div>' +
+        '<div class="gap-missing" style="' + (isNone ? 'color:var(--moss);font-style:italic' : '') + '">' + g.m + '</div>';
+      gapsEl.appendChild(row);
+    });
+  } else {
+    gapsLabel.textContent = '';
+  }
+
+  drawer.classList.add('open');
+  drawerOpen = true;
+}
+
+function closeDrawer() {
+  drawer.classList.remove('open');
+  drawerOpen = false;
+  currentDrawerPW = null;
+}
+
+document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+document.getElementById('drawer-handle').addEventListener('click', closeDrawer);
+map.on('click', function() {
+  if (drawerOpen) closeDrawer();
+  popup.style.display = 'none';
+});
+
 </script>
 </body>
 </html>
