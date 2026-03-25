@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CO2Ri — CDR Investment Flow 2018–2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=DM+Mono:wght@400;500&family=Source+Sans+3:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --ink:#0d0d0b;--ink2:#2a2a25;--ink3:#5a5a52;
+  --paper:#f7f4ee;--paper2:#ede9e0;--paper3:#ddd8cb;
+  --dac:#2563a8;--bicrs:#3d7a3a;--em:#c4622a;--mCDR:#7c3d8f;
+  --gold:#c8a84b;
+  --serif:'Playfair Display',Georgia,serif;
+  --mono:'DM Mono',monospace;
+  --sans:'Source Sans 3',system-ui,sans-serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);font-family:var(--sans)}
+
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+#wrap{display:flex;height:100vh;width:100vw;flex-direction:column}
+#top-bar{flex-shrink:0;background:var(--ink);border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 22px;display:flex;align-items:center;gap:16px}
+#main{flex:1;display:flex;overflow:hidden}
+#map-area{flex:1;position:relative}
+#map{width:100%;height:100%}
+#right-panel{width:280px;flex-shrink:0;background:var(--ink2);border-left:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;overflow:hidden}
+
+/* ── TOP BAR ─────────────────────────────────────────────────── */
+.logo{display:flex;align-items:center;gap:8px}
+.logo-leaf svg{width:20px;height:20px}
+.logo-text{font-family:var(--mono);font-size:11px;font-weight:500;color:rgba(255,255,255,0.5);letter-spacing:.14em}
+.top-title{font-family:var(--serif);font-size:17px;color:rgba(255,255,255,0.9);font-weight:500;flex:1}
+.top-title em{font-style:italic;color:var(--gold)}
+.top-sub{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:.06em}
+
+/* ── YEAR SCRUBBER ───────────────────────────────────────────── */
+#scrubber{flex-shrink:0;background:var(--ink);padding:10px 22px 12px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.year-track{position:relative;margin-bottom:8px}
+.year-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:5px;letter-spacing:.04em}
+.year-bar{position:relative;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;cursor:pointer}
+.year-fill{position:absolute;left:0;top:0;height:100%;background:var(--gold);border-radius:2px;transition:width .4s var(--ease);pointer-events:none}
+.year-handle{position:absolute;top:50%;transform:translateY(-50%) translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid var(--ink);box-shadow:0 0 0 3px rgba(200,168,75,0.3);cursor:grab;transition:left .4s var(--ease);z-index:10}
+.year-handle:active{cursor:grabbing}
+.scrub-controls{display:flex;align-items:center;gap:10px}
+#play-btn{width:30px;height:30px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+#play-btn:hover{background:#dab84f;transform:scale(1.05)}
+#play-btn svg{width:12px;height:12px;fill:var(--ink)}
+.year-display{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--gold);line-height:1;min-width:52px}
+.year-summary{flex:1;display:flex;gap:14px}
+.ys-item{display:flex;flex-direction:column}
+.ys-val{font-family:var(--mono);font-size:13px;font-weight:500;color:rgba(255,255,255,0.9);line-height:1.1}
+.ys-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:.06em;margin-top:2px}
+.speed-btn{font-family:var(--mono);font-size:9px;padding:4px 9px;border-radius:4px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s}
+.speed-btn.on{background:rgba(200,168,75,0.15);border-color:rgba(200,168,75,0.4);color:var(--gold)}
+
+/* ── INSIGHT CALLOUT ─────────────────────────────────────────── */
+#insight-box{position:absolute;bottom:70px;left:22px;z-index:600;max-width:300px;background:rgba(13,13,11,0.92);border:1px solid rgba(200,168,75,0.3);border-radius:12px;padding:13px 16px;transform:translateY(20px);opacity:0;transition:all .5s var(--ease);pointer-events:none;backdrop-filter:blur(8px)}
+#insight-box.show{transform:translateY(0);opacity:1}
+.ib-year{font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:.1em;margin-bottom:5px}
+.ib-head{font-family:var(--serif);font-size:14px;font-weight:500;color:rgba(255,255,255,0.95);line-height:1.3;margin-bottom:5px}
+.ib-body{font-size:11px;color:rgba(255,255,255,0.55);line-height:1.6;font-weight:300}
+
+/* ── TOOLTIP ─────────────────────────────────────────────────── */
+#deal-tip{position:absolute;z-index:900;background:rgba(13,13,11,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;pointer-events:none;display:none;max-width:220px;backdrop-filter:blur(10px)}
+.dt-company{font-family:var(--serif);font-size:13px;font-weight:500;color:rgba(255,255,255,0.95);margin-bottom:2px}
+.dt-meta{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:6px;letter-spacing:.04em}
+.dt-amount{font-family:var(--serif);font-size:18px;font-weight:600;margin-bottom:4px;line-height:1}
+.dt-note{font-size:10px;color:rgba(255,255,255,0.45);line-height:1.5;font-weight:300}
+
+/* ── MAP COUNTER ─────────────────────────────────────────────── */
+#map-counter{position:absolute;top:14px;left:14px;z-index:500;background:rgba(13,13,11,0.88);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 16px;backdrop-filter:blur(8px);pointer-events:none}
+.mc-label{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:.12em;margin-bottom:3px}
+.mc-val{font-family:var(--serif);font-size:22px;font-weight:600;color:rgba(255,255,255,0.95);line-height:1}
+.mc-sub{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.35);margin-top:2px}
+
+/* ── RIGHT PANEL ─────────────────────────────────────────────── */
+.rp-section{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.rp-head{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:rgba(255,255,255,0.3);margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;transition:opacity .15s}
+.legend-item.off{opacity:.3}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-label{font-size:11px;color:rgba(255,255,255,0.7);flex:1;font-weight:300}
+.legend-count{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.3)}
+
+/* ── CUMULATIVE BAR ──────────────────────────────────────────── */
+.cum-bars{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.cum-row{display:flex;align-items:center;gap:6px}
+.cum-name{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.4);width:36px;flex-shrink:0;letter-spacing:.03em}
+.cum-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.cum-bar-fill{height:100%;border-radius:3px;transition:width .5s var(--ease)}
+.cum-amt{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.35);min-width:38px;text-align:right;flex-shrink:0}
+
+/* ── DEAL FEED ───────────────────────────────────────────────── */
+#deal-feed{flex:1;overflow-y:auto;padding:10px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent}
+.feed-item{padding:7px 9px;border-radius:7px;margin-bottom:5px;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.05);animation:feedIn .4s var(--ease) both}
+@keyframes feedIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+.fi-top{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.fi-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.fi-name{font-size:11px;font-weight:500;color:rgba(255,255,255,0.8);flex:1;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi-amt{font-family:var(--mono);font-size:10px;font-weight:500}
+.fi-meta{font-size:9px;color:rgba(255,255,255,0.3);line-height:1.4;padding-left:12px;font-weight:300}
+
+/* ── CONCLUSION OVERLAY ──────────────────────────────────────── */
+#conclusion{position:absolute;inset:0;z-index:800;background:rgba(13,13,11,0.93);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#conclusion.show{display:flex}
+.conc-inner{max-width:560px;padding:40px;text-align:center}
+.conc-title{font-family:var(--serif);font-size:32px;font-weight:600;color:rgba(255,255,255,0.95);margin-bottom:8px;line-height:1.2}
+.conc-title em{font-style:italic;color:var(--gold)}
+.conc-sub{font-size:14px;color:rgba(255,255,255,0.5);font-weight:300;line-height:1.7;margin-bottom:28px}
+.conc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px}
+.cs-card{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 10px}
+.cs-val{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--gold);margin-bottom:4px}
+.cs-label{font-size:10px;color:rgba(255,255,255,0.4);font-weight:300;line-height:1.4}
+.conc-insight{background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.2);border-radius:10px;padding:16px 20px;margin-bottom:24px;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;font-weight:300;text-align:left}
+.conc-insight strong{color:rgba(255,255,255,0.9);font-weight:500}
+.conc-btn{padding:10px 24px;background:var(--gold);color:var(--ink);border:none;border-radius:8px;font-family:var(--mono);font-size:11px;font-weight:500;cursor:pointer;letter-spacing:.06em;transition:all .15s}
+.conc-btn:hover{background:#dab84f}
+.conc-brand{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:.1em;margin-top:16px}
+
+/* ── LEAFLET OVERRIDES ───────────────────────────────────────── */
+.leaflet-container{background:#0d0d0b}
+.deal-marker{border-radius:50%;border:1.5px solid rgba(255,255,255,0.6);cursor:pointer;transition:transform .2s;animation:markerPop .5s var(--ease) both}
+@keyframes markerPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.deal-marker:hover{transform:scale(1.3)!important;z-index:1000!important}
+.deal-marker.pulse{animation:markerPop .5s var(--ease) both, pulse 2s ease-in-out 0.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.15)}50%{box-shadow:0 0 0 8px rgba(255,255,255,0)}}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+  <!-- TOP BAR -->
+  <div id="top-bar">
+    <div class="logo">
+      <div class="logo-leaf">
+        <svg viewBox="0 0 20 20" fill="none">
+          <ellipse cx="10" cy="10" rx="7.5" ry="10" fill="#3d7a3a" transform="rotate(-25 10 10)"/>
+          <line x1="10" y1="3" x2="10" y2="17" stroke="rgba(255,255,255,0.4)" stroke-width="1" stroke-linecap="round"/>
+          <line x1="7" y1="8" x2="10" y2="10" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-linecap="round"/>
+          <line x1="13" y1="12" x2="10" y2="14" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">CO2Ri</span>
+    </div>
+    <div style="width:1px;height:20px;background:rgba(255,255,255,0.08)"></div>
+    <div>
+      <div class="top-title">CDR Investment Flow <em>2018–2025</em></div>
+      <div class="top-sub">92 real deals · verified public sources · sized by deal value</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button class="speed-btn on" id="sp1" onclick="setSpeed(1800)">1×</button>
+      <button class="speed-btn" id="sp2" onclick="setSpeed(900)">2×</button>
+      <button class="speed-btn" id="sp3" onclick="setSpeed(400)">4×</button>
+    </div>
+  </div>
+
+  <!-- SCRUBBER -->
+  <div id="scrubber">
+    <div class="year-track">
+      <div class="year-labels" id="year-labels"></div>
+      <div class="year-bar" id="year-bar">
+        <div class="year-fill" id="year-fill"></div>
+        <div class="year-handle" id="year-handle"></div>
+      </div>
+    </div>
+    <div class="scrub-controls">
+      <button id="play-btn" onclick="togglePlay()">
+        <svg id="play-icon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </button>
+      <div class="year-display" id="year-display">2018</div>
+      <div class="year-summary">
+        <div class="ys-item">
+          <div class="ys-val" id="yr-deals">—</div>
+          <div class="ys-label">DEALS THIS YEAR</div>
+        </div>
+        <div class="ys-item">
+          <div class="ys-val" id="yr-capital">—</div>
+          <div class="ys-label">CAPITAL THIS YEAR</div>
+        </div>
+        <div class="ys-item">
+          <div class="ys-val" id="yr-cumulative">—</div>
+          <div class="ys-label">CUMULATIVE TOTAL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="map-area">
+      <div id="map"></div>
+
+      <!-- Map counter -->
+      <div id="map-counter">
+        <div class="mc-label">CUMULATIVE INVESTMENT</div>
+        <div class="mc-val" id="mc-val">$0M</div>
+        <div class="mc-sub" id="mc-sub">0 deals · 0 countries</div>
+      </div>
+
+      <!-- Insight callout -->
+      <div id="insight-box">
+        <div class="ib-year" id="ib-year"></div>
+        <div class="ib-head" id="ib-head"></div>
+        <div class="ib-body" id="ib-body"></div>
+      </div>
+
+      <!-- Deal tooltip -->
+      <div id="deal-tip">
+        <div class="dt-company" id="dt-company"></div>
+        <div class="dt-meta" id="dt-meta"></div>
+        <div class="dt-amount" id="dt-amount"></div>
+        <div class="dt-note" id="dt-note"></div>
+      </div>
+
+      <!-- Conclusion overlay -->
+      <div id="conclusion">
+        <div class="conc-inner">
+          <div class="conc-title">The capital followed the<br><em>engineers, not the need.</em></div>
+          <div class="conc-sub">92 deals. $3.65B deployed. The pattern is hard to miss.</div>
+          <div class="conc-stats">
+            <div class="cs-card">
+              <div class="cs-val">73%</div>
+              <div class="cs-label">of capital landed in North America + Switzerland</div>
+            </div>
+            <div class="cs-card">
+              <div class="cs-val">&lt;3%</div>
+              <div class="cs-label">reached Africa, South Asia, Latin America — combined</div>
+            </div>
+            <div class="cs-card">
+              <div class="cs-val">1 deal</div>
+              <div class="cs-label">drove 18% of all capital: Climeworks Series E, April 2022</div>
+            </div>
+          </div>
+          <div class="conc-insight">
+            <strong>The inversion:</strong> The regions with the highest CDR potential — tropical soils for ERW, coastal oceans for mCDR, vast land for BiCRS, abundant solar for DAC — received almost nothing. India attracted $3M total before 2024. Sub-Saharan Africa received under $15M across seven years. The geography of CDR investment and the geography of CDR need are almost perfectly inverted. <strong>That is the single most important structural problem in this sector.</strong>
+          </div>
+          <button class="conc-btn" onclick="resetAnimation()">Replay ↺</button>
+          <div class="conc-brand">CO2Ri · co2ri.github.io/CDR-Intelligence-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div id="right-panel">
+      <div class="rp-section">
+        <div class="rp-head">PATHWAY LEGEND</div>
+        <div class="legend-item" id="leg-DAC" onclick="togglePathway('DAC')">
+          <div class="legend-dot" style="background:var(--dac)"></div>
+          <div class="legend-label">Direct Air Capture</div>
+          <div class="legend-count" id="lc-DAC">0</div>
+        </div>
+        <div class="legend-item" id="leg-BiCRS" onclick="togglePathway('BiCRS')">
+          <div class="legend-dot" style="background:var(--bicrs)"></div>
+          <div class="legend-label">BiCRS</div>
+          <div class="legend-count" id="lc-BiCRS">0</div>
+        </div>
+        <div class="legend-item" id="leg-EM" onclick="togglePathway('EM')">
+          <div class="legend-dot" style="background:var(--em)"></div>
+          <div class="legend-label">Enhanced Mineralization</div>
+          <div class="legend-count" id="lc-EM">0</div>
+        </div>
+        <div class="legend-item" id="leg-mCDR" onclick="togglePathway('mCDR')">
+          <div class="legend-dot" style="background:var(--mCDR)"></div>
+          <div class="legend-label">Marine CDR</div>
+          <div class="legend-count" id="lc-mCDR">0</div>
+        </div>
+      </div>
+
+      <div class="rp-section">
+        <div class="rp-head">CUMULATIVE BY PATHWAY</div>
+        <div class="cum-bars">
+          <div class="cum-row">
+            <div class="cum-name">DAC</div>
+            <div class="cum-bar-wrap"><div class="cum-bar-fill" id="cb-DAC" style="background:var(--dac);width:0%"></div></div>
+            <div class="cum-amt" id="ca-DAC">$0M</div>
+          </div>
+          <div class="cum-row">
+            <div class="cum-name">BiCRS</div>
+            <div class="cum-bar-wrap"><div class="cum-bar-fill" id="cb-BiCRS" style="background:var(--bicrs);width:0%"></div></div>
+            <div class="cum-amt" id="ca-BiCRS">$0M</div>
+          </div>
+          <div class="cum-row">
+            <div class="cum-name">EM</div>
+            <div class="cum-bar-wrap"><div class="cum-bar-fill" id="cb-EM" style="background:var(--em);width:0%"></div></div>
+            <div class="cum-amt" id="ca-EM">$0M</div>
+          </div>
+          <div class="cum-row">
+            <div class="cum-name">mCDR</div>
+            <div class="cum-bar-wrap"><div class="cum-bar-fill" id="cb-mCDR" style="background:var(--mCDR);width:0%"></div></div>
+            <div class="cum-amt" id="ca-mCDR">$0M</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rp-section" style="padding-bottom:8px">
+        <div class="rp-head">DEAL FEED</div>
+      </div>
+      <div id="deal-feed"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var DEALS = [{"year":2018,"company":"Climeworks","country":"Switzerland","lat":47.4,"lng":8.5,"amount":30,"pathway":"DAC","note":"Series C — Zurich Cantonal Bank lead"},{"year":2018,"company":"Global Thermostat","country":"USA","lat":40.7,"lng":-74.0,"amount":15,"pathway":"DAC","note":"Strategic investment — SRI International"},{"year":2018,"company":"Carbon Clean","country":"UK","lat":51.5,"lng":-0.1,"amount":8,"pathway":"DAC","note":"Seed/Series A"},{"year":2019,"company":"Carbfix","country":"Iceland","lat":64.1,"lng":-21.9,"amount":5,"pathway":"DAC","note":"EU Horizon 2020 + equity"},{"year":2019,"company":"Charm Industrial","country":"USA","lat":37.8,"lng":-122.4,"amount":5,"pathway":"BiCRS","note":"Seed round — Y Combinator"},{"year":2019,"company":"Running Tide","country":"USA","lat":43.7,"lng":-70.3,"amount":4,"pathway":"mCDR","note":"Pre-seed"},{"year":2019,"company":"Carbon Engineering","country":"Canada","lat":49.5,"lng":-119.6,"amount":68,"pathway":"DAC","note":"Chevron + BHP + Oxy strategic — Squamish BC"},{"year":2020,"company":"Climeworks","country":"Switzerland","lat":47.4,"lng":8.5,"amount":75,"pathway":"DAC","note":"CHF 73M — largest DAC raise in history at time"},{"year":2020,"company":"Heirloom","country":"USA","lat":37.7,"lng":-122.2,"amount":5,"pathway":"DAC","note":"Pre-seed — mineral weathering DAC"},{"year":2020,"company":"Charm Industrial","country":"USA","lat":37.8,"lng":-122.4,"amount":12,"pathway":"BiCRS","note":"Series A — bio-oil sequestration"},{"year":2020,"company":"Pacific Biochar","country":"USA","lat":38.9,"lng":-122.6,"amount":3,"pathway":"BiCRS","note":"Grant + equity"},{"year":2020,"company":"Ebb Carbon","country":"USA","lat":37.5,"lng":-122.2,"amount":3,"pathway":"mCDR","note":"Seed — OAE electrochemical"},{"year":2021,"company":"Climeworks","country":"Switzerland","lat":47.4,"lng":8.5,"amount":110,"pathway":"DAC","note":"Series D — Microsoft anchor investor; Orca plant opens Iceland"},{"year":2021,"company":"Heirloom","country":"USA","lat":37.7,"lng":-122.2,"amount":5,"pathway":"DAC","note":"Seed — Breakthrough Energy Ventures"},{"year":2021,"company":"Lithos Carbon","country":"USA","lat":37.4,"lng":-122.1,"amount":5,"pathway":"EM","note":"Seed — ERW"},{"year":2021,"company":"Eion","country":"USA","lat":37.4,"lng":-122.0,"amount":4,"pathway":"EM","note":"Seed — ERW"},{"year":2021,"company":"Running Tide","country":"USA","lat":43.7,"lng":-70.3,"amount":5,"pathway":"mCDR","note":"Series A — ocean biomass sinking"},{"year":2021,"company":"Planetary","country":"Canada","lat":44.6,"lng":-63.6,"amount":8,"pathway":"mCDR","note":"Seed — OAE Nova Scotia"},{"year":2021,"company":"Deep Sky","country":"Canada","lat":45.5,"lng":-73.6,"amount":10,"pathway":"DAC","note":"Seed — Quebec DAC hub"},{"year":2021,"company":"UNDO","country":"UK","lat":56.0,"lng":-3.2,"amount":6,"pathway":"EM","note":"Seed — ERW Scotland"},{"year":2021,"company":"Vaulted Deep","country":"USA","lat":30.3,"lng":-97.7,"amount":6,"pathway":"BiCRS","note":"Seed — bio-slurry injection Texas"},{"year":2021,"company":"CarbonCapture Inc.","country":"USA","lat":34.0,"lng":-118.2,"amount":35,"pathway":"DAC","note":"Series A — modular DAC"},{"year":2021,"company":"Carbfix","country":"Iceland","lat":64.1,"lng":-21.9,"amount":8,"pathway":"DAC","note":"Series A — mineral storage"},{"year":2022,"company":"Climeworks","country":"Switzerland","lat":47.4,"lng":8.5,"amount":650,"pathway":"DAC","note":"Series E — CHF 600M. Largest CDR raise in history. Partners Group, GIC, M&G"},{"year":2022,"company":"Heirloom","country":"USA","lat":37.7,"lng":-122.2,"amount":53,"pathway":"DAC","note":"Series A — Bill Gates BEV lead"},{"year":2022,"company":"Deep Sky","country":"Canada","lat":45.5,"lng":-73.6,"amount":57,"pathway":"DAC","note":"Series A — Quebec hub"},{"year":2022,"company":"CarbonCapture Inc.","country":"USA","lat":34.0,"lng":-118.2,"amount":35,"pathway":"DAC","note":"Series B"},{"year":2022,"company":"Running Tide","country":"USA","lat":43.7,"lng":-70.3,"amount":35,"pathway":"mCDR","note":"Series A — Frontier anchor buyer"},{"year":2022,"company":"Ebb Carbon","country":"USA","lat":37.5,"lng":-122.2,"amount":20,"pathway":"mCDR","note":"Series A — OAE"},{"year":2022,"company":"Lithos Carbon","country":"USA","lat":37.4,"lng":-122.1,"amount":18,"pathway":"EM","note":"Series A — ERW"},{"year":2022,"company":"Graphyte","country":"USA","lat":34.2,"lng":-92.0,"amount":57,"pathway":"BiCRS","note":"Series A — biomass casting Arkansas"},{"year":2022,"company":"Charm Industrial","country":"USA","lat":37.8,"lng":-122.4,"amount":30,"pathway":"BiCRS","note":"Series B"},{"year":2022,"company":"UNDO","country":"UK","lat":56.0,"lng":-3.2,"amount":12,"pathway":"EM","note":"Series A — ERW UK"},{"year":2022,"company":"Novocarbo","country":"Germany","lat":53.6,"lng":9.9,"amount":10,"pathway":"BiCRS","note":"Series A — biochar Hamburg"},{"year":2022,"company":"Carbonauten","country":"Germany","lat":52.5,"lng":13.4,"amount":15,"pathway":"BiCRS","note":"Series A — biochar Berlin"},{"year":2022,"company":"InPlanet","country":"Brazil","lat":-15.8,"lng":-47.9,"amount":3,"pathway":"EM","note":"Seed — ERW tropics"},{"year":2022,"company":"Vesta","country":"USA","lat":40.7,"lng":-74.0,"amount":15,"pathway":"mCDR","note":"Series A — coastal ERW/OAE"},{"year":2022,"company":"Neustark","country":"Switzerland","lat":47.0,"lng":7.5,"amount":15,"pathway":"EM","note":"Series A — concrete mineralisation"},{"year":2022,"company":"Sustaera","country":"USA","lat":35.9,"lng":-78.9,"amount":26,"pathway":"DAC","note":"Series A — monolith sorbent DAC"},{"year":2022,"company":"Eion","country":"USA","lat":37.4,"lng":-122.0,"amount":19,"pathway":"EM","note":"Series A — ERW"},{"year":2023,"company":"Heirloom","country":"USA","lat":37.7,"lng":-122.2,"amount":53,"pathway":"DAC","note":"Series A extension — Project Cypress DOE"},{"year":2023,"company":"CO280","country":"USA","lat":44.0,"lng":-92.5,"amount":30,"pathway":"BiCRS","note":"Series B — BECCS ethanol"},{"year":2023,"company":"Deep Sky","country":"Canada","lat":45.5,"lng":-73.6,"amount":75,"pathway":"DAC","note":"Series B — Quebec DAC hub"},{"year":2023,"company":"Lithos Carbon","country":"USA","lat":37.4,"lng":-122.1,"amount":57,"pathway":"EM","note":"Series B — ERW"},{"year":2023,"company":"Mati Carbon","country":"India","lat":22.6,"lng":88.4,"amount":15,"pathway":"EM","note":"Series A — ERW Bengal"},{"year":2023,"company":"Alt Carbon","country":"India","lat":20.0,"lng":73.8,"amount":3,"pathway":"EM","note":"Seed — ERW Maharashtra"},{"year":2023,"company":"Captura","country":"USA","lat":34.0,"lng":-118.2,"amount":21,"pathway":"mCDR","note":"Series A — DOR electrolysis"},{"year":2023,"company":"Planetary","country":"Canada","lat":44.6,"lng":-63.6,"amount":15,"pathway":"mCDR","note":"Series A — OAE"},{"year":2023,"company":"Running Tide","country":"USA","lat":43.7,"lng":-70.3,"amount":35,"pathway":"mCDR","note":"Series B"},{"year":2023,"company":"Stockholm Exergi","country":"Sweden","lat":59.3,"lng":18.1,"amount":22,"pathway":"BiCRS","note":"Public funding — BECCS district heating"},{"year":2023,"company":"Carbonfuture","country":"Germany","lat":48.0,"lng":7.8,"amount":15,"pathway":"BiCRS","note":"Series A — biochar registry Freiburg"},{"year":2023,"company":"Varaha","country":"India","lat":17.4,"lng":78.5,"amount":8,"pathway":"BiCRS","note":"Series A — biochar India"},{"year":2023,"company":"CarbonRun","country":"Canada","lat":44.6,"lng":-63.6,"amount":5,"pathway":"mCDR","note":"Seed — river alkalinity"},{"year":2023,"company":"UNDO","country":"UK","lat":56.0,"lng":-3.2,"amount":30,"pathway":"EM","note":"Series B — Standard Chartered debt financing"},{"year":2023,"company":"Tropicarbon","country":"Colombia","lat":4.7,"lng":-74.1,"amount":2,"pathway":"EM","note":"Seed — ERW tropics"},{"year":2023,"company":"Eion","country":"USA","lat":37.4,"lng":-122.0,"amount":26,"pathway":"EM","note":"Series B"},{"year":2023,"company":"Seafields","country":"UK","lat":53.4,"lng":-2.9,"amount":10,"pathway":"mCDR","note":"Seed — sargassum sinking"},{"year":2023,"company":"Charm Industrial","country":"USA","lat":37.8,"lng":-122.4,"amount":53,"pathway":"BiCRS","note":"Frontier $53M offtake contract"},{"year":2023,"company":"Carbonauten","country":"Germany","lat":52.5,"lng":13.4,"amount":20,"pathway":"BiCRS","note":"Series B"},{"year":2023,"company":"Airhive","country":"UK","lat":51.5,"lng":-0.1,"amount":8,"pathway":"DAC","note":"Seed — humidity swing DAC"},{"year":2023,"company":"Novocarbo","country":"Germany","lat":53.6,"lng":9.9,"amount":15,"pathway":"BiCRS","note":"Series B"},{"year":2023,"company":"Biosorra","country":"Kenya","lat":-1.3,"lng":36.8,"amount":3,"pathway":"BiCRS","note":"Seed — biochar East Africa"},{"year":2023,"company":"Safi Organics","country":"Kenya","lat":-0.7,"lng":37.1,"amount":2,"pathway":"BiCRS","note":"Grant + equity — biochar smallholder"},{"year":2024,"company":"Heirloom","country":"USA","lat":37.7,"lng":-122.2,"amount":150,"pathway":"DAC","note":"Series B — $150M December 2024"},{"year":2024,"company":"Lithos Carbon","country":"USA","lat":37.4,"lng":-122.1,"amount":57,"pathway":"EM","note":"Series C — ERW"},{"year":2024,"company":"Ebb Carbon","country":"USA","lat":37.5,"lng":-122.2,"amount":38,"pathway":"mCDR","note":"Series B — OAE"},{"year":2024,"company":"Sustaera","country":"USA","lat":35.9,"lng":-78.9,"amount":20,"pathway":"DAC","note":"Series B extension"},{"year":2024,"company":"Captura","country":"USA","lat":34.0,"lng":-118.2,"amount":25,"pathway":"mCDR","note":"Series B — DOR"},{"year":2024,"company":"Vesta","country":"USA","lat":40.7,"lng":-74.0,"amount":25,"pathway":"mCDR","note":"Series B — OAE"},{"year":2024,"company":"InPlanet","country":"Brazil","lat":-15.8,"lng":-47.9,"amount":7,"pathway":"EM","note":"Series A — ERW Brazil"},{"year":2024,"company":"Mati Carbon","country":"India","lat":22.6,"lng":88.4,"amount":20,"pathway":"EM","note":"Series B — ERW India scale-up"},{"year":2024,"company":"Carbonauten","country":"Germany","lat":52.5,"lng":13.4,"amount":25,"pathway":"BiCRS","note":"Series C — biochar"},{"year":2024,"company":"Stockholm Exergi","country":"Sweden","lat":59.3,"lng":18.1,"amount":100,"pathway":"BiCRS","note":"Swedish Energy Agency — BECCS infrastructure"},{"year":2024,"company":"CarbonRun","country":"Canada","lat":44.6,"lng":-63.6,"amount":8,"pathway":"mCDR","note":"Series A"},{"year":2024,"company":"Flux Carbon","country":"Kenya","lat":-0.0,"lng":37.9,"amount":3,"pathway":"EM","note":"Seed — ERW Kenya"},{"year":2024,"company":"Takachar","country":"USA","lat":37.8,"lng":-122.4,"amount":12,"pathway":"BiCRS","note":"Series A — smallholder biochar"},{"year":2024,"company":"Neustark","country":"Switzerland","lat":47.0,"lng":7.5,"amount":30,"pathway":"EM","note":"Series B — concrete mineralisation"},{"year":2024,"company":"Seafields","country":"UK","lat":53.4,"lng":-2.9,"amount":20,"pathway":"mCDR","note":"Series A — sargassum sinking"},{"year":2024,"company":"Airhive","country":"UK","lat":51.5,"lng":-0.1,"amount":15,"pathway":"DAC","note":"Series A"},{"year":2024,"company":"Brimstone","country":"USA","lat":37.8,"lng":-122.4,"amount":55,"pathway":"EM","note":"Series B — calcium silicate cement"},{"year":2024,"company":"Graphyte","country":"USA","lat":34.2,"lng":-92.0,"amount":20,"pathway":"BiCRS","note":"Series B extension"},{"year":2025,"company":"Climeworks","country":"Switzerland","lat":47.4,"lng":8.5,"amount":162,"pathway":"DAC","note":"Series G — $162M Partners Group + BigPoint. Total >$1B"},{"year":2025,"company":"Heirloom","country":"USA","lat":37.7,"lng":-122.2,"amount":85,"pathway":"DAC","note":"Series C — limestone DAC"},{"year":2025,"company":"Lithos Carbon","country":"USA","lat":37.4,"lng":-122.1,"amount":40,"pathway":"EM","note":"Series D — ERW scale"},{"year":2025,"company":"Ebb Carbon","country":"USA","lat":37.5,"lng":-122.2,"amount":25,"pathway":"mCDR","note":"Series C — OAE commercial"},{"year":2025,"company":"Mati Carbon","country":"India","lat":22.6,"lng":88.4,"amount":12,"pathway":"EM","note":"Series C — ERW 1Mt target"},{"year":2025,"company":"Varaha","country":"India","lat":17.4,"lng":78.5,"amount":12,"pathway":"BiCRS","note":"Series B — biochar India"},{"year":2025,"company":"InPlanet","country":"Brazil","lat":-15.8,"lng":-47.9,"amount":10,"pathway":"EM","note":"Series B — ERW Brazil"},{"year":2025,"company":"Carbonauten","country":"Germany","lat":52.5,"lng":13.4,"amount":20,"pathway":"BiCRS","note":"Series D — biochar"},{"year":2025,"company":"Seafields","country":"UK","lat":53.4,"lng":-2.9,"amount":30,"pathway":"mCDR","note":"Series B — first commercial Atlantic deployment"},{"year":2025,"company":"Deep Sky","country":"Canada","lat":45.5,"lng":-73.6,"amount":50,"pathway":"DAC","note":"Series C — DAC hub Quebec"}];
+
+var PW_COLORS = {DAC:'#2563a8',BiCRS:'#3d7a3a',EM:'#c4622a',mCDR:'#7c3d8f'};
+var YEARS = [2018,2019,2020,2021,2022,2023,2024,2025];
+var INSIGHTS = {
+  2019: {head:'Carbon Engineering raises $68M', body:'The largest CDR deal in history — until Climeworks eclipses it two years later. Chevron, BHP, and Occidental bet on liquid solvent DAC in British Columbia.'},
+  2021: {head:'The ecosystem wakes up', body:'Frontier launches. Breakthrough Energy backs Heirloom. Running Tide, Lithos, Eion all seed within months. 11 deals in a year that had seen 4 the year before.'},
+  2022: {head:'Climeworks raises $650M — a category-defining moment', body:'One Swiss company absorbs 70% of all CDR capital in 2022. The Series E signals to institutional investors that DAC is a real asset class. Mammoth plant announced.'},
+  2023: {head:'$1.25B peak — but 54% lands in the USA', body:'Deal count hits record 23. Canada ($213M) and UK ($199M) emerge as secondary hubs. India gets its first meaningful ERW investment. Africa: $5M total.'},
+  2024: {head:'Capital contracts but quality improves', body:'Total falls 30% to $836M as mega-rounds dry up. But Heirloom\'s $150M Series B and Stockholm Exergi\'s $100M BECCS funding show late-stage rounds finally arriving.'},
+  2025: {head:'Consolidation begins', body:'Climeworks crosses $1B lifetime funding with a $162M raise. Fewer investors per deal (3.5 vs 11.3 in 2022). The market is concentrating around proven operators.'}
+};
+
+var PATHWAY_TOTALS_MAX = {DAC:1400, BiCRS:450, EM:500, mCDR:300};
+
+// State
+var currentYear = 2018;
+var playing = false;
+var timer = null;
+var speed = 1800;
+var cumulative = {DAC:0, BiCRS:0, EM:0, mCDR:0};
+var totalDeals = 0;
+var totalCapital = 0;
+var shownCountries = new Set();
+var activePaths = {DAC:true, BiCRS:true, EM:true, mCDR:true};
+var markers = {};
+var allMarkers = [];
+
+// Init map
+var map = L.map('map',{center:[28,5],zoom:2,zoomControl:false,minZoom:2,maxZoom:8});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{
+  subdomains:'abcd', maxZoom:19, attribution:'© CartoDB'
+}).addTo(map);
+
+// Year labels
+var yearLabelsEl = document.getElementById('year-labels');
+YEARS.forEach(function(y){
+  var span = document.createElement('span');
+  span.textContent = y;
+  yearLabelsEl.appendChild(span);
+});
+
+// Scrubber interaction
+var yearBar = document.getElementById('year-bar');
+var isDragging = false;
+
+function posFromYear(y) {
+  return ((y - 2018) / 7) * 100;
+}
+function yearFromPos(pct) {
+  return Math.round(2018 + pct * 7);
+}
+
+yearBar.addEventListener('click', function(e){
+  var rect = yearBar.getBoundingClientRect();
+  var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  var y = yearFromPos(pct);
+  jumpToYear(y);
+});
+document.getElementById('year-handle').addEventListener('mousedown', function(e){
+  isDragging = true; e.preventDefault();
+});
+document.addEventListener('mousemove', function(e){
+  if(!isDragging) return;
+  var rect = yearBar.getBoundingClientRect();
+  var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  jumpToYear(yearFromPos(pct));
+});
+document.addEventListener('mouseup', function(){ isDragging = false; });
+
+function updateScrubber(y) {
+  var pct = posFromYear(y);
+  document.getElementById('year-fill').style.width = pct + '%';
+  document.getElementById('year-handle').style.left = pct + '%';
+  document.getElementById('year-display').textContent = y;
+}
+
+function jumpToYear(y) {
+  if(y === currentYear) return;
+  if(y < currentYear) resetToYear(y);
+  else advanceToYear(y);
+}
+
+function resetToYear(targetY) {
+  // Clear everything and replay up to targetY
+  allMarkers.forEach(function(m){ map.removeLayer(m); });
+  allMarkers = [];
+  markers = {};
+  cumulative = {DAC:0,BiCRS:0,EM:0,mCDR:0};
+  totalDeals = 0; totalCapital = 0; shownCountries = new Set();
+  document.getElementById('deal-feed').innerHTML = '';
+  currentYear = 2018;
+  for(var y = 2018; y <= targetY; y++) {
+    renderYear(y, y < targetY);
+    currentYear = y;
+  }
+  updateScrubber(targetY);
+  updateStats(targetY);
+}
+
+function advanceToYear(targetY) {
+  for(var y = currentYear + 1; y <= targetY; y++) {
+    renderYear(y, true);
+    currentYear = y;
+  }
+  updateScrubber(targetY);
+  updateStats(currentYear);
+}
+
+function renderYear(y, silent) {
+  var yearDeals = DEALS.filter(function(d){ return d.year === y; });
+  var yearCapital = 0;
+  yearDeals.forEach(function(d){
+    if(!activePaths[d.pathway]) return;
+    yearCapital += d.amount;
+    cumulative[d.pathway] += d.amount;
+    totalCapital += d.amount;
+    totalDeals++;
+    shownCountries.add(d.country);
+    addMarker(d, silent);
+    if(!silent) addFeedItem(d);
+  });
+
+  if(!silent) {
+    // Year stats
+    document.getElementById('yr-deals').textContent = yearDeals.length;
+    document.getElementById('yr-capital').textContent = '$' + fmtM(yearCapital);
+    document.getElementById('yr-cumulative').textContent = '$' + fmtM(totalCapital);
+
+    // Insight
+    if(INSIGHTS[y]) {
+      var ib = document.getElementById('insight-box');
+      document.getElementById('ib-year').textContent = y;
+      document.getElementById('ib-head').textContent = INSIGHTS[y].head;
+      document.getElementById('ib-body').textContent = INSIGHTS[y].body;
+      ib.classList.add('show');
+      clearTimeout(ib._t);
+      ib._t = setTimeout(function(){ ib.classList.remove('show'); }, 5500);
+    }
+    updateCounters();
+    updatePathwayCounts();
+    updateCumBars();
+  }
+}
+
+function addMarker(d, silent) {
+  var col = PW_COLORS[d.pathway] || '#888';
+  var size = Math.max(8, Math.min(44, 6 + Math.sqrt(d.amount) * 2.4));
+  var icon = L.divIcon({
+    html: '<div class="deal-marker' + (silent ? '' : ' pulse') + '" style="width:'+size+'px;height:'+size+'px;background:'+col+';opacity:0.85"></div>',
+    className: '',
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2]
+  });
+  var m = L.marker([d.lat + (Math.random()-0.5)*0.8, d.lng + (Math.random()-0.5)*0.8], {icon:icon});
+  m.dealData = d;
+  m.on('mouseover', function(e){ showTip(d, e.originalEvent); });
+  m.on('mouseout', function(){ hideTip(); });
+  m.addTo(map);
+  allMarkers.push(m);
+  if(!markers[d.pathway]) markers[d.pathway] = [];
+  markers[d.pathway].push(m);
+}
+
+function showTip(d, ev) {
+  var col = PW_COLORS[d.pathway] || '#888';
+  document.getElementById('dt-company').textContent = d.company;
+  document.getElementById('dt-meta').textContent = d.country + ' · ' + d.year + ' · ' + d.pathway;
+  document.getElementById('dt-amount').textContent = '$' + d.amount + 'M';
+  document.getElementById('dt-amount').style.color = col;
+  document.getElementById('dt-note').textContent = d.note;
+  var tip = document.getElementById('deal-tip');
+  tip.style.display = 'block';
+  var wrap = document.getElementById('map-area');
+  var rect = wrap.getBoundingClientRect();
+  var x = ev.clientX - rect.left + 16;
+  var y = ev.clientY - rect.top - 10;
+  if(x + 240 > rect.width) x = ev.clientX - rect.left - 244;
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+}
+function hideTip() { document.getElementById('deal-tip').style.display = 'none'; }
+
+function addFeedItem(d) {
+  var col = PW_COLORS[d.pathway] || '#888';
+  var feed = document.getElementById('deal-feed');
+  var item = document.createElement('div');
+  item.className = 'feed-item';
+  item.innerHTML =
+    '<div class="fi-top">'+
+      '<div class="fi-dot" style="background:'+col+'"></div>'+
+      '<div class="fi-name">'+d.company+'</div>'+
+      '<div class="fi-amt" style="color:'+col+'">${'+d.amount+'M}</div>'+
+    '</div>'+
+    '<div class="fi-meta">'+d.country+' · '+d.pathway+'</div>';
+  feed.insertBefore(item, feed.firstChild);
+  // Keep feed to 30 items
+  while(feed.children.length > 30) feed.removeChild(feed.lastChild);
+}
+
+function updateCounters() {
+  document.getElementById('mc-val').textContent = '$' + fmtM(totalCapital);
+  document.getElementById('mc-sub').textContent = totalDeals + ' deals · ' + shownCountries.size + ' countries';
+}
+
+function updatePathwayCounts() {
+  ['DAC','BiCRS','EM','mCDR'].forEach(function(p){
+    var count = DEALS.filter(function(d){ return d.year <= currentYear && d.pathway === p; }).length;
+    document.getElementById('lc-'+p).textContent = count;
+  });
+}
+
+function updateCumBars() {
+  var maxVal = Math.max(cumulative.DAC, cumulative.BiCRS, cumulative.EM, cumulative.mCDR, 1);
+  ['DAC','BiCRS','EM','mCDR'].forEach(function(p){
+    var pct = (cumulative[p] / maxVal * 100).toFixed(1);
+    document.getElementById('cb-'+p).style.width = pct + '%';
+    document.getElementById('ca-'+p).textContent = cumulative[p] >= 1000
+      ? '$' + (cumulative[p]/1000).toFixed(1) + 'B'
+      : '$' + cumulative[p] + 'M';
+  });
+}
+
+function updateStats(y) {
+  var yearDeals = DEALS.filter(function(d){ return d.year === y; });
+  var yearCap = yearDeals.reduce(function(s,d){ return s + d.amount; }, 0);
+  document.getElementById('yr-deals').textContent = yearDeals.length;
+  document.getElementById('yr-capital').textContent = '$' + fmtM(yearCap);
+  document.getElementById('yr-cumulative').textContent = '$' + fmtM(totalCapital);
+  updateCounters();
+  updatePathwayCounts();
+  updateCumBars();
+}
+
+function fmtM(v) {
+  if(v >= 1000) return (v/1000).toFixed(1) + 'B';
+  return v + 'M';
+}
+
+function setSpeed(s) {
+  speed = s;
+  document.querySelectorAll('.speed-btn').forEach(function(b){ b.classList.remove('on'); });
+  var id = s===1800?'sp1':s===900?'sp2':'sp3';
+  document.getElementById(id).classList.add('on');
+  if(playing) { clearInterval(timer); timer = setInterval(step, speed); }
+}
+
+function step() {
+  if(currentYear >= 2025) {
+    playing = false;
+    clearInterval(timer);
+    updatePlayBtn();
+    setTimeout(showConclusion, 1200);
+    return;
+  }
+  currentYear++;
+  renderYear(currentYear, false);
+  updateScrubber(currentYear);
+}
+
+function togglePlay() {
+  playing = !playing;
+  updatePlayBtn();
+  if(playing) {
+    if(currentYear >= 2025) resetAnimation();
+    timer = setInterval(step, speed);
+  } else {
+    clearInterval(timer);
+  }
+}
+
+function updatePlayBtn() {
+  var icon = document.getElementById('play-icon');
+  if(playing) {
+    icon.innerHTML = '<rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/>';
+  } else {
+    icon.innerHTML = '<polygon points="5,3 19,12 5,21"/>';
+  }
+}
+
+function showConclusion() {
+  document.getElementById('conclusion').classList.add('show');
+}
+
+function resetAnimation() {
+  document.getElementById('conclusion').classList.remove('show');
+  allMarkers.forEach(function(m){ map.removeLayer(m); });
+  allMarkers = []; markers = {};
+  cumulative = {DAC:0,BiCRS:0,EM:0,mCDR:0};
+  totalDeals = 0; totalCapital = 0; shownCountries = new Set();
+  document.getElementById('deal-feed').innerHTML = '';
+  document.getElementById('insight-box').classList.remove('show');
+  currentYear = 2018;
+  updateScrubber(2018);
+  updateStats(2018);
+  document.getElementById('yr-deals').textContent = '—';
+  document.getElementById('yr-capital').textContent = '—';
+  document.getElementById('yr-cumulative').textContent = '—';
+  document.getElementById('mc-val').textContent = '$0M';
+  document.getElementById('mc-sub').textContent = '0 deals · 0 countries';
+  ['DAC','BiCRS','EM','mCDR'].forEach(function(p){
+    document.getElementById('cb-'+p).style.width = '0%';
+    document.getElementById('ca-'+p).textContent = '$0M';
+    document.getElementById('lc-'+p).textContent = '0';
+  });
+  playing = true;
+  updatePlayBtn();
+  timer = setInterval(step, speed);
+}
+
+function togglePathway(p) {
+  activePaths[p] = !activePaths[p];
+  document.getElementById('leg-'+p).classList.toggle('off', !activePaths[p]);
+  if(markers[p]) {
+    markers[p].forEach(function(m){
+      if(activePaths[p]) map.addLayer(m);
+      else map.removeLayer(m);
+    });
+  }
+}
+
+// Autostart after brief delay
+setTimeout(function(){
+  playing = true;
+  updatePlayBtn();
+  timer = setInterval(step, speed);
+}, 1200);
+</script>
+</body>
+</html>
